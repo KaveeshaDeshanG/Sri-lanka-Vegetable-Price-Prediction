@@ -1,0 +1,7 @@
+# Deliberately names a model ModelTrainer has no factory for, to test that
+# an unrecognized entry in model.models_to_train raises rather than being
+# silently skipped.
+
+model:
+  models_to_train:
+    - "not_a_real_model"

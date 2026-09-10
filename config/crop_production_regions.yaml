@@ -1,0 +1,125 @@
+# Evidence-based vegetable -> production-region mapping, used to retrieve weather from
+# the vegetable's major cultivation region instead of always the market location.
+#
+# Only vegetables with sufficient documented evidence of a single dominant production
+# region are listed under vegetable_production_regions. Any real vegetable NOT listed
+# here (see the comment at the bottom for the full list) falls back to the market's own
+# weather (config.yaml's weather_api section, i.e. current/original behavior) -- this is
+# a deliberate, evidence-based choice, not an omission: do not add an entry without a
+# real source backing it, and do not guess a region for an unlisted vegetable in code.
+#
+# Primary source for every "high"/"medium" up-country entry below: HARTI (Hector
+# Kobbekaduwa Agrarian Research and Training Institute) Research Report No. 102,
+# L.P. Rupasena, "Production and Marketing of Vegetables" -- district-level production
+# share statistics for Nuwara Eliya vs Badulla (vs Kandy/Matale, remainder).
+# Other sources are cited per-entry below.
+
+regions:
+  nuwara_eliya:
+    name: "Nuwara Eliya"
+    latitude: 6.97078
+    longitude: 80.78286
+  kandy:
+    name: "Kandy"
+    latitude: 7.2906
+    longitude: 80.6336
+  badulla:
+    name: "Badulla"
+    latitude: 6.9802
+    longitude: 81.0577
+  welimada:
+    name: "Welimada"
+    latitude: 6.90111
+    longitude: 80.92278
+  jaffna:
+    name: "Jaffna"
+    latitude: 9.66845
+    longitude: 80.00742
+  anuradhapura:
+    name: "Anuradhapura"
+    latitude: 8.31223
+    longitude: 80.41306
+  monaragala:
+    name: "Monaragala"
+    latitude: 6.8714
+    longitude: 81.3487
+
+vegetable_production_regions:
+  Carrot:
+    region: nuwara_eliya
+    evidence: "HARTI Report No. 102: 60% of national carrot production in Nuwara Eliya vs 32% Badulla"
+    confidence: high
+  Leeks:
+    region: nuwara_eliya
+    evidence: "HARTI Report No. 102: 86% of national leeks production in Nuwara Eliya vs 10% Badulla"
+    confidence: high
+  "Knol Khol":
+    region: nuwara_eliya
+    evidence: "HARTI Report No. 102: 51% of national knol khol production in Nuwara Eliya vs 33% Badulla"
+    confidence: high
+  Beetroot:
+    region: nuwara_eliya
+    evidence: "HARTI Report No. 102: 50% of national beetroot production in Nuwara Eliya vs 11% Badulla"
+    confidence: high
+  "Beetroot (Nuwara Eliya)":
+    region: nuwara_eliya
+    evidence: "HARTI's own market-bulletin naming already identifies Nuwara Eliya; corroborated by Report No. 102's 50% NE share for beetroot generally"
+    confidence: high
+  "Cabbage (Nuwara Eliya)":
+    region: nuwara_eliya
+    evidence: "HARTI's own market-bulletin naming already identifies Nuwara Eliya; corroborated by Report No. 102's 38% NE share for cabbage (vs 33% Badulla)"
+    confidence: high
+  "Cabbage (Kandy)":
+    region: kandy
+    evidence: "HARTI's own market-bulletin naming already identifies Kandy"
+    confidence: high
+  Radish:
+    region: nuwara_eliya
+    evidence: "HARTI Report No. 102: 30% of national radish production in Nuwara Eliya vs 16% Badulla (plurality, not majority)"
+    confidence: medium
+  Beans:
+    region: badulla
+    evidence: "HARTI Report No. 102: 46% of national beans production in Badulla vs 14% Nuwara Eliya -- Badulla leads, not Nuwara Eliya"
+    confidence: high
+  "Potato (Nuwara Eliya)":
+    region: nuwara_eliya
+    evidence: "HARTI's own market-bulletin naming already identifies Nuwara Eliya"
+    confidence: high
+  "Potato (Welimada)":
+    region: welimada
+    evidence: "HARTI's own market-bulletin naming already identifies Welimada (Badulla district)"
+    confidence: high
+  "Big Onion (Local)":
+    region: jaffna
+    evidence: "Sri Lanka Department of Agriculture district cultivation-extent bulletin (Feb 2022): Jaffna targeted ~1,900 ha; one of 7 major onion-growing districts"
+    confidence: medium
+  Pumpkin:
+    region: anuradhapura
+    evidence: "District production-share data: Anuradhapura ash pumpkin 29% + red pumpkin 27% of national production"
+    confidence: medium
+  Lime:
+    region: monaragala
+    evidence: "District cultivation-share data: Monaragala 37% vs Kurunegala 12%"
+    confidence: medium
+
+# Deliberately NOT mapped -- insufficient evidence of a single dominant production
+# region (multiple candidate districts named in sources with no ranking, or production
+# described as dispersed/nationwide), or imported with no domestic production region:
+#   Ash Plantain            -- Monaragala only ~20% of national production (not a majority)
+#   Big Onion (Imported)    -- imported; no Sri Lankan production region exists
+#   Bitter Gourd            -- multiple low-country districts named, no ranking found
+#   Brinjal / Brinjals      -- Anuradhapura ~15%, other low-country districts unranked
+#   Capsicum                -- 5+ districts named (NE, Badulla, Kurunegala, Puttalam, Anuradhapura), no ranking
+#   Cucumber                -- multiple low-country districts named, no ranking found
+#   "Green Chillies"        -- 7+ districts named, no ranking found
+#   "Ladies Fingers"        -- Anuradhapura ~12%, other districts named as "large quantities", unranked
+#   "Long Beans"            -- multiple low-country districts named, no ranking found
+#   Luffa                   -- multiple low-country districts named, no ranking found
+#   Manioc                  -- Matale/Anuradhapura/Kurunegala/Hambantota named, no ranking found
+#   "Potato (Imported)"     -- imported; no Sri Lankan production region exists
+#   "Snake Gourd"           -- Matale/Kandy/Hambantota/Kurunegala/Ratnapura named, no ranking found
+#   "Sweet Potato"          -- explicitly documented as grown nationwide except the arid zone
+#   Tomato                  -- grown both up-country and in the Dambulla dry-zone belt itself; genuinely mixed evidence
+#
+# These fall back to the market's own configured weather (weather_api section) --
+# identical to this project's original, pre-crop-specific-weather behavior.

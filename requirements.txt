@@ -1,0 +1,15 @@
+pandas>=2.2.0
+numpy>=1.26.0
+matplotlib>=3.8.0
+scikit-learn>=1.4.0
+xgboost>=2.0.0
+joblib>=1.3.0
+streamlit>=1.32.0
+pyyaml>=6.0.1
+requests>=2.31.0
+pymupdf>=1.24.0 # parses HARTI's live daily bulletin PDF (see harti_live_client.py)
+beautifulsoup4>=4.12.0 # parses HARTI's daily-price.php archive table (finds the latest bulletin link)
+
+# Dev/test tooling (pytest, ruff, black) is intentionally not listed here -- it's
+# already declared under pyproject.toml's [project.optional-dependencies].dev.
+# To run the test suite: pip install -e ".[dev]" (or `pip install pytest` directly).

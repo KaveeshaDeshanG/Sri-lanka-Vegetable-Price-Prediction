@@ -1,0 +1,22 @@
+# Minimal config pointing DataLoader at the fixture CSVs instead of data/raw/.
+# Lets tests exercise the real, config-driven DataLoader facade end-to-end
+# without touching config/config.yaml. Only harti_prices is set here,
+# matching the real single-source architecture (dambulla_prices is optional
+# and unset in config/config.yaml too). See tests/data_collection/ and
+# tests/fixtures/test_config_two_source.yaml for dedicated coverage of the
+# optional second-source path.
+
+paths:
+  raw_files:
+    harti_prices: "tests/fixtures/market_sample.csv"
+    weather_data: "tests/fixtures/weather_sample.csv"
+
+data_schema:
+  date_column: "date"
+  vegetable_column: "vegetable"
+  market_column: "market"
+  price_column: "price"
+  weather_columns:
+    - "rainfall_mm"
+    - "temperature_c"
+    - "humidity_pct"

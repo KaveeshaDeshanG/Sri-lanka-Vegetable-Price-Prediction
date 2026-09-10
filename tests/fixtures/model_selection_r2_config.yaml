@@ -1,0 +1,5 @@
+# Names r2 (higher-is-better) as the best-model metric, to test that
+# select_best_model doesn't hardcode "lower is better".
+
+evaluation:
+  best_model_metric: "r2"

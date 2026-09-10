@@ -1,0 +1,23 @@
+# Minimal config for verifying model.* hyperparameters are actually read
+# from config rather than falling back to trainer.py's internal defaults.
+# Values are deliberately different from both config/config.yaml's real
+# values (200/10, 200/0.05/6) and from trainer.py's own fallback defaults.
+
+project:
+  random_seed: 7
+
+model:
+  models_to_train:
+    - "random_forest"
+    - "xgboost"
+  random_forest:
+    n_estimators: 5
+    max_depth: 3
+  xgboost:
+    n_estimators: 6
+    learning_rate: 0.3
+    max_depth: 2
+
+evaluation:
+  metrics: ["mae", "rmse"]
+  best_model_metric: "mae"

@@ -1,0 +1,23 @@
+# Exercises the OPTIONAL fuel-price source path in DataLoader, CONFIGURED.
+# See tests/fixtures/test_config.yaml for the baseline (fuel unset) case --
+# that file is deliberately left untouched so it keeps testing "not
+# configured" behavior; this one is the "configured" counterpart.
+
+paths:
+  raw_files:
+    harti_prices: "tests/fixtures/market_sample.csv"
+    weather_data: "tests/fixtures/weather_sample.csv"
+    fuel_prices: "tests/fixtures/fuel_price_sample.csv"
+
+data_schema:
+  date_column: "date"
+  vegetable_column: "vegetable"
+  market_column: "market"
+  price_column: "price"
+  weather_columns:
+    - "rainfall_mm"
+    - "temperature_c"
+    - "humidity_pct"
+  fuel_price_columns:
+    - "diesel_price"
+    - "petrol_price"

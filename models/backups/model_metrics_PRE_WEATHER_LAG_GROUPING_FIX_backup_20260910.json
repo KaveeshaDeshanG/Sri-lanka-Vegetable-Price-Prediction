@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-08-20T22:25:36",
+  "dataset": {
+    "market_rows": 24459,
+    "weather_rows": 855,
+    "fuel_configured": true,
+    "fuel_rows": 841,
+    "merged_rows": 21459,
+    "train_rows": 12383,
+    "test_rows": 3287,
+    "feature_count": 51
+  },
+  "models": {
+    "linear_regression": {
+      "mae": 18.429712681878495,
+      "rmse": 29.505677726316563,
+      "r2": 0.9536382136299302
+    },
+    "random_forest": {
+      "mae": 17.85099771950718,
+      "rmse": 28.761304715906363,
+      "r2": 0.9559479484290554
+    },
+    "xgboost": {
+      "mae": 17.765523764874604,
+      "rmse": 29.384462445122253,
+      "r2": 0.9540183583244811
+    }
+  },
+  "best_model": {
+    "name": "random_forest",
+    "selection_metric": "rmse",
+    "selection_value": 28.761304715906363
+  }
+}

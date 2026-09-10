@@ -1,0 +1,23 @@
+# Exercises the OPTIONAL second-source path in DataLoader/MarketDataLoader.
+# Both keys point at the same market_sample.csv purely because the test only
+# needs two real files to load from -- this is a test-only convenience to
+# prove the optional second-source code path still works end-to-end via
+# config. It is NOT a recommendation to ever point dambulla_prices at a copy
+# of harti_prices.csv in real config: that would fabricate a source="Dambulla"
+# label for data that isn't actually from a second, independent source.
+
+paths:
+  raw_files:
+    harti_prices: "tests/fixtures/market_sample.csv"
+    dambulla_prices: "tests/fixtures/market_sample.csv"
+    weather_data: "tests/fixtures/weather_sample.csv"
+
+data_schema:
+  date_column: "date"
+  vegetable_column: "vegetable"
+  market_column: "market"
+  price_column: "price"
+  weather_columns:
+    - "rainfall_mm"
+    - "temperature_c"
+    - "humidity_pct"

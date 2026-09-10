@@ -1,0 +1,151 @@
+# =============================================================================
+# Central configuration for the Sri Lankan Vegetable Price Prediction System.
+# Every module reads paths and parameters from here instead of hardcoding them,
+# so changing a file path, a lag window, or a model hyperparameter never
+# requires touching src/ code.
+# =============================================================================
+
+project:
+  name: "Sri Lankan Vegetable Price Prediction"
+  version: "1.0.0"
+  random_seed: 42
+
+paths:
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+  models_dir: "models"
+  # Where app/services.py's train_demo_model() (the Streamlit Predict page's
+  # "train a sandbox model" actions) persists to -- deliberately never models_dir
+  # above. Keeps a demo/sandbox retrain (bundled synthetic sample, or a user's own
+  # uploaded CSV) from ever overwriting the real best_model.joblib produced by
+  # scripts/train.py. If unset, this defaults in-code to "<paths.models_dir>/demo".
+  demo_models_dir: "models/demo"
+  reports_dir: "reports"
+  figures_dir: "reports/figures"
+  metrics_dir: "reports/metrics"
+
+  raw_files:
+    harti_prices: "data/raw/harti_prices.csv"
+    # Optional second market-price source. Left unset: only one real, verified
+    # source exists today -- HARTI's own daily bulletin, Dambulla (DEC) market,
+    # wholesale prices (see data_schema below). MarketDataLoader.load_all()
+    # treats this as optional and works with harti_prices alone.
+    # Do NOT point this at a copy of harti_prices.csv to satisfy ingestion --
+    # that would tag identical rows with a fabricated source="Dambulla" label
+    # and duplicate every observation. Only set this once a genuinely
+    # independent second price feed (e.g. Dambulla DEC's own records, not
+    # derived from HARTI) is actually obtained.
+    dambulla_prices: null
+    weather_data: "data/raw/weather_data.csv"
+    # Real Open-Meteo archive weather per production region (config/crop_production_regions.yaml),
+    # built by scripts/build_historical_weather_by_region.py. Used to correct a row's
+    # same-day weather to its vegetable's production region before weather-lag features
+    # are computed -- see src/feature_engineering/production_region_weather.py. Optional:
+    # a missing file means every vegetable falls back to market-location weather
+    # (this key's absence, or the file's absence, are both handled leniently, not fatal).
+    weather_data_by_region: "data/raw/weather_data_by_region.csv"
+    # Optional: a national fuel-price series (currently CEYPETCO diesel/petrol
+    # retail prices). Left null, the pipeline works exactly as before --
+    # DataLoader.load_fuel_price_data() returns None rather than raising.
+    fuel_prices: "data/raw/fuel_prices.csv"
+
+  # Evidence-based vegetable -> production-region mapping (config/crop_production_regions.yaml).
+  # A vegetable absent from it falls back to weather_api's market-location coordinates.
+  crop_production_regions_mapping: "config/crop_production_regions.yaml"
+
+  processed_files:
+    merged_dataset: "data/processed/processed_prices.csv"
+    feature_dataset: "data/processed/feature_dataset.csv"
+
+# Column names expected in the raw CSVs. Centralizing these means a source
+# renaming a column only requires a one-line change here.
+data_schema:
+  date_column: "date"
+  vegetable_column: "vegetable"
+  market_column: "market"
+  price_column: "price"
+  weather_columns:
+    - "rainfall_mm"
+    - "temperature_c"
+    - "humidity_pct"
+  fuel_price_columns:
+    - "diesel_price"
+    - "petrol_price"
+
+# Thresholds used by src/preprocessing/cleaner.py. Kept independent of
+# src/data_collection's own hardcoded validation defaults (same values, by
+# coincidence of both being reasonable for Sri Lanka) rather than shared,
+# since Phase 2 modules are not being modified in Phase 3.
+preprocessing:
+  min_valid_year: 2000 # dates before this are treated as implausible, not just malformed
+  temperature_min_c: 0.0
+  temperature_max_c: 45.0
+  humidity_min_pct: 0.0
+  humidity_max_pct: 100.0
+
+feature_engineering:
+  lag_periods_days: [1, 7, 14, 30]
+  rolling_windows_days: [7, 14, 30]
+  weather_lag_days: 14 # weather affects harvested price weeks later, not same-day
+  fuel_price_lag_days: 1 # fuel price is known same-day; lagged only to avoid using an unmerged future date
+
+# Live weather for the PREDICTION path only (src/data_collection/live_weather_client.py).
+# Historical training always reads paths.raw_files.weather_data (the CSV) unchanged --
+# this section is never read by PreprocessingPipeline/DataLoader.
+# Open-Meteo requires no API key for non-commercial use, so there is no key/secret here.
+weather_api:
+  provider: "open_meteo"
+  enabled: true # if false, prediction falls back to whatever weather is already in the input
+  latitude: 7.8567 # Dambulla, Sri Lanka -- matches data/raw/weather_data.csv's single national series
+  longitude: 80.6517
+  timezone: "Asia/Colombo"
+  timeout_seconds: 10
+
+# Live fuel price for the PREDICTION path only (src/data_collection/live_fuel_price_client.py).
+# Historical training always reads paths.raw_files.fuel_prices (the CSV) unchanged --
+# this section is never read by PreprocessingPipeline/DataLoader. CEYPETCO has no API,
+# only its own "Marketing & Sales" page showing each product's current price and the
+# date it took effect -- investigated directly against the real site (2026-08).
+fuel_api:
+  provider: "ceypetco"
+  enabled: true # if false, prediction falls back to the last known historical fuel price
+  url: "https://ceypetco.gov.lk/marketing-sales/"
+  timeout_seconds: 15
+  cache_minutes: 60 # CEYPETCO revises prices infrequently (weeks/months apart); no need to re-fetch more often
+
+# Latest HARTI daily bulletin, fetched live for the Streamlit "Latest HARTI Data"
+# prediction option (src/data_collection/harti_live_client.py). NOT a real-time API --
+# investigated directly against harti.gov.lk: there is no API/CSV/Excel export, only a
+# daily archive page listing one PDF bulletin per calendar day, itself typically 1-2
+# days behind today and not guaranteed for every market on every day. This section is
+# never read by DataLoader/PreprocessingPipeline -- historical training always reads
+# paths.raw_files.harti_prices (the CSV) unchanged.
+harti:
+  latest_data_enabled: true # if false, the UI hides the "Latest HARTI Data" option entirely
+  archive_url: "https://www.harti.gov.lk/daily-price.php"
+  request_timeout_seconds: 15
+  cache_minutes: 60 # HARTI publishes at most once a day; no need to re-fetch more often
+  target_market: "Dambulla" # the only market the currently-trained model recognizes
+
+model:
+  target_column: "price"
+  test_size: 0.2 # chronological holdout, not random
+  models_to_train:
+    - "linear_regression"
+    - "random_forest"
+    - "xgboost"
+  random_forest:
+    n_estimators: 200
+    max_depth: 10
+  xgboost:
+    n_estimators: 200
+    learning_rate: 0.05
+    max_depth: 6
+
+evaluation:
+  metrics: ["mae", "rmse", "r2"]
+  best_model_metric: "rmse" # lower is better; used to select the saved model
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

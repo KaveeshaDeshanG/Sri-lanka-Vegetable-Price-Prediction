@@ -1,0 +1,6 @@
+# Deliberately names a metric ModelEvaluator has no function for, to test
+# that an unrecognized entry in evaluation.metrics raises rather than being
+# silently skipped.
+
+evaluation:
+  metrics: ["not_a_real_metric"]
