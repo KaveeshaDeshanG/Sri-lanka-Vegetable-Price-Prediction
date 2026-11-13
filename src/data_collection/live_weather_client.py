@@ -15,6 +15,7 @@ normalized to LiveWeatherError, so callers only need to catch one thing.
 """
 
 import logging
+import time
 from typing import Any
 
 import pandas as pd
@@ -50,6 +51,9 @@ MAX_FORECAST_DAYS = 16
 # monthly-blended product. This client deliberately caps itself at the EC46 boundary,
 # not the API's outer limit, so every day it returns is the higher-confidence product.
 MAX_SEASONAL_FORECAST_DAYS = 46
+_REQUEST_ATTEMPTS = 3
+_RETRY_DELAY_SECONDS = 1.0
+_RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 
 # Open-Meteo daily variable -> the project's existing weather_columns schema.
 # temperature_2m_mean (a daily mean) is used, not temperature_2m_max/min, to match
@@ -66,9 +70,8 @@ class LiveWeatherError(Exception):
 
     Covers network failure, timeout, non-200 HTTP status, an Open-Meteo-level
     error payload, malformed JSON, a missing required field, an unparseable
-    date, a non-numeric reading, or a reading outside a plausible range.
-    Never partially returns a result -- either a fully validated DataFrame
-    comes back, or this is raised.
+    date, a non-numeric reading, or a reading outside a plausible range. Every
+    row returned is fully validated; a day Open-Meteo left null is left out.
     """
 
 
@@ -311,16 +314,28 @@ class OpenMeteoWeatherClient:
         return self._send(self._base_url, params)
 
     def _send(self, base_url: str, params: dict[str, Any]) -> dict[str, Any]:
-        try:
-            response = requests.get(base_url, params=params, timeout=self._timeout_seconds)
-        except requests.exceptions.Timeout as error:
-            message = f"Open-Meteo request timed out after {self._timeout_seconds}s"
-            logger.error(message)
-            raise LiveWeatherError(message) from error
-        except requests.exceptions.RequestException as error:
-            message = f"Open-Meteo request failed: {error}"
-            logger.error(message)
-            raise LiveWeatherError(message) from error
+        for attempt in range(1, _REQUEST_ATTEMPTS + 1):
+            try:
+                response = requests.get(base_url, params=params, timeout=self._timeout_seconds)
+            except requests.exceptions.Timeout as error:
+                if attempt < _REQUEST_ATTEMPTS:
+                    time.sleep(_RETRY_DELAY_SECONDS * attempt)
+                    continue
+                message = f"Open-Meteo request timed out after {self._timeout_seconds}s"
+                logger.error(message)
+                raise LiveWeatherError(message) from error
+            except requests.exceptions.RequestException as error:
+                if attempt < _REQUEST_ATTEMPTS:
+                    time.sleep(_RETRY_DELAY_SECONDS * attempt)
+                    continue
+                message = f"Open-Meteo request failed: {error}"
+                logger.error(message)
+                raise LiveWeatherError(message) from error
+            # "The service is overloaded" (503) and rate limits (429) are usually brief.
+            if response.status_code not in _RETRYABLE_STATUS_CODES or attempt == _REQUEST_ATTEMPTS:
+                break
+            logger.warning("Open-Meteo returned HTTP %d; retrying", response.status_code)
+            time.sleep(_RETRY_DELAY_SECONDS * attempt)
 
         if response.status_code != 200:
             message = f"Open-Meteo returned HTTP {response.status_code}: {response.text[:300]}"
@@ -391,12 +406,17 @@ class OpenMeteoWeatherClient:
                 raise LiveWeatherError(message)
             df[column] = numeric
 
-        if df[["rainfall_mm", "temperature_c", "humidity_pct"]].isna().any().any():
-            message = "Open-Meteo response has missing (null) weather value(s) for at least one day"
+        # Open-Meteo routinely leaves the far ends of a window null (often just the last day
+        # of a 16-day forecast). Only those days are unusable: they're dropped, never filled
+        # in, so a caller asking for one finds no reading and tries another source.
+        has_null = df[["rainfall_mm", "temperature_c", "humidity_pct"]].isna().any(axis=1)
+        if has_null.all():
+            message = "Open-Meteo response has missing (null) weather values for every day"
             logger.error(message)
             raise LiveWeatherError(message)
-
-        return df
+        if has_null.any():
+            logger.info("LiveWeather: dropped %d day(s) with null values from the response", int(has_null.sum()))
+        return df.loc[~has_null].reset_index(drop=True)
 
     def _validate(self, df: pd.DataFrame) -> None:
         try:

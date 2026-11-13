@@ -1,0 +1,1647 @@
+{
+  "bulletins_listed": 3146,
+  "bulletins_skipped": [
+    {
+      "bulletin": "2015-07-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2015/July/daily_31-07-2015.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2016-05-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2016/May/daily_01-05-2016.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2016-12-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2016/December/daily_31-12-2016.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_01-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_02-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_03-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_06-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_07-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_08-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_09-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_13-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_14-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-15",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_15-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-16",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_16-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_17-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_20-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_21-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_22-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-23",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_23-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_27-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2017-02-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/February/daily_28-02-2017.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2018-02-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2018/February/daily_13-02-2018.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2018-05-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2018/May/daily_29-05-2018.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2018-06-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2018/June/daily_30-06-2018.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2018-08-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2018/August/daily_22-08-2018.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2019-02-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/February/daily_19-02-2019.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2019-03-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/March/daily_30-03-2019.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2019-03-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/March/daily_31-03-2019.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2020-02-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2020/February/daily_29-02-2020.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-02-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/February/daily_26-02-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-02-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/February/daily_27-02-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-02-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/February/daily_28-02-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-08-10",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/August/daily_10-08-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-10-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/October/daily_30-10-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2021-10-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/October/daily_31-10-2021.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2022-04-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_28-04-2022.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2023-07-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/July/daily_29-07-2023.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2023-08-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/August/daily_30-08-2023.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2023-10-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/October/daily_28-10-2023.pdf",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2026-01-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2026-05-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/",
+      "reason": "not downloadable from the archive's link (HTTP 404/403 or a folder link)"
+    },
+    {
+      "bulletin": "2015-07-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2015/July/daily_01-07-2015.pdf",
+      "reason": "unusable reporting date '2/7/2015'"
+    },
+    {
+      "bulletin": "2015-09-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2015/September/daily_02-09-2015.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2015-10-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2015/October/daily_06-10-2015.pdf",
+      "reason": "unusable reporting date '10/6/2015'"
+    },
+    {
+      "bulletin": "2015-12-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2015/December/daily_20-12-2015.pdf",
+      "reason": "unusable reporting date '21/12/2015'"
+    },
+    {
+      "bulletin": "2016-01-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2016/January/daily_12-01-2016.pdf",
+      "reason": "unusable reporting date '01/12/2016'"
+    },
+    {
+      "bulletin": "2016-07-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2016/July/daily_06-07-2016.pdf",
+      "reason": "unusable reporting date '7/7/2016'"
+    },
+    {
+      "bulletin": "2016-10-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2016/October/daily_11-10-2016.pdf",
+      "reason": "unusable reporting date '10/11/2016'"
+    },
+    {
+      "bulletin": "2017-04-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/April/daily_05-04-2017.pdf",
+      "reason": "unusable reporting date '5/4/2016'"
+    },
+    {
+      "bulletin": "2017-06-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2017/June/daily_09-06-2017.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2018-06-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2018/June/daily_28-06-2018.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2019-05-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/May/daily_24-05-2019.pdf",
+      "reason": "no table with a 'Dambulla' column on any page"
+    },
+    {
+      "bulletin": "2019-07-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/July/daily_31-07-2019.pdf",
+      "reason": "no table with a 'Dambulla' column on any page"
+    },
+    {
+      "bulletin": "2019-08-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/August/daily_05-08-2019.pdf",
+      "reason": "no table with a 'Dambulla' column on any page"
+    },
+    {
+      "bulletin": "2019-09-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2019/September/daily_11-09-2019.pdf",
+      "reason": "no table with a 'Dambulla' column on any page"
+    },
+    {
+      "bulletin": "2020-10-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2020/October/daily_01-10-2020.pdf",
+      "reason": "unusable reporting date '2/10/2020'"
+    },
+    {
+      "bulletin": "2020-11-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2020/November/daily_27-11-2020.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-01-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/January/daily_20-01-2021.pdf",
+      "reason": "unusable reporting date '20/12021'"
+    },
+    {
+      "bulletin": "2021-01-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/January/daily_21-01-2021.pdf",
+      "reason": "unusable reporting date '21/12021'"
+    },
+    {
+      "bulletin": "2021-01-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/January/daily_22-01-2021.pdf",
+      "reason": "unusable reporting date '22/12021'"
+    },
+    {
+      "bulletin": "2021-01-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/January/daily_26-01-2021.pdf",
+      "reason": "unusable reporting date '26/12021'"
+    },
+    {
+      "bulletin": "2021-01-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/January/daily_27-01-2021.pdf",
+      "reason": "unusable reporting date '27/12021'"
+    },
+    {
+      "bulletin": "2021-04-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/April/daily_27-04-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-04-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/April/daily_28-04-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-04-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/April/daily_29-04-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-04-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/April/daily_30-04-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-05-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/May/daily_03-05-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-05-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/May/daily_04-05-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2021-06-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2021/June/daily_28-06-2021.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2022-01-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/January/daily_01-01-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_12-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_13-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_19-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_20-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_26-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-02-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/February/daily_27-02-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_01-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_05-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_06-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_12-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_13-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_19-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_20-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_26-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-03-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/March/daily_27-03-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_02-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_09-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-10",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_10-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_11-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_17-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-23",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_23-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_24-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-04-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/April/daily_30-04-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_01-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_02-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_03-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_07-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_08-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_14-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_21-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_22-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_28-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-05-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/May/daily_29-05-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_04-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_05-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_11-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_12-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-15",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_15-06-2022.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2022-06-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_18-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_19-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_25-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-06-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/June/daily_26-06-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_02-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_03-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_09-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-10",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_10-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-16",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_16-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_17-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-23",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_23-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_24-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_30-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-07-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/July/daily_31-07-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_06-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_07-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_13-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_14-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_20-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_21-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_27-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-08-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/August/daily_28-08-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_03-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_04-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_11-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_17-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_18-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_24-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-09-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/September/daily_25-09-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_01-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_02-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_08-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-15",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_15-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-16",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_16-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_22-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-23",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_23-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_24-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_29-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-10-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/October/daily_30-10-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_05-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_06-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_12-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_13-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_19-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_20-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_26-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-11-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/November/daily_27-11-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-03",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_03-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_04-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-10",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_10-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_11-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_17-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_18-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_24-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_25-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2022-12-31",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2022/December/daily_31-12-2022.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_07-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_08-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_14-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-15",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_15-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_21-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_22-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_28-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-01-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/January/daily_29-01-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_04-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_11-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_12-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_18-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_19-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_25-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-02-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/February/daily_26-02-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_04-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-05",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_05-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_11-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-12",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_12-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_18-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_19-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_25-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-03-26",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/March/daily_26-03-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_01-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_02-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_07-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_08-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_09-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-22",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_22-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-23",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_23-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_29-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-04-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/April/daily_30-04-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_01-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-07",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_07-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-13",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_13-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_14-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-20",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_20-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_21-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_27-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-05-28",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/May/daily_28-05-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-04",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_04-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-10",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_10-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_11-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-17",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_17-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-18",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_18-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-24",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_24-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-25",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_25-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-06-29",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/June/daily_29-06-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-07-01",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/July/daily_01-07-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-07-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/July/daily_02-07-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-07-08",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/July/daily_08-07-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2023-07-09",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2023/July/daily_09-07-2023.pdf",
+      "reason": "unusable reporting date ''"
+    },
+    {
+      "bulletin": "2024-02-27",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/February/daily_27-02-2024.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2024-05-02",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/May/daily_02-05-2024.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2024-09-21",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/September/daily_21-09-2024.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2024-11-14",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/November/daily_14-11-2024.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2025-02-19",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/February/daily_19-02-2025.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2025-05-06",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/May/daily_06-05-2025.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2025-06-11",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/June/daily_11-06-2025.pdf",
+      "reason": "table found, but no usable price in it"
+    },
+    {
+      "bulletin": "2026-06-30",
+      "url": "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/June/Vegetables Wholesale Prices (2026.06.30).pdf",
+      "reason": "table found, but no usable price in it"
+    }
+  ],
+  "bulletins_where_market_date_trailed_bulletin": 7,
+  "unknown_row_labels": {
+    "Low country Vegetable": 2942,
+    "Banana": 2916,
+    "Seeni": 2916,
+    "Anamalu (Rs/Fruits)": 2916,
+    "Other Fruits (Rs/Fruit)": 2916,
+    "Pineapple - Large": 2916,
+    "- Medium": 2916,
+    "- Small": 2916,
+    "Mango - Betti": 2916,
+    "Woodapple": 2916,
+    "Avocado": 2916,
+    "Orange": 2916,
+    "Up Country Vegetable": 2774,
+    "Kolikuttu": 1787,
+    "Maize": 1684,
+    "Black Gram": 1684,
+    "Gingerly": 1684,
+    "Ambul(Rs/Kg)": 1519,
+    "Papaya (Rs/Kg)": 1518,
+    "Papaya": 1398,
+    "Ambul": 1397,
+    "Soya": 1316,
+    "- Karathakolo": 1275,
+    "- Karathakolom": 1265,
+    "Kolikuttu (Rs/Fruits)": 1129,
+    "Passion Fruits": 1129,
+    "Passion Fruits(Rs/Fruit": 1105,
+    "Passion Fruits(Rs/Fruit)": 239,
+    "Passion Fruits(Rs/Fruits) -": 179,
+    "- Karathakolomban-": 178,
+    "Passion Fruits(Rs/Fruits": 170,
+    "- Karathakolomb": 150,
+    "Passion Fruits(Rs/Fruits)": 51,
+    "Passion Fruits(Rs/Fru": 43,
+    "- Karathako": 36,
+    "Bitter Gourd (Village": 19,
+    "B'Onion(Imported)": 15,
+    "- Karathak": 7,
+    "- Karathakolomban": 4,
+    "Up Country Vegetabl": 1,
+    "21/1/2024": 1,
+    "22/1/2024": 1,
+    "23/1/2024": 1,
+    "24/1/2024": 1,
+    "26/1/2024": 1,
+    "- Karathakolomban -": 1
+  },
+  "cross_check_mismatch_count": 24282,
+  "cross_check_mismatches": [
+    "2015-06-22 Beans: words='190.00 - 210.00' table='19000 21000\\n. - .'",
+    "2015-06-22 Carrot: words='180.00 - 200.00' table='18000 20000\\n. - .'",
+    "2015-06-22 Leeks: words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-22 Beet root: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-22 Beet Root(N'Eliya): words='110.00 - 125.00' table='11000 12500\\n. - .'",
+    "2015-06-22 Knolkhol: words='70.00 - 85.00' table='7000 8500\\n. - .'",
+    "2015-06-22 Raddish: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-22 Cabbage (Kandy): words='40.00 - 50.00' table='4000 5000\\n. - .'",
+    "2015-06-22 Tomato: words='40.00 - 50.00' table='4000 5000\\n. - .'",
+    "2015-06-22 Ladies Fingers: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-22 Brinjals (Other): words='25.00 - 35.00' table='2500 3500\\n. - .'",
+    "2015-06-22 Capsicum: words='160.00 - 180.00' table='16000 18000\\n. - .'",
+    "2015-06-22 Pumpkin: words='12.00 - 18.00' table='1200 1800\\n. - .'",
+    "2015-06-22 Cucumber: words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-22 Bitter Gourd (Other): words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-22 Snake Gourd: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-22 Luffa: words='65.00 - 80.00' table='6500 8000\\n. - .'",
+    "2015-06-22 Long Beans: words='70.00 - 90.00' table='7000 9000\\n. - .'",
+    "2015-06-22 Ash Plantains: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-22 Green Chillies: words='180.00 - 200.00' table='18000 20000\\n. - .'",
+    "2015-06-22 Lime: words='80.00 - 90.00' table='8000 9000\\n. - .'",
+    "2015-06-22 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-22 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-22 Potato (Nuwaraeliya): words='110.00 - 112.00' table='11000 11200\\n. - .'",
+    "2015-06-22 B'Onion Imported: words='85.00 - 90.00' table='8500 9000\\n. - .'",
+    "2015-06-23 Beans: words='200.00 - 230.00' table='20000 23000\\n. - .'",
+    "2015-06-23 Carrot: words='160.00 - 200.00' table='16000 20000\\n. - .'",
+    "2015-06-23 Leeks: words='100.00 - 120.00' table='10000 12000\\n. - .'",
+    "2015-06-23 Beet root: words='85.00 - 100.00' table='8500 10000\\n. - .'",
+    "2015-06-23 Beet Root(N'Eliya): words='110.00 - 125.00' table='11000 12500\\n. - .'",
+    "2015-06-23 Knolkhol: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-06-23 Raddish: words='30.00 - 35.00' table='3000 3500\\n. - .'",
+    "2015-06-23 Cabbage (Kandy): words='30.00 - 42.00' table='3000 4200\\n. - .'",
+    "2015-06-23 Tomato: words='40.00 - 50.00' table='4000 5000\\n. - .'",
+    "2015-06-23 Ladies Fingers: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-23 Brinjals (Other): words='30.00 - 40.00' table='3000 4000\\n. - .'",
+    "2015-06-23 Capsicum: words='140.00 - 160.00' table='14000 16000\\n. - .'",
+    "2015-06-23 Pumpkin: words='12.00 - 18.00' table='1200 1800\\n. - .'",
+    "2015-06-23 Cucumber: words='35.00 - 42.00' table='3500 4200\\n. - .'",
+    "2015-06-23 Bitter Gourd (Other): words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-23 Snake Gourd: words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-23 Luffa: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-06-23 Long Beans: words='70.00 - 90.00' table='7000 9000\\n. - .'",
+    "2015-06-23 Ash Plantains: words='45.00 - 50.00' table='4500 5000\\n. - .'",
+    "2015-06-23 Green Chillies: words='190.00 - 220.00' table='19000 22000\\n. - .'",
+    "2015-06-23 Lime: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-23 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-23 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-23 Potato (Nuwaraeliya): words='105.00 - 110.00' table='10500 11000\\n. - .'",
+    "2015-06-23 B'Onion Imported: words='85.00 - 86.00' table='8500 8600\\n. - .'",
+    "2015-06-24 Beans: words='180.00 - 200.00' table='18000 20000\\n. - .'",
+    "2015-06-24 Carrot: words='160.00 - 210.00' table='16000 21000\\n. - .'",
+    "2015-06-24 Leeks: words='85.00 - 110.00' table='8500 11000\\n. - .'",
+    "2015-06-24 Beet root: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-24 Beet Root(N'Eliya): words='120.00 - 130.00' table='12000 13000\\n. - .'",
+    "2015-06-24 Knolkhol: words='50.00 - 70.00' table='5000 7000\\n. - .'",
+    "2015-06-24 Raddish: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-24 Cabbage (Kandy): words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-24 Tomato: words='40.00 - 50.00' table='4000 5000\\n. - .'",
+    "2015-06-24 Ladies Fingers: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-24 Brinjals (Other): words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-24 Capsicum: words='140.00 - 170.00' table='14000 17000\\n. - .'",
+    "2015-06-24 Pumpkin: words='12.00 - 16.00' table='1200 1600\\n. - .'",
+    "2015-06-24 Cucumber: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-24 Bitter Gourd (Other): words='85.00 - 110.00' table='8500 11000\\n. - .'",
+    "2015-06-24 Snake Gourd: words='30.00 - 40.00' table='3000 4000\\n. - .'",
+    "2015-06-24 Luffa: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-06-24 Long Beans: words='65.00 - 80.00' table='6500 8000\\n. - .'",
+    "2015-06-24 Ash Plantains: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-24 Green Chillies: words='180.00 - 210.00' table='18000 21000\\n. - .'",
+    "2015-06-24 Lime: words='70.00 - 85.00' table='7000 8500\\n. - .'",
+    "2015-06-24 Sweet Potatoe: words='35.00 - 42.00' table='3500 4200\\n. - .'",
+    "2015-06-24 Manioc: words='22.00 - 28.00' table='2200 2800\\n. - .'",
+    "2015-06-24 Potato (Nuwaraeliya): words='105.00 - 110.00' table='10500 11000\\n. - .'",
+    "2015-06-24 B'Onion Imported: words='78.00 - 80.00' table='7800 8000\\n. - .'",
+    "2015-06-25 Beans: words='160.00 - 180.00' table='16000 18000\\n. - .'",
+    "2015-06-25 Carrot: words='160.00 - 210.00' table='16000 21000\\n. - .'",
+    "2015-06-25 Leeks: words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-25 Beet root: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-25 Beet Root(N'Eliya): words='110.00 - 125.00' table='11000 12500\\n. - .'",
+    "2015-06-25 Knolkhol: words='70.00 - 90.00' table='7000 9000\\n. - .'",
+    "2015-06-25 Raddish: words='25.00 - 35.00' table='2500 3500\\n. - .'",
+    "2015-06-25 Cabbage (Kandy): words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-25 Tomato: words='60.00 - 70.00' table='6000 7000\\n. - .'",
+    "2015-06-25 Ladies Fingers: words='65.00 - 80.00' table='6500 8000\\n. - .'",
+    "2015-06-25 Brinjals (Other): words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-25 Capsicum: words='140.00 - 170.00' table='14000 17000\\n. - .'",
+    "2015-06-25 Pumpkin: words='12.00 - 16.00' table='1200 1600\\n. - .'",
+    "2015-06-25 Cucumber: words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-25 Bitter Gourd (Other): words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-25 Snake Gourd: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-25 Luffa: words='80.00 - 85.00' table='8000 8500\\n. - .'",
+    "2015-06-25 Long Beans: words='65.00 - 80.00' table='6500 8000\\n. - .'",
+    "2015-06-25 Ash Plantains: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-25 Green Chillies: words='200.00 - 220.00' table='20000 22000\\n. - .'",
+    "2015-06-25 Lime: words='80.00 - 85.00' table='8000 8500\\n. - .'",
+    "2015-06-25 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-25 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-25 Potato (Nuwaraeliya): words='108.00 - 112.00' table='10800 11200\\n. - .'",
+    "2015-06-25 B'Onion Imported: words='75.00 - 80.00' table='7500 8000\\n. - .'",
+    "2015-06-26 Beans: words='120.00 - 140.00' table='12000 14000\\n. - .'",
+    "2015-06-26 Carrot: words='150.00 - 200.00' table='15000 20000\\n. - .'",
+    "2015-06-26 Leeks: words='90.00 - 100.00' table='9000 10000\\n. - .'",
+    "2015-06-26 Beet root: words='90.00 - 100.00' table='9000 10000\\n. - .'",
+    "2015-06-26 Beet Root(N'Eliya): words='110.00 - 125.00' table='11000 12500\\n. - .'",
+    "2015-06-26 Knolkhol: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-26 Raddish: words='25.00 - 35.00' table='2500 3500\\n. - .'",
+    "2015-06-26 Cabbage (Kandy): words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-26 Tomato: words='45.00 - 55.00' table='4500 5500\\n. - .'",
+    "2015-06-26 Ladies Fingers: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-26 Brinjals (Other): words='20.00 - 30.00' table='2000 3000\\n. - .'",
+    "2015-06-26 Capsicum: words='140.00 - 170.00' table='14000 17000\\n. - .'",
+    "2015-06-26 Pumpkin: words='10.00 - 15.00' table='1000 1500\\n. - .'",
+    "2015-06-26 Cucumber: words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-26 Bitter Gourd (Other): words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-26 Snake Gourd: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-26 Luffa: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-06-26 Long Beans: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-26 Ash Plantains: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-26 Green Chillies: words='250.00 - 280.00' table='25000 28000\\n. - .'",
+    "2015-06-26 Lime: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-26 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-26 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-26 Potato (Nuwaraeliya): words='115.00 - 120.00' table='11500 12000\\n. - .'",
+    "2015-06-26 B'Onion Imported: words='83.00 - 85.00' table='8300 8500\\n. - .'",
+    "2015-06-29 Beans: words='140.00 - 160.00' table='14000 16000\\n. - .'",
+    "2015-06-29 Carrot: words='160.00 - 200.00' table='16000 20000\\n. - .'",
+    "2015-06-29 Leeks: words='80.00 - 100.00' table='8000 10000\\n. - .'",
+    "2015-06-29 Beet root: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-06-29 Beet Root(N'Eliya): words='110.00 - 120.00' table='11000 12000\\n. - .'",
+    "2015-06-29 Knolkhol: words='60.00 - 70.00' table='6000 7000\\n. - .'",
+    "2015-06-29 Raddish: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-29 Cabbage (Kandy): words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-06-29 Tomato: words='50.00 - 55.00' table='5000 5500\\n. - .'",
+    "2015-06-29 Ladies Fingers: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-29 Brinjals (Other): words='15.00 - 20.00' table='1500 2000\\n. - .'",
+    "2015-06-29 Capsicum: words='140.00 - 180.00' table='14000 18000\\n. - .'",
+    "2015-06-29 Pumpkin: words='12.00 - 15.00' table='1200 1500\\n. - .'",
+    "2015-06-29 Cucumber: words='30.00 - 38.00' table='3000 3800\\n. - .'",
+    "2015-06-29 Bitter Gourd (Other): words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-06-29 Snake Gourd: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-29 Luffa: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-29 Long Beans: words='70.00 - 90.00' table='7000 9000\\n. - .'",
+    "2015-06-29 Ash Plantains: words='45.00 - 60.00' table='4500 6000\\n. - .'",
+    "2015-06-29 Green Chillies: words='330.00 - 340.00' table='33000 34000\\n. - .'",
+    "2015-06-29 Lime: words='75.00 - 80.00' table='7500 8000\\n. - .'",
+    "2015-06-29 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-06-29 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-29 Potato (Nuwaraeliya): words='120.00 - 130.00' table='12000 13000\\n. - .'",
+    "2015-06-29 B'Onion Imported: words='83.00 - 85.00' table='8300 8500\\n. - .'",
+    "2015-06-30 Beans: words='120.00 - 130.00' table='12000 13000\\n. - .'",
+    "2015-06-30 Carrot: words='160.00 - 180.00' table='16000 18000\\n. - .'",
+    "2015-06-30 Leeks: words='80.00 - 90.00' table='8000 9000\\n. - .'",
+    "2015-06-30 Beet root: words='70.00 - 90.00' table='7000 9000\\n. - .'",
+    "2015-06-30 Beet Root(N'Eliya): words='100.00 - 110.00' table='10000 11000\\n. - .'",
+    "2015-06-30 Knolkhol: words='60.00 - 65.00' table='6000 6500\\n. - .'",
+    "2015-06-30 Raddish: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-30 Cabbage (Kandy): words='35.00 - 45.00' table='3500 4500\\n. - .'",
+    "2015-06-30 Tomato: words='45.00 - 50.00' table='4500 5000\\n. - .'",
+    "2015-06-30 Ladies Fingers: words='60.00 - 70.00' table='6000 7000\\n. - .'",
+    "2015-06-30 Brinjals (Other): words='10.00 - 20.00' table='1000 2000\\n. - .'",
+    "2015-06-30 Capsicum: words='150.00 - 180.00' table='15000 18000\\n. - .'",
+    "2015-06-30 Pumpkin: words='10.00 - 15.00' table='1000 1500\\n. - .'",
+    "2015-06-30 Cucumber: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-30 Bitter Gourd (Other): words='90.00 - 100.00' table='9000 10000\\n. - .'",
+    "2015-06-30 Snake Gourd: words='30.00 - 35.00' table='3000 3500\\n. - .'",
+    "2015-06-30 Luffa: words='60.00 - 70.00' table='6000 7000\\n. - .'",
+    "2015-06-30 Long Beans: words='65.00 - 80.00' table='6500 8000\\n. - .'",
+    "2015-06-30 Ash Plantains: words='45.00 - 50.00' table='4500 5000\\n. - .'",
+    "2015-06-30 Green Chillies: words='320.00 - 350.00' table='32000 35000\\n. - .'",
+    "2015-06-30 Lime: words='70.00 - 80.00' table='7000 8000\\n. - .'",
+    "2015-06-30 Sweet Potatoe: words='35.00 - 43.00' table='3500 4300\\n. - .'",
+    "2015-06-30 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-06-30 Potato (Nuwaraeliya): words='125.00 - 130.00' table='12500 13000\\n. - .'",
+    "2015-06-30 B'Onion Imported: words='75.00 - 78.00' table='7500 7800\\n. - .'",
+    "2015-07-02 Beans: words='100.00 - 120.00' table='10000 12000\\n. - .'",
+    "2015-07-02 Carrot: words='140.00 - 160.00' table='14000 16000\\n. - .'",
+    "2015-07-02 Leeks: words='80.00 - 90.00' table='8000 9000\\n. - .'",
+    "2015-07-02 Beet root: words='75.00 - 90.00' table='7500 9000\\n. - .'",
+    "2015-07-02 Beet Root(N'Eliya): words='110.00 - 120.00' table='11000 12000\\n. - .'",
+    "2015-07-02 Knolkhol: words='60.00 - 65.00' table='6000 6500\\n. - .'",
+    "2015-07-02 Raddish: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-07-02 Cabbage (Kandy): words='30.00 - 43.00' table='3000 4300\\n. - .'",
+    "2015-07-02 Tomato: words='35.00 - 50.00' table='3500 5000\\n. - .'",
+    "2015-07-02 Ladies Fingers: words='50.00 - 60.00' table='5000 6000\\n. - .'",
+    "2015-07-02 Brinjals (Other): words='10.00 - 60.00' table='1000 6000\\n. - .'",
+    "2015-07-02 Capsicum: words='150.00 - 180.00' table='15000 18000\\n. - .'",
+    "2015-07-02 Pumpkin: words='10.00 - 20.00' table='1000 2000\\n. - .'",
+    "2015-07-02 Cucumber: words='28.00 - 35.00' table='2800 3500\\n. - .'",
+    "2015-07-02 Bitter Gourd (Other): words='90.00 - 110.00' table='9000 11000\\n. - .'",
+    "2015-07-02 Snake Gourd: words='40.00 - 45.00' table='4000 4500\\n. - .'",
+    "2015-07-02 Luffa: words='65.00 - 70.00' table='6500 7000\\n. - .'",
+    "2015-07-02 Long Beans: words='60.00 - 75.00' table='6000 7500\\n. - .'",
+    "2015-07-02 Ash Plantains: words='45.00 - 50.00' table='4500 5000\\n. - .'",
+    "2015-07-02 Green Chillies: words='380.00 - 400.00' table='38000 40000\\n. - .'",
+    "2015-07-02 Lime: words='75.00 - 85.00' table='7500 8500\\n. - .'",
+    "2015-07-02 Sweet Potatoe: words='35.00 - 40.00' table='3500 4000\\n. - .'",
+    "2015-07-02 Manioc: words='25.00 - 30.00' table='2500 3000\\n. - .'",
+    "2015-07-02 B'Onion Imported: words='67.00 - 68.00' table='6700 6800\\n. - .'",
+    "2015-07-03 Beans: words='130.00 - 150.00' table='13000 15000\\n. - .'"
+  ],
+  "rows_written": 76719,
+  "date_range": [
+    "2015-06-22",
+    "2026-11-09"
+  ],
+  "distinct_dates": 2915,
+  "rows_per_vegetable": {
+    "Ash Plantain": 2915,
+    "Beans": 2915,
+    "Carrot": 2915,
+    "Green Chillies": 2915,
+    "Leeks": 2915,
+    "Long Beans": 2915,
+    "Luffa": 2915,
+    "Pumpkin": 2915,
+    "Snake Gourd": 2915,
+    "Tomato": 2915,
+    "Capsicum": 2914,
+    "Ladies Fingers": 2914,
+    "Lime": 2914,
+    "Radish": 2914,
+    "Cucumber": 2913,
+    "Cabbage (Kandy)": 2907,
+    "Beetroot": 2903,
+    "Knol Khol": 2887,
+    "Sweet Potato": 2761,
+    "Manioc": 2751,
+    "Beetroot (Nuwara Eliya)": 2543,
+    "Big Onion (Imported)": 2384,
+    "Brinjals (Other)": 1656,
+    "Bitter Gourd (Other)": 1631,
+    "Potato (Imported)": 1612,
+    "Potato (Nuwara Eliya)": 1570,
+    "Potato (Welimada)": 1277,
+    "Brinjals": 1259,
+    "Bitter Gourd": 1258,
+    "Eggplant": 1216,
+    "Big Onion (Local)": 822,
+    "Cabbage (Nuwara Eliya)": 692,
+    "Drumstick": 364,
+    "Brinjals (Village)": 269,
+    "Bitter Gourd (Village)": 238
+  },
+  "rows_needing_review": [
+    {
+      "date": "2016-07-21",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2016-07-22",
+      "vegetable": "Cucumber",
+      "raw_cell": "5.00 - 8.00"
+    },
+    {
+      "date": "2016-07-25",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2016-07-26",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2016-07-27",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2016-07-28",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2016-07-29",
+      "vegetable": "Cucumber",
+      "raw_cell": "5.00 - 8.00"
+    },
+    {
+      "date": "2016-08-01",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2016-08-02",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2016-08-04",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2016-08-05",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-01-23",
+      "vegetable": "Cabbage (Kandy)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-01-24",
+      "vegetable": "Cabbage (Kandy)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-01-27",
+      "vegetable": "Cabbage (Kandy)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-01-30",
+      "vegetable": "Cabbage (Kandy)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-03-13",
+      "vegetable": "Brinjals (Other)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-03-14",
+      "vegetable": "Brinjals (Other)",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-03-15",
+      "vegetable": "Brinjals (Other)",
+      "raw_cell": "7.00 - 12.00"
+    },
+    {
+      "date": "2017-03-16",
+      "vegetable": "Brinjals (Other)",
+      "raw_cell": "5.00 - 10.00"
+    },
+    {
+      "date": "2017-03-17",
+      "vegetable": "Brinjals (Other)",
+      "raw_cell": "5.00 - 10.00"
+    },
+    {
+      "date": "2017-03-30",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-03-31",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-04-03",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2017-04-06",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2018-02-07",
+      "vegetable": "Radish",
+      "raw_cell": "5.00 - 10.00"
+    },
+    {
+      "date": "2018-07-31",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-01",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2018-08-02",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2018-08-03",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-06",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2018-08-07",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-08",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2018-08-09",
+      "vegetable": "Cucumber",
+      "raw_cell": "5.00 - 10.00"
+    },
+    {
+      "date": "2018-08-10",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-13",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2018-08-14",
+      "vegetable": "Cucumber",
+      "raw_cell": "7.00 - 10.00"
+    },
+    {
+      "date": "2018-08-15",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-16",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2018-08-17",
+      "vegetable": "Cucumber",
+      "raw_cell": "6.00 - 10.00"
+    },
+    {
+      "date": "2018-08-28",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2018-08-29",
+      "vegetable": "Cucumber",
+      "raw_cell": "8.00 - 10.00"
+    },
+    {
+      "date": "2019-03-26",
+      "vegetable": "Pumpkin",
+      "raw_cell": "5.00 - 12.00"
+    },
+    {
+      "date": "2019-03-29",
+      "vegetable": "Pumpkin",
+      "raw_cell": "6.00 - 12.00"
+    },
+    {
+      "date": "2019-04-01",
+      "vegetable": "Pumpkin",
+      "raw_cell": "6.00 - 12.00"
+    },
+    {
+      "date": "2019-04-04",
+      "vegetable": "Pumpkin",
+      "raw_cell": "7.00 - 12.00"
+    }
+  ]
+}

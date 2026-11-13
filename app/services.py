@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from config.config_loader import ConfigLoader
+from src.data_collection.data_validator import DataValidationError
 from src.data_collection.harti_live_client import (
     HartiLiveClient,
     HartiLiveDataError,
@@ -20,6 +21,8 @@ from src.data_collection.live_fuel_price_client import (
     LiveFuelPriceSnapshot,
 )
 from src.data_collection.live_weather_client import (
+    MAX_FORECAST_DAYS,
+    MAX_SEASONAL_FORECAST_DAYS,
     LiveWeatherError,
     OpenMeteoWeatherClient,
 )
@@ -28,6 +31,7 @@ from src.data_collection.production_region_resolver import (
     ResolvedWeatherLocation,
 )
 from src.feature_engineering.dataset_builder import TrainTestDatasetBuilder
+from src.feature_engineering.forecast_features import MAX_CARRY_DAYS
 from src.feature_engineering.production_region_weather import (
     apply_production_region_weather,
 )
@@ -37,13 +41,201 @@ from src.models.artifact_metadata import (
     new_training_run_id,
     save_artifact_metadata,
 )
+from src.models.direct_forecaster import FORECASTER_FILENAME
 from src.models.pipeline import ModelTrainingPipeline, ModelTrainingResult
 from src.prediction.predictor import InferenceArtifact, save_inference_artifact
+from src.preprocessing.cleaner import DataCleaner
 from src.preprocessing.pipeline import PreprocessingPipeline
+from src.preprocessing.transformer import DataTransformer
 
 logger = logging.getLogger(__name__)
 
 SAMPLE_DATA_PATH = Path(__file__).resolve().parent / "sample_data" / "sample_history.csv"
+WEATHER_COLUMNS = ("rainfall_mm", "temperature_c", "humidity_pct")
+FUEL_COLUMNS = ("diesel_price", "petrol_price")
+# Open-Meteo's archive runs a few days behind today, and its forecast endpoint returns nulls
+# for days more than about 8 weeks old (verified against the real API, 2026-11). So a date
+# at least this old comes from the archive, and anything newer from the forecast endpoint.
+ARCHIVE_MIN_AGE_DAYS = 7
+NUMERIC_COLUMNS = {"price", *WEATHER_COLUMNS, *FUEL_COLUMNS}
+HISTORICAL_DATASETS = {
+    "harti_prices": ("date", "vegetable", "market", "price"),
+    "weather_data": ("date", "rainfall_mm", "temperature_c", "humidity_pct"),
+    "fuel_prices": ("date", "diesel_price", "petrol_price"),
+}
+# The saved datasets the direct forecaster's features come from, with the columns it reads.
+FORECASTER_DATASETS = {
+    "weather_data_by_region": ("date", "region", "rainfall_mm", "temperature_c", "humidity_pct"),
+    "harti_all_markets": ("published", "market", "vegetable", "price"),
+}
+
+
+class HistoryInputError(Exception):
+    """Raised when a user-supplied price history can't be used, with a message for the user."""
+
+
+def missing_historical_datasets(config_path: str = "config/config.yaml") -> list[str]:
+    """The real raw datasets the "Historical dataset" option needs that aren't present."""
+    config = ConfigLoader(config_path)
+    missing = []
+    for key in ("harti_prices", "weather_data", "fuel_prices"):
+        path = config.get(f"paths.raw_files.{key}")
+        if not path or not Path(path).exists():
+            missing.append(path or f"paths.raw_files.{key}")
+    return missing
+
+
+def historical_data_available(config_path: str = "config/config.yaml") -> bool:
+    """Whether the real raw datasets the "Historical dataset" option needs are all present."""
+    return not missing_historical_datasets(config_path)
+
+
+def _dataset_problem(path: str | None, key: str, columns: tuple[str, ...]) -> str | None:
+    """Why this dataset can't be used, or None if it can."""
+    if not path:
+        return f"`paths.raw_files.{key}` is not set in the configuration."
+    if not Path(path).exists():
+        return f"`{path}` is missing."
+    try:
+        sample = pd.read_csv(path, nrows=5)
+    except (ValueError, OSError) as error:  # includes pandas' parser and decoding errors
+        return f"`{path}` could not be read ({type(error).__name__}: {error})."
+    absent = [column for column in columns if column not in sample.columns]
+    if absent:
+        return f"`{path}` is missing required column(s): {', '.join(absent)}."
+    if sample.empty:
+        return f"`{path}` has no data rows."
+    not_numeric = [c for c in columns if c in NUMERIC_COLUMNS and pd.to_numeric(sample[c], errors="coerce").isna().all()]
+    if not_numeric:
+        return f"`{path}` has non-numeric values in column(s): {', '.join(not_numeric)}."
+    return None
+
+
+def historical_dataset_problems(config_path: str = "config/config.yaml") -> list[str]:
+    """Why the real datasets behind the "Historical dataset" option can't be used, if they can't."""
+    config = ConfigLoader(config_path)
+    problems = [_dataset_problem(config.get(f"paths.raw_files.{key}"), key, columns) for key, columns in HISTORICAL_DATASETS.items()]
+    return [problem for problem in problems if problem]
+
+
+def forecaster_problems(config_path: str = "config/config.yaml") -> list[str]:
+    """Everything stopping the direct forecaster from running as it was evaluated.
+
+    Each dataset here would otherwise fail quietly: without the all-markets file its features are
+    filled with training medians, which changes the forecast with no error. An empty list doesn't
+    prove the model file is readable, only loading it can show that.
+    """
+    config = ConfigLoader(config_path)
+    problems = [
+        _dataset_problem(config.get(f"paths.raw_files.{key}"), key, columns)
+        for key, columns in FORECASTER_DATASETS.items()
+    ]
+    model_path = Path(config.get("paths.models_dir", "models")) / FORECASTER_FILENAME
+    if not model_path.exists():
+        problems.append(f"`{model_path.as_posix()}` is missing.")
+    return [problem for problem in problems if problem]
+
+
+def break_long_gaps(series: pd.Series, max_gap_days: int = MAX_CARRY_DAYS) -> pd.Series:
+    """A date-indexed series with an empty point inside each gap longer than max_gap_days, so a
+    line chart shows a break there rather than a straight line implying prices were recorded."""
+    series = series.sort_index()
+    gaps = series.index.to_series().diff() > pd.Timedelta(days=max_gap_days)
+    breaks = series.index[gaps] - pd.Timedelta(days=1)
+    return pd.concat([series, pd.Series(float("nan"), index=breaks, name=series.name)]).sort_index()
+
+
+def prepare_uploaded_history(raw_df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    """Validate and normalize an uploaded price history the same way training data is.
+
+    Applies the text hygiene and alias steps training uses, so "carrot " and "Carrot" are
+    one vegetable. Weather columns are optional (missing readings can be fetched live).
+
+    Returns:
+        (cleaned DataFrame sorted by date, notes describing any rows that were dropped).
+
+    Raises:
+        HistoryInputError: if required columns are missing or no usable rows remain.
+    """
+    required = ["date", "vegetable", "market", "price"]
+    missing = [column for column in required if column not in raw_df.columns]
+    if missing:
+        found = [str(column) for column in raw_df.columns[:8]]
+        raise HistoryInputError(
+            f"The CSV is missing required column(s): {missing}. Columns found: {found}. "
+            "Headers must be lowercase, and values separated by commas."
+        )
+    if raw_df.empty:
+        raise HistoryInputError("The CSV has a header but no data rows.")
+
+    df = raw_df.copy()
+    notes: list[str] = []
+
+    df["date"] = pd.to_datetime(df["date"], format="ISO8601", errors="coerce")
+    bad_dates = int(df["date"].isna().sum())
+    if bad_dates == len(df):
+        raise HistoryInputError("No date in the CSV could be read. Dates must look like 2026-11-06.")
+    if bad_dates:
+        notes.append(f"Dropped {bad_dates} row(s) with a date not in YYYY-MM-DD format.")
+
+    missing_names = int((df["vegetable"].isna() | df["market"].isna()).sum())
+    if missing_names:
+        notes.append(f"Dropped {missing_names} row(s) with no vegetable or market name.")
+    df = df[df["date"].notna() & df["vegetable"].notna() & df["market"].notna()]
+    if df.empty:
+        raise HistoryInputError("No row in the CSV has a valid date, vegetable and market.")
+
+    df["price"] = pd.to_numeric(df["price"], errors="coerce")
+    df.loc[df["price"] <= 0, "price"] = float("nan")
+    unpriced = int(df["price"].isna().sum())
+    if unpriced == len(df):
+        raise HistoryInputError("No row in the CSV has a valid price (a number above zero).")
+    if unpriced:
+        notes.append(f"Dropped {unpriced} row(s) with a missing or invalid price.")
+    df = df[df["price"].notna()]
+
+    cleaner, transformer = DataCleaner(), DataTransformer()
+    df = cleaner.clean_text_columns(df, ["vegetable", "market"])
+    df = transformer.standardize_market_names(transformer.standardize_vegetable_names(df))
+
+    # Training drops exact repeats too. Left in, they'd count twice in the rolling price features.
+    rows_before = len(df)
+    df = df.drop_duplicates()
+    if len(df) < rows_before:
+        notes.append(f"Dropped {rows_before - len(df)} exact duplicate row(s).")
+    keys = ["date", "vegetable", "market"]
+    conflicts = df.groupby(keys)["price"].nunique().gt(1).sum()
+    if conflicts:
+        notes.append(f"{conflicts} date, vegetable and market combination(s) have more than one price. All are kept and affect the result, so check the data.")
+    future_rows = int((df["date"] > pd.Timestamp.now().normalize()).sum())
+    if future_rows:
+        notes.append(f"{future_rows} row(s) are dated after today. They are treated as recorded prices, so check the dates.")
+
+    for column in WEATHER_COLUMNS:
+        df[column] = pd.to_numeric(df[column], errors="coerce") if column in df.columns else float("nan")
+    for column in FUEL_COLUMNS:
+        if column in df.columns:
+            df[column] = pd.to_numeric(df[column], errors="coerce")
+    if "source" not in df.columns:
+        df["source"] = UPLOAD_SOURCE_LABEL
+
+    return df.sort_values("date").reset_index(drop=True), notes
+
+
+def _canonical_vegetables(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply training's vegetable aliases to live-bulletin rows.
+
+    HARTI's "Eggplant" row is "Brinjal" throughout training and history. Without this,
+    selecting Brinjal could never find its row in a live bulletin.
+    """
+    return DataTransformer().standardize_vegetable_names(df)
+
+
+def _today(config: ConfigLoader) -> pd.Timestamp:
+    """Today in the weather provider's timezone, so "past" and "future" dates agree with it
+    wherever this runs (Sri Lanka and, say, Perth differ by 2.5 hours)."""
+    timezone = config.get("weather_api.timezone", "Asia/Colombo")
+    return pd.Timestamp.now(tz=timezone).tz_localize(None).normalize()
 
 
 def resolve_demo_models_dir(config_path: str = "config/config.yaml") -> str:
@@ -86,7 +278,11 @@ def load_real_market_history(config_path: str = "config/config.yaml") -> pd.Data
     preprocessing.clean_data()
     preprocessing.transform_data()
     merged = preprocessing.merge_data()
-    return apply_production_region_weather(merged, config_path=config_path)
+    try:
+        return apply_production_region_weather(merged, config_path=config_path)
+    except (ValueError, KeyError, TypeError, OSError) as error:  # what a damaged CSV can raise
+        path = ConfigLoader(config_path).get("paths.raw_files.weather_data_by_region")
+        raise DataValidationError(f"the regional weather file `{path}` could not be used ({type(error).__name__}: {error})") from error
 
 
 def resolve_weather_region(vegetable: str, config_path: str = "config/config.yaml") -> ResolvedWeatherLocation:
@@ -139,8 +335,14 @@ def build_live_prediction_input(
     vegetable: str,
     market: str,
     config_path: str = "config/config.yaml",
+    weather_cache: dict | None = None,
 ) -> pd.DataFrame:
     """Like build_prediction_input, but backfills a missing weather-lag reading with live data.
+
+    weather_cache: pass the same empty dict across calls for ONE vegetable (as a recursive
+    forecast does). Each fetch then requests a whole window and remembers every day, so a
+    30-day forecast makes a few requests rather than one per day. Never share one between
+    vegetables, since their weather can come from different locations.
 
     FeatureEngineer's WeatherFeatureGenerator computes rainfall_mm_lag14d/
     temperature_c_lag14d/humidity_pct_lag14d for a row dated D from the
@@ -161,6 +363,9 @@ def build_live_prediction_input(
     own (same-day) weather, which build_prediction_input already correctly
     leaves NaN (see its docstring: same-day weather is never read for a
     row's own features, only earlier rows' weather is looked up).
+
+    required_date at least ARCHIVE_MIN_AGE_DAYS old comes from Open-Meteo's archive
+    (source="ARCHIVE_WEATHER"), since the forecast endpoint has nulls for older days.
 
     required_date beyond Open-Meteo's own 16-day forecast reach (e.g. a distant
     recursive forecast day whose weather_lag_days lookback still lands in the
@@ -207,8 +412,13 @@ def build_live_prediction_input(
     weather_lag_days = config.get("feature_engineering.weather_lag_days", 14)
     required_date = target_date - pd.Timedelta(days=weather_lag_days)
 
-    weather_columns = ["rainfall_mm", "temperature_c", "humidity_pct"]
-    existing = history_df.loc[history_df["date"] == required_date, weather_columns]
+    # Only this vegetable's own rows count: its weather-lag feature is looked up per
+    # vegetable (see feature_engineer.py), so another vegetable's reading on this date
+    # wouldn't reach it, and may be from a different location anyway.
+    weather_columns = list(WEATHER_COLUMNS)
+    existing = history_df.loc[
+        (history_df["date"] == required_date) & (history_df["vegetable"] == vegetable), weather_columns
+    ]
     already_covered = not existing.empty and bool(existing.notna().all(axis=1).any())
 
     if already_covered:
@@ -222,40 +432,21 @@ def build_live_prediction_input(
             f"weather data for that date some other way."
         )
 
-    today = pd.Timestamp.now().normalize()
-    past_days = max(0, (today - required_date).days)
-    forecast_days = max(1, (required_date - today).days + 1)
-
-    resolved_location = resolve_weather_region(vegetable, config_path=config_path)
-    client = OpenMeteoWeatherClient.for_coordinates(
-        resolved_location.latitude, resolved_location.longitude, config_path=config_path
-    )
-    live_weather = client.fetch_recent_daily_weather(past_days=past_days, forecast_days=forecast_days)
-    match = live_weather.loc[live_weather["date"] == required_date]
-    context_source = "LIVE_WEATHER"
-
-    attempted_sources = [f"Open-Meteo forecast (past_days={past_days}, forecast_days={forecast_days})"]
-    if match.empty and required_date > today:
-        # required_date is beyond fetch_recent_daily_weather()'s own MAX_FORECAST_DAYS
-        # (16 days) -- fall back to Open-Meteo's separate Seasonal Forecast API
-        # (ECMWF EC46 sub-seasonal model), a real, distinct, same-provider endpoint
-        # reaching up to MAX_SEASONAL_FORECAST_DAYS (46) days ahead -- see
-        # fetch_seasonal_daily_weather()'s docstring. Never attempted for a
-        # required_date in the past: a seasonal forecast is only meaningful going
-        # forward from today, unlike a genuinely missing historical reading.
-        seasonal_forecast_days = (required_date - today).days + 1
-        seasonal_weather = client.fetch_seasonal_daily_weather(forecast_days=seasonal_forecast_days)
-        match = seasonal_weather.loc[seasonal_weather["date"] == required_date]
-        context_source = "LIVE_WEATHER_SEASONAL"
-        attempted_sources.append(f"Open-Meteo seasonal forecast (forecast_days={seasonal_forecast_days})")
-
-    if match.empty:
-        raise LiveWeatherError(
-            f"None of Open-Meteo's endpoints ({'; '.join(attempted_sources)}) returned a weather "
-            f"reading for {required_date.date()}, needed for {target_date.date()}'s "
-            f"{weather_lag_days}-day weather lag feature."
-        )
-    reading = match.iloc[0]
+    today = _today(config)
+    if weather_cache is not None and required_date in weather_cache:
+        reading, context_source = weather_cache[required_date]
+    else:
+        resolved_location = resolve_weather_region(vegetable, config_path=config_path)
+        local_reading = _local_weather_reading(config, resolved_location, market, required_date)
+        if local_reading is not None:
+            reading, context_source = local_reading, LOCAL_WEATHER_SOURCE_LABEL
+        else:
+            client = OpenMeteoWeatherClient.for_coordinates(
+                resolved_location.latitude, resolved_location.longitude, config_path=config_path
+            )
+            reading, context_source = _fetch_required_weather(
+                client, required_date, today, weather_cache, target_date, weather_lag_days
+            )
 
     context_row = pd.DataFrame(
         {
@@ -272,6 +463,90 @@ def build_live_prediction_input(
 
     extended_history = pd.concat([history_df, context_row], ignore_index=True)
     return build_prediction_input(extended_history, target_date, vegetable, market)
+
+
+def _local_weather_reading(
+    config: ConfigLoader, location: ResolvedWeatherLocation, market: str, required_date: pd.Timestamp
+) -> pd.Series | None:
+    """The reading for this location from the saved regional weather file, if it has one.
+
+    A vegetable can lack a price row on a date the saved weather covers. Using the saved
+    reading avoids a network call, and lets the app keep working during an outage.
+    """
+    path = config.get("paths.raw_files.weather_data_by_region")
+    if not path or not Path(path).exists():
+        return None
+    region = location.region_name if location.is_production_region else market
+    try:
+        weather = pd.read_csv(path, parse_dates=["date"])
+        match = weather[(weather["region"] == region) & (weather["date"] == required_date)]
+    except (ValueError, KeyError, TypeError, OSError) as error:  # a damaged file: ask the weather provider instead
+        logger.warning("Couldn't read saved regional weather '%s': %s", path, error)
+        return None
+    return None if match.empty else match.iloc[0]
+
+
+def _fetch_required_weather(
+    client: OpenMeteoWeatherClient,
+    required_date: pd.Timestamp,
+    today: pd.Timestamp,
+    weather_cache: dict | None,
+    target_date: pd.Timestamp,
+    weather_lag_days: int,
+) -> tuple[pd.Series, str]:
+    """(reading for required_date, source label), from the right Open-Meteo endpoint for its
+    age. With a weather_cache, requests a whole window and remembers every day it returns.
+
+    Raises:
+        LiveWeatherError: if no endpoint has a reading for required_date. Never fabricated.
+    """
+    batching = weather_cache is not None
+    age_days = (today - required_date).days
+    attempted: list[str] = []
+    match = pd.DataFrame()
+    source = "LIVE_WEATHER"
+
+    def remember(weather: pd.DataFrame, label: str) -> pd.DataFrame:
+        if batching:
+            for _, row in weather.iterrows():
+                weather_cache.setdefault(row["date"], (row, label))
+        return weather.loc[weather["date"] == required_date]
+
+    if age_days > ARCHIVE_MIN_AGE_DAYS:
+        end_date = today - pd.Timedelta(days=ARCHIVE_MIN_AGE_DAYS) if batching else required_date
+        source = "ARCHIVE_WEATHER"
+        attempted.append(f"Open-Meteo archive ({required_date.date()} to {end_date.date()})")
+        match = remember(
+            client.fetch_historical_daily_weather(
+                start_date=required_date.strftime("%Y-%m-%d"), end_date=end_date.strftime("%Y-%m-%d")
+            ),
+            source,
+        )
+    else:
+        past_days = max(0, age_days)
+        needed_forecast_days = max(1, -age_days + 1)
+        # Once batching, a date beyond the forecast window was already found to be out of its reach.
+        if not (batching and needed_forecast_days > MAX_FORECAST_DAYS and weather_cache):
+            forecast_days = MAX_FORECAST_DAYS if batching else needed_forecast_days
+            attempted.append(f"Open-Meteo forecast (past_days={past_days}, forecast_days={forecast_days})")
+            match = remember(client.fetch_recent_daily_weather(past_days=past_days, forecast_days=forecast_days), source)
+
+    if match.empty and required_date > today:
+        # Beyond the forecast endpoint's own reach -- fall back to Open-Meteo's separate
+        # Seasonal Forecast API (ECMWF EC46). Never attempted for a past date: a seasonal
+        # forecast only means something going forward from today.
+        seasonal_days = MAX_SEASONAL_FORECAST_DAYS if batching else (required_date - today).days + 1
+        source = "LIVE_WEATHER_SEASONAL"
+        attempted.append(f"Open-Meteo seasonal forecast (forecast_days={seasonal_days})")
+        match = remember(client.fetch_seasonal_daily_weather(forecast_days=seasonal_days), source)
+
+    if match.empty:
+        raise LiveWeatherError(
+            f"None of Open-Meteo's endpoints ({'; '.join(attempted)}) returned a weather "
+            f"reading for {required_date.date()}, needed for {target_date.date()}'s "
+            f"{weather_lag_days}-day weather lag feature."
+        )
+    return match.iloc[0], source
 
 
 def fetch_harti_latest_snapshot(config_path: str = "config/config.yaml") -> HartiLiveSnapshot:
@@ -398,21 +673,30 @@ def merge_harti_live_price(
     reading actually covers this row's date (see finalize_live_row()). Omit (the
     default) to always forward-fill, e.g. when live fuel price couldn't be fetched.
 
+    Returns history_df unchanged if it already has a real price for this bulletin's date
+    (the CSV is up to date), rather than counting the same observation twice.
+
     Raises:
         HartiLiveDataError: if live_snapshot has no row for (vegetable, market) --
             e.g. that vegetable had no reading ("-") in this particular bulletin.
     """
-    live_rows = live_snapshot.data[
-        (live_snapshot.data["vegetable"] == vegetable) & (live_snapshot.data["market"] == market)
-    ]
+    bulletin_rows = _canonical_vegetables(live_snapshot.data)
+    live_rows = bulletin_rows[(bulletin_rows["vegetable"] == vegetable) & (bulletin_rows["market"] == market)]
     if live_rows.empty:
-        available = sorted(
-            live_snapshot.data.loc[live_snapshot.data["market"] == market, "vegetable"].unique()
-        )
+        available = sorted(bulletin_rows.loc[bulletin_rows["market"] == market, "vegetable"].unique())
         raise HartiLiveDataError(
             f"HARTI's latest bulletin ({live_snapshot.bulletin_date.date()}) has no '{market}' "
             f"price for '{vegetable}'. Vegetables it did report a '{market}' price for: {available}"
         )
+
+    already_present = (
+        (history_df["vegetable"] == vegetable)
+        & (history_df["market"] == market)
+        & (history_df["date"] == live_rows["date"].iloc[0])
+        & history_df["price"].notna()
+    )
+    if already_present.any():
+        return history_df
 
     live_row = finalize_live_row(history_df, live_rows.iloc[[0]], live_fuel_snapshot)
     return pd.concat([history_df, live_row], ignore_index=True)
@@ -425,6 +709,7 @@ def backfill_harti_price_gap(
     market: str,
     config_path: str = "config/config.yaml",
     live_fuel_snapshot: LiveFuelPriceSnapshot | None = None,
+    client: HartiLiveClient | None = None,
 ) -> pd.DataFrame:
     """Fill (vegetable, market)'s real HARTI bulletins for any calendar day between
     history_df's last known date for that group and live_snapshot.bulletin_date.
@@ -463,6 +748,9 @@ def backfill_harti_price_gap(
 
     live_fuel_snapshot: forwarded to finalize_live_row() for each backfilled row --
     see merge_harti_live_price()'s docstring.
+
+    client: a long-lived HartiLiveClient to reuse (it remembers bulletins it has read), so
+    a Streamlit rerun doesn't re-download them. Defaults to a new one.
     """
     group_history = history_df.loc[
         (history_df["vegetable"] == vegetable) & (history_df["market"] == market)
@@ -484,7 +772,7 @@ def backfill_harti_price_gap(
     if gap_start > gap_end:
         return history_df
 
-    client = HartiLiveClient.from_config(config_path)
+    client = client or HartiLiveClient.from_config(config_path)
     filled_rows = [
         row
         for row in (
@@ -531,9 +819,8 @@ def _fetch_and_finalize_harti_day(
         )
         return None
 
-    day_rows = day_snapshot.data[
-        (day_snapshot.data["vegetable"] == vegetable) & (day_snapshot.data["market"] == market)
-    ]
+    bulletin_rows = _canonical_vegetables(day_snapshot.data)
+    day_rows = bulletin_rows[(bulletin_rows["vegetable"] == vegetable) & (bulletin_rows["market"] == market)]
     if day_rows.empty:
         logger.info(
             "%s's bulletin had no '%s' price for '%s' -- skipped, not fabricated",
@@ -552,6 +839,7 @@ def backfill_internal_harti_gaps(
     market: str,
     config_path: str = "config/config.yaml",
     live_fuel_snapshot: LiveFuelPriceSnapshot | None = None,
+    client: HartiLiveClient | None = None,
 ) -> pd.DataFrame:
     """Fill any ISOLATED missing calendar day within (vegetable, market)'s own recent
     price history -- not the contiguous "recent" gap backfill_harti_price_gap() closes
@@ -606,7 +894,7 @@ def backfill_internal_harti_gaps(
     if not missing_days:
         return history_df
 
-    client = HartiLiveClient.from_config(config_path)
+    client = client or HartiLiveClient.from_config(config_path)
     filled_rows = [
         row
         for row in (
@@ -632,6 +920,8 @@ def backfill_internal_harti_gaps(
 
 
 IMPUTED_HISTORICAL_SOURCE_LABEL = "IMPUTED_HISTORICAL"
+UPLOAD_SOURCE_LABEL = "UPLOAD"
+LOCAL_WEATHER_SOURCE_LABEL = "LOCAL_WEATHER"
 
 
 def impute_missing_historical_prices(

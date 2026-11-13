@@ -11,7 +11,7 @@ adds a new file. Every value in it is a real Open-Meteo reading; nothing is fabr
 interpolated across regions, or estimated.
 
 Usage:
-    .venv/Scripts/python.exe scripts/build_historical_weather_by_region.py
+    .venv312/Scripts/python.exe scripts/build_historical_weather_by_region.py
 """
 
 import logging

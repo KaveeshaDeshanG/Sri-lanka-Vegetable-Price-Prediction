@@ -33,6 +33,10 @@ from config.config_loader import ConfigLoader
 logger = logging.getLogger(__name__)
 
 DEFAULT_URL = "https://ceypetco.gov.lk/marketing-sales/"
+# CEYPETCO's page became a JavaScript app (2026-11): its HTML no longer contains prices, and
+# the page itself loads them from this public endpoint. Tried first; the HTML parser remains
+# as a fallback in case the site changes back.
+DEFAULT_API_URL = "https://api.ceypetco.gov.lk/api/admin/fuel-prices/active"
 _REQUEST_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; veggie-price-prediction/1.0)"}
 
 # This project's fuel_price_columns -> the exact product name CEYPETCO's page uses for
@@ -96,8 +100,10 @@ class CeypetcoLiveFuelPriceClient:
         url: str = DEFAULT_URL,
         timeout_seconds: float = 15.0,
         label_map: dict[str, str] | None = None,
+        api_url: str = DEFAULT_API_URL,
     ) -> None:
         self._url = url
+        self._api_url = api_url
         self._timeout_seconds = timeout_seconds
         self._label_map = dict(label_map) if label_map else dict(DEFAULT_LABEL_MAP)
 
@@ -119,6 +125,7 @@ class CeypetcoLiveFuelPriceClient:
             url=config.get("fuel_api.url", DEFAULT_URL),
             timeout_seconds=config.get("fuel_api.timeout_seconds", 15.0),
             label_map=label_map or None,
+            api_url=config.get("fuel_api.api_url", DEFAULT_API_URL),
         )
 
     def fetch_latest_prices(self) -> LiveFuelPriceSnapshot:
@@ -130,8 +137,13 @@ class CeypetcoLiveFuelPriceClient:
                 configured column whose product label isn't present on the page, or
                 an unparseable price/effective-date for it.
         """
-        html = self._download()
-        cards = self._parse_cards(html)
+        source_url = self._api_url
+        try:
+            cards = self._fetch_cards_from_api()
+        except LiveFuelPriceError as error:
+            logger.info("CEYPETCO price API unavailable (%s); trying the HTML page", error)
+            source_url = self._url
+            cards = self._parse_cards(self._download())
 
         prices: dict[str, float] = {}
         effective_dates: dict[str, pd.Timestamp] = {}
@@ -149,14 +161,35 @@ class CeypetcoLiveFuelPriceClient:
             effective_dates[column] = effective_date
 
         logger.info(
-            "CeypetcoLiveFuelPriceClient: fetched %s from %s", prices, self._url
+            "CeypetcoLiveFuelPriceClient: fetched %s from %s", prices, source_url
         )
         return LiveFuelPriceSnapshot(
             prices=prices,
             effective_dates=effective_dates,
             retrieved_at=pd.Timestamp.now(),
-            source_url=self._url,
+            source_url=source_url,
         )
+
+    def _fetch_cards_from_api(self) -> dict[str, tuple[float, "pd.Timestamp"]]:
+        """{product name: (price, effective_date)} from CEYPETCO's public price endpoint."""
+        try:
+            response = requests.get(self._api_url, timeout=self._timeout_seconds, headers=_REQUEST_HEADERS)
+            if response.status_code != 200:
+                raise LiveFuelPriceError(f"price API returned HTTP {response.status_code}")
+            records = response.json()["data"]
+            cards = {
+                record["product"]: (
+                    float(record["price"]),
+                    pd.Timestamp(record["effectiveDate"]).tz_localize(None).normalize(),
+                )
+                for record in records
+                if record.get("product") and record.get("price") is not None and record.get("effectiveDate")
+            }
+        except (requests.exceptions.RequestException, ValueError, KeyError, TypeError, AttributeError) as error:
+            raise LiveFuelPriceError(f"price API request failed: {error}") from error
+        if not cards:
+            raise LiveFuelPriceError("price API returned no products")
+        return cards
 
     def _download(self) -> str:
         try:

@@ -1,328 +1,336 @@
-# Sri Lankan Vegetable Price Prediction — Project Report
-
-**Version:** 1.0.0 (per `pyproject.toml`)
-**Generated:** 2026-08-13
-**Scope of this report:** describes the system strictly as currently implemented and verified in this repository. No results, datasets, or experiments beyond what is directly traceable to the current code and test suite are included.
-
----
-
-> ⚠️ **Historical snapshot — read this before relying on any claim below.**
-> This report was generated on 2026-08-13, **before real HARTI/Dambulla market data was
-> acquired and before the model was trained on it.** Every statement below claiming "no
-> real data," describing `data/raw/` as empty/absent, giving a test count of 158, stating
-> metrics are "never persisted," or describing `models/` as containing only `.gitkeep`
-> reflects that earlier state and is now **superseded**.
->
-> **For current, accurate status, see [`../README.md`](../README.md) and
-> [`metrics/model_metrics.json`](metrics/model_metrics.json)** — real datasets, the real
-> trained Random Forest model, 264 passing tests, and persisted MAE/RMSE/R² are all in
-> place as of 2026-08-19.
->
-> This document is kept as-is otherwise: its description of the pipeline's architecture,
-> leakage-prevention design, and error-handling contracts remains accurate and is not
-> restated in the README. Only its data-availability/results/test-count claims (§1, §5,
-> §15, §20–24) are dated.
-
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [Problem Statement](#2-problem-statement)
-3. [Objectives](#3-objectives)
-4. [System Architecture](#4-system-architecture)
-5. [Complete Data Pipeline](#5-complete-data-pipeline)
-6. [Data Preprocessing](#6-data-preprocessing)
-7. [Feature Engineering](#7-feature-engineering)
-8. [Chronological Train/Test Splitting](#8-chronological-traintest-splitting)
-9. [Data Leakage Prevention](#9-data-leakage-prevention)
-10. [Categorical Encoding and Train-Only Fitting](#10-categorical-encoding-and-train-only-fitting)
-11. [Machine Learning Models](#11-machine-learning-models)
-12. [Model Configuration and Hyperparameters](#12-model-configuration-and-hyperparameters)
-13. [Evaluation Metrics](#13-evaluation-metrics)
-14. [Best-Model Selection](#14-best-model-selection)
-15. [Model and Inference-Artifact Persistence](#15-model-and-inference-artifact-persistence)
-16. [Prediction/Inference Pipeline](#16-predictioninference-pipeline)
-17. [Historical-Context Requirement](#17-historical-context-requirement)
-18. [Error Handling](#18-error-handling)
-19. [Streamlit Application](#19-streamlit-application)
-20. [Testing and Validation](#20-testing-and-validation)
-21. [Current Results](#21-current-results)
-22. [Limitations](#22-limitations)
-23. [Future Improvements](#23-future-improvements)
-24. [Conclusion](#24-conclusion)
-
----
-
-## 1. Project Overview
-
-This project is an AI-powered Sri Lankan vegetable price prediction system built on historical market and weather data (`pyproject.toml`'s own description). It is implemented as a modular Python pipeline (`src/`) covering data preprocessing, feature engineering, model training, evaluation, and inference, plus a Streamlit application (`app/`) that exposes the pipeline to an end user. The stack is pandas, NumPy, scikit-learn, XGBoost, Streamlit, and PyYAML, targeting Python ≥ 3.12.
-
-The system was built incrementally, with each stage backed by an automated pytest suite before the next stage was started. At the time of this report, **158 automated tests pass**.
-
-## 2. Problem Statement
-
-Vegetable prices in Sri Lankan markets (e.g. Dambulla, Pettah) vary day to day due to seasonal cycles, market-specific dynamics, and weather conditions. A system that can learn historical price patterns — combined with lagged weather signals — and produce a price estimate for a near-future date would be useful to producers, traders, and market analysts. This project builds the data and modelling infrastructure for that estimate, along with an inference pipeline and a demonstration UI.
-
-## 3. Objectives
-
-- Build a reproducible pipeline from raw market/weather data through to a trained, evaluated model.
-- Keep every stage configuration-driven (`config/config.yaml`) rather than hardcoded, so the system is not tied to specific vegetables, markets, or file paths.
-- Prevent data leakage at every boundary: chronological (not random) splitting, train-only categorical fitting, and backward-only lag/rolling/weather features.
-- Compare multiple model families (Linear Regression, Random Forest, XGBoost) and select the best one by a configurable metric.
-- Provide a prediction/inference pipeline that reuses training-time fitted state exactly, with no silent fallback behavior.
-- Provide an accessible Streamlit interface over that pipeline.
-- Maintain thorough automated test coverage validating correctness properties (not just "it runs").
-
-## 4. System Architecture
-
-The codebase is organized by pipeline stage:
+# AI-Powered Sri Lankan Vegetable Price Prediction: Project Report
 
-| Package | Responsibility | Status |
-|---|---|---|
-| `config/` | `ConfigLoader` — typed, dotted-path access to `config.yaml` | Complete |
-| `src/data_collection/` | Load and validate raw market/weather CSVs | Complete |
-| `src/preprocessing/` | Clean, standardize, and merge market + weather data | Complete |
-| `src/feature_engineering/` | Date/lag/rolling/weather features, chronological split, categorical encoding, dataset building | Complete |
-| `src/models/` | Baseline, training, evaluation, model selection, persistence | Complete |
-| `src/prediction/` | Inference artifact persistence and the prediction pipeline | Complete |
-| `src/visualization/` | — | **Not implemented** (empty package, 0 lines beyond the module docstring-less `__init__.py`) |
-| `app/` | Streamlit UI (`Home.py`, `pages/1_Predict.py`, `services.py`) and bundled sample data | Complete |
-| `tests/` | pytest suite, one subpackage per `src/` package except `data_collection` | Present for every package **except `data_collection`** (see §20, §22) |
+**Version:** 1.0.0
+**Report date:** 2026-11-07
+**Data covered:** 2024-04-25 to 2026-11-06
 
-Within each package, the project consistently follows a pattern of small, single-responsibility modules composed by one orchestrator class per stage (`PreprocessingPipeline`, `TrainTestDatasetBuilder`, `ModelTrainingPipeline`, `PredictionPipeline`), so each transformation is independently testable and the orchestrators contain no transformation logic of their own — only sequencing.
+## Summary
 
-## 5. Complete Data Pipeline
+This project predicts wholesale vegetable prices at Sri Lanka's Dambulla market, from 1 to 30 days ahead. It uses real data: 870 HARTI price bulletins, Open-Meteo weather and CEYPETCO fuel prices. The system covers the whole path from reading source PDFs to a Streamlit dashboard.
 
-The production flow, traced through the actual current code:
-
-```
-raw CSVs (data/raw/*.csv — currently absent, see §22)
- → DataLoader.load_all()                              [src/data_collection/data_loader.py]
- → DataCleaner.clean_market_data()/clean_weather_data()[src/preprocessing/cleaner.py]
- → DataTransformer.transform_market_data()/            [src/preprocessing/transformer.py]
-   transform_weather_data()
- → DataMerger.merge()                                  [src/preprocessing/merger.py]
-   (the above four steps = PreprocessingPipeline.run() in src/preprocessing/pipeline.py)
- → FeatureEngineer.build_features()                    [src/feature_engineering/feature_engineer.py]
- → chronological_train_test_split()                    [src/feature_engineering/train_test_split.py]
- → FeatureEngineer.split_features_target()              (once per split)
- → CategoricalEncoder.fit_transform(X_train) /
-   CategoricalEncoder.transform(X_test)
-   (the above three steps = TrainTestDatasetBuilder.build() in dataset_builder.py)
- → ModelTrainer.train_all(X_train, y_train)             [src/models/trainer.py]
- → ModelEvaluator.evaluate_all(models, X_test, y_test)  [src/models/evaluator.py]
- → select_best_model(metrics)                           [src/models/model_selection.py]
- → save_model(best_model, "best_model.joblib")          [src/models/persistence.py]
- → save_inference_artifact(encoder, feature_columns,
-   "feature_pipeline_state.joblib")                     [src/prediction/predictor.py]
-   (training orchestration above = ModelTrainingPipeline.run() + app/services.train_demo_model())
- → new prediction input (a row with price = NaN)
- → PredictionPipeline._normalize() → build_features() → split_features_target(require_target=False)
- → Predictor.load() → Predictor.predict()               [src/prediction/pipeline.py, predictor.py]
- → app/pages/1_Predict.py renders the result or a typed error
-```
+The final model is a **direct forecaster**: a separate Ridge regression for each number of days ahead. On a test period of nearly six months, its next-day average error was Rs. 17.47 (7.51%), which is **4.3% lower** than simply repeating the last known price. The reduction ranges from 4.2% to 7.8% across all forecast ranges, and its 95% interval stays above zero in each one.
 
-Every stage in this diagram corresponds to code that exists and is exercised by the test suite today. The pipeline has never been run against real raw data (see §22); it has been run end to end against synthetic fixtures, including via the Streamlit app's own demo-training path.
+The gain is real but modest. Vegetable prices stay hard to predict, the gain varies by month and vegetable, and from 8 days ahead the model doesn't reduce the largest errors. A notable finding is that the earlier Linear Regression, Random Forest and XGBoost models had high R² (up to 0.965) but didn't beat yesterday's price. This is why every result here is compared with a simple baseline.
 
-## 6. Data Preprocessing
+## 1. Problem and objectives
 
-`src/preprocessing/cleaner.py` — `DataCleaner`:
-- `clean_market_data()`: drops exact duplicate rows; drops rows missing any of date/vegetable/market/price (no imputation of these); removes non-positive or non-numeric prices; applies `clean_text_columns()` (whitespace/casing hygiene, title-casing); drops unparseable or implausible dates (`preprocessing.min_valid_year`, no future dates).
-- `clean_weather_data()`: drops exact duplicates and missing dates; linearly interpolates missing rainfall/temperature/humidity readings in chronological order (edge gaps that can't be interpolated are dropped); removes physically implausible values (`preprocessing.temperature_min_c/max_c`, `preprocessing.humidity_min_pct/max_pct`).
+Vegetable prices in Sri Lankan markets move sharply from day to day. A useful estimate of future prices could help producers, traders and analysts plan. A prediction system is only useful, however, if it does better than the obvious alternative: assuming tomorrow's price will equal today's.
 
-`src/preprocessing/transformer.py` — `DataTransformer`: converts the date column to a real datetime dtype, standardizes vegetable/market names via `DEFAULT_VEGETABLE_ALIASES`/`DEFAULT_MARKET_ALIASES` (explicitly documented in the code as **illustrative alias sets, not yet validated against real HARTI/Dambulla exports**, since no real raw file has ever been loaded), coerces price/weather columns to numeric, and sorts chronologically.
+The objectives were to:
 
-`src/preprocessing/merger.py` — `DataMerger`: left-joins market data with weather data on date (market rows are the base — a price observation is always kept even if its weather is missing, which becomes NaN); duplicate weather rows for the same date are averaged before the join to avoid fan-out.
+1. Build a validated dataset from real published sources, with no invented values.
+2. Predict Dambulla wholesale prices up to 30 days ahead, using only information available on the forecast date.
+3. Measure accuracy honestly on later data, against a simple baseline.
+4. Provide a dashboard that explains its results and says when it can't produce one.
+5. Back the system with automated tests and browser checks.
 
-`src/preprocessing/pipeline.py` — `PreprocessingPipeline.run()` orchestrates load → clean → transform → merge → save as one call, with each step also individually callable.
+## 2. Data
 
-## 7. Feature Engineering
+All project datasets are real. A small synthetic sample is bundled only for trying the dashboard, and is labelled as synthetic everywhere it appears.
 
-All feature generators are in `src/feature_engineering/` and are composed by `FeatureEngineer.build_features()`.
+| Dataset | Rows | Range | Source |
+|---|---|---|---|
+| `harti_prices.csv` | 23,809 | 2024-04-25 to 2026-11-06 | HARTI daily bulletins, Dambulla wholesale |
+| `harti_all_markets.csv` | 184,996 | 2024-04-25 to 2026-11-06 | The same bulletins, all 10 markets |
+| `fuel_prices.csv` | 926 | 2024-04-25 to 2026-11-06 | CEYPETCO diesel and petrol revisions, per day |
+| `weather_data.csv` | 924 | 2024-04-25 to 2026-11-04 | Open-Meteo archive, Dambulla |
+| `weather_data_by_region.csv` | 7,392 | 2024-04-25 to 2026-11-04 | Open-Meteo archive, 8 locations |
 
-**Date features** (`date_features.py`, `DateFeatureGenerator`): `day_of_week`, `day_of_month`, `week_of_year`, `month`, `quarter`, derived from the date column. No Sri Lanka-specific season boundaries are hardcoded, since no such rule is present in `config.yaml`.
+**How values are derived.** HARTI publishes a daily price range, so each price is the range's midpoint. A fuel price is the latest published revision, carried forward until the next one. No value is random, estimated or interpolated in these files.
 
-**Lag features** (`lag_features.py`, `LagFeatureGenerator`): `price_lag_{n}d` for `n` in config's `feature_engineering.lag_periods_days` (default `[1, 7, 14, 30]`), computed via an exact-calendar-day **self-join** per `(vegetable, market)` group — not a positional `.shift()`, because the data is not guaranteed to be sampled on a strict daily cadence. A lag value is populated only when a row for that exact earlier date exists in the same group; otherwise it is left `NaN`, never fabricated.
+**Scope.** Predictions cover Dambulla and 31 vegetable labels. The other 9 markets are inputs only. `config/crop_production_regions.yaml` maps 14 vegetables to an evidence-based production region with a cited source, so Carrot, for example, uses Nuwara Eliya's weather. Other vegetables use the market's weather rather than a guessed location.
 
-**Rolling features** (`rolling_features.py`, `RollingFeatureGenerator`): `price_rolling_mean_{n}d` / `price_rolling_std_{n}d` for `n` in `feature_engineering.rolling_windows_days` (default `[7, 14, 30]`), computed via pandas time-based rolling with `closed="left"` — the window is `[date − n, date)`, explicitly excluding the current row's own price from its own rolling statistic.
+### 2.1 Validation
 
-**Weather features** (`weather_features.py`, `WeatherFeatureGenerator`): `{rainfall_mm,temperature_c,humidity_pct}_lag{n}d` for `n = feature_engineering.weather_lag_days` (default `14`), looked up by date only (weather is one national/regional series, not per group). The same-day weather columns present after the merge are deliberately **excluded** from the final feature set by `split_features_target()` — they are a fine training-time feature but assume the current day's weather is already observed, which does not hold for predicting a genuinely future date. The lagged version is always already-observed by construction, which is the documented reason it is used instead.
+`scripts/validate_real_datasets.py` writes the full results to `DATA_QUALITY_REPORT.md`.
 
-## 8. Chronological Train/Test Splitting
+**Comparison with source PDFs.** All 870 PDFs were read again by a separate extraction route (`Table.extract()`, where the dataset was built by word position). Of 184,996 cells, **184,996 matched**, with none differing and none found on only one side. Both routes share the same label and market name mapping, so a mapping error wouldn't show up there. To cover this, 40 random readings (4 per market) were also checked by eye against page images, and all 40 matched.
 
-`src/feature_engineering/train_test_split.py` — `chronological_train_test_split()` splits by the **date column's actual values** (via a stable `np.argsort`), not by row position, and not with `sklearn.model_selection.train_test_split`'s shuffling. The oldest `1 − test_size` fraction of rows (by date rank) becomes train, the newest `test_size` fraction becomes test. `test_size` defaults to `model.test_size` in config (`0.2`). Rows within each resulting split keep their original relative order. Ties on the same date are resolved deterministically (stable sort), not randomly.
-
-## 9. Data Leakage Prevention
-
-Leakage prevention is enforced structurally, not just by convention:
-
-- **Chronological, not random, split** — see §8.
-- **Feature computation is backward-only** — lag features require an exact *earlier* date; rolling features use `closed="left"`; weather-lag features reference an earlier date. None of the three generators can reference a value from a later date. This is why feature engineering runs on the full historical dataset *before* the split (test-period rows may legitimately need train-period history) without leaking train-period information forward, since nothing looks forward.
-- **Train-only categorical fitting** — see §10.
-- **Training never sees the test set** — `ModelTrainer.train_all(X_train, y_train)` has no `X_test`/`y_test` parameter at all; it is structurally impossible for it to use test data.
-- **Inference never fits anything** — grepping `src/prediction/` for `.fit(`/`.fit_transform(` returns zero matches. `Predictor.predict()` only ever calls `.transform()` on the persisted, already-fitted encoder.
-- **No train/test split during inference** — `PredictionPipeline.predict()` never calls `chronological_train_test_split()`; a single new-input DataFrame goes straight to feature engineering and prediction.
-
-These properties are additionally regression-tested (e.g. `test_no_future_information_leaks_into_training_features`, `test_lag_feature_does_not_leak_future_prices`, `test_predictor_never_calls_fit_on_the_encoder`, `test_pipeline_training_is_unaffected_by_test_split_contents`).
-
-## 10. Categorical Encoding and Train-Only Fitting
-
-`src/feature_engineering/categorical_features.py` — `CategoricalEncoder` wraps sklearn's `OneHotEncoder` with `handle_unknown="ignore"`, chosen specifically because the real vegetable/market vocabulary has never been observed (no real data has been loaded) and a category seen only at prediction time must not crash the pipeline — it is encoded as all-zero across that category's columns instead.
-
-The encoder is fit **exactly once in the entire codebase**: inside `TrainTestDatasetBuilder.build()` (`src/feature_engineering/dataset_builder.py`), on `X_train` only, then reused via `.transform()` for `X_test`. The fitted instance is exposed afterward via the builder's `fitted_encoder` property specifically so it can be persisted for inference — inference reuses this exact object and never creates or fits a new one.
-
-## 11. Machine Learning Models
-
-All three models are built and trained through one config-driven entry point, `ModelTrainer.train_all()` in `src/models/trainer.py`.
-
-- **Linear Regression** (`src/models/baseline.py`): plain `sklearn.linear_model.LinearRegression`, no hyperparameters. Used as the project's baseline — its closed-form OLS solution is deterministic, so it needs no random seed.
-- **Random Forest**: `sklearn.ensemble.RandomForestRegressor`, hyperparameters and `random_state` read from config (see §12).
-- **XGBoost**: `xgboost.XGBRegressor`, hyperparameters and `random_state` read from config (see §12).
-
-`ModelTrainer` uses a small factory registry (`_MODEL_FACTORIES`) keyed by the model names in `config.model.models_to_train`; the `"linear_regression"` entry delegates to `baseline.py` rather than re-implementing model construction.
-
-## 12. Model Configuration and Hyperparameters
-
-Current values in `config/config.yaml`, all confirmed consumed by code (see also §5 of the prior audit turn, re-verified this session by grep against every call site):
-
-| Key | Value | Consumed at |
-|---|---|---|
-| `project.random_seed` | `42` | `trainer.py` → `random_state` for Random Forest and XGBoost |
-| `model.test_size` | `0.2` | `train_test_split.py` (default when not passed explicitly) |
-| `model.target_column` | `"price"` | `feature_engineer.py` |
-| `model.models_to_train` | `["linear_regression", "random_forest", "xgboost"]` | `trainer.py` |
-| `model.random_forest.n_estimators` | `200` | `trainer.py` |
-| `model.random_forest.max_depth` | `10` | `trainer.py` |
-| `model.xgboost.n_estimators` | `200` | `trainer.py` |
-| `model.xgboost.learning_rate` | `0.05` | `trainer.py` |
-| `model.xgboost.max_depth` | `6` | `trainer.py` |
-
-Linear Regression intentionally receives no seed, since OLS has no stochastic component. Hyperparameter values are read via `ConfigLoader.get()` with in-code fallback defaults that mirror `config.yaml`'s own values; a dedicated test (`test_random_forest_uses_configured_hyperparameters`, `test_xgboost_uses_configured_hyperparameters`) verifies against a fixture config with deliberately *different* values, so this is confirmed to be genuine config consumption rather than a coincidental match between the fallback and the real file.
-
-## 13. Evaluation Metrics
-
-`src/models/evaluator.py` — `ModelEvaluator` computes exactly the metrics listed in `config.evaluation.metrics` (`["mae", "rmse", "r2"]`):
-
-- **MAE** — `sklearn.metrics.mean_absolute_error`
-- **RMSE** — `mean_squared_error(y_true, y_pred) ** 0.5` (computed manually rather than via a version-specific `squared=False`/`root_mean_squared_error` API, for compatibility across sklearn versions)
-- **R²** — `sklearn.metrics.r2_score`
-
-Evaluation is always performed with `model.predict(X_test)` against `y_test` — the held-out chronological test set — never against the training set.
-
-## 14. Best-Model Selection
-
-`src/models/model_selection.py` — `select_best_model()` reads `config.evaluation.best_model_metric` (default `"rmse"`) and picks the model with the best score for that metric, using a direction lookup (`mae`/`rmse` → lower is better, `r2` → higher is better) rather than assuming "lower always wins." It raises a clear `ModelSelectionError` if the configured metric is absent from a model's results or if no models were evaluated at all.
-
-## 15. Model and Inference-Artifact Persistence
-
-Two separate joblib files are written under `config.paths.models_dir` (`"models"`):
-
-- **`best_model.joblib`** — the selected best model, written by `ModelTrainingPipeline.run()` via `src/models/persistence.py`'s `save_model()`.
-- **`feature_pipeline_state.joblib`** — an `InferenceArtifact` (the fitted `CategoricalEncoder` + the exact ordered `feature_columns` list from `X_train`), written by `src/prediction/predictor.py`'s `save_inference_artifact()`.
-
-These are deliberately kept as two independent files so that "model missing" and "transformation state missing" are distinguishable failure modes at load time (`ModelArtifactNotFoundError` vs. `TransformationArtifactNotFoundError`), each independently tested. `persistence.py`'s `save_model`/`load_model` are generic joblib wrappers (not model-type-specific), reused by both the models and prediction layers rather than duplicated.
-
-As of this report, the real `models/` directory contains only a `.gitkeep` placeholder — these artifacts only exist when created inside a test's `tmp_path`, or if the Streamlit app's training flow has been run locally by a user.
-
-## 16. Prediction/Inference Pipeline
-
-`src/prediction/pipeline.py` — `PredictionPipeline.predict(input_df)`:
-
-1. **Normalizes** the new input using the same non-destructive steps training data went through — `DataCleaner.clean_text_columns()` and `DataTransformer`'s alias-standardization/dtype-conversion methods — so that category casing (e.g. `"carrot"` vs. the trained `"Carrot"`) matches what the encoder learned. The row-*dropping* cleaning rules (missing/invalid price, implausible dates) are deliberately **not** reused here, since they would delete the very row being predicted (its price is unknown by definition).
-2. Runs `FeatureEngineer.build_features()` and `split_features_target(drop_incomplete_rows=False, require_target=False)` — identical feature computation to training. `require_target` is a parameter added specifically to support this: it lets a row with an unknown (`NaN`) target survive, which `split_features_target()` would otherwise always drop.
-3. Treats every row whose price is `NaN` as "to predict" — no separate target-date parameter exists in the API.
-4. Delegates to `src/prediction/predictor.py`'s `Predictor`, which loads the persisted model and `InferenceArtifact`, encodes with the reused fitted encoder, reindexes to the persisted `feature_columns`, and calls `model.predict()`.
-
-## 17. Historical-Context Requirement
-
-Because lag/rolling/weather features are defined exactly as in §7, a prediction for a given date is only fully computable if the input's historical rows satisfy those same backward-looking requirements — specifically, an exact row at `date − n` for each configured lag/weather-lag window (up to 30 days back by default), and at least one to two points within each configured rolling window. A single new observation with no history is **not sufficient** to produce a real prediction.
-
-This is a deliberate design choice, not an oversight: `Predictor.predict()` does not substitute zero or any other fabricated value for a missing engineered feature. If the aligned feature matrix contains `NaN` in any column the model was trained on, it raises `FeatureAlignmentError`, naming the exact row and feature(s) responsible. This matters concretely for XGBoost, which has native missing-value handling and would otherwise silently produce a plausible-looking prediction from incomplete input rather than failing — the explicit pre-check exists specifically to prevent that.
-
-## 18. Error Handling
-
-Every stage defines its own specific exception type(s) rather than relying on generic exceptions, and none of them are swallowed silently:
-
-| Exception | Raised in | Condition |
-|---|---|---|
-| `ConfigKeyError` | `config/config_loader.py` | required config key missing/null |
-| `DataValidationError` | `src/data_collection/` | schema/type violation in raw data |
-| `FeatureEngineeringError` | `feature_engineer.py` | date/vegetable/market/price missing |
-| `ChronologicalSplitError` | `train_test_split.py` | bad `test_size`, missing/unparseable dates, split would be empty |
-| `CategoricalFeatureEncodingError` | `categorical_features.py` | vegetable/market column missing |
-| `ModelTrainingError` | `trainer.py` | unrecognized entry in `models_to_train` |
-| `EvaluationError` | `evaluator.py` | unrecognized entry in `evaluation.metrics` |
-| `ModelSelectionError` | `model_selection.py` | empty metrics, missing metric, unknown comparison direction |
-| `ModelArtifactNotFoundError` / `TransformationArtifactNotFoundError` | `predictor.py` | persisted model / inference artifact file absent |
-| `FeatureAlignmentError` | `predictor.py` | required feature missing/NaN after alignment (see §17) |
-| `PredictionInputError` | `prediction/pipeline.py` | malformed date, nothing to predict |
-
-In the Streamlit app, each of these is caught explicitly and rendered as a specific `st.error()` message rather than an unhandled stack trace.
-
-## 19. Streamlit Application
-
-`app/Home.py`: overview page. States the real-data limitation directly to the user, describes the pipeline, and links to the Predict page.
-
-`app/pages/1_Predict.py`: the interactive page. Lets the user choose between the bundled sample dataset (`app/sample_data/sample_history.csv` — 360 rows, 4 synthetic vegetable/market groups over 90 days, `source="SAMPLE"`) or uploading their own CSV of the same schema. If no trained model is found, it offers a "train model on loaded data" action, which is the first place in the project that actually wires `TrainTestDatasetBuilder` → `ModelTrainingPipeline` → `save_inference_artifact` together outside of a test. Once a model is available, the user selects a vegetable, market, and target date, and the page calls `PredictionPipeline`, displaying the result as a metric plus a matplotlib chart, or a specific error message per §18.
-
-`app/services.py`: all of the above's non-widget logic (`load_sample_history()`, `build_prediction_input()`, `train_demo_model()`), deliberately kept free of any Streamlit import so it is independently unit-testable.
-
-## 20. Testing and Validation
-
-**Automated (verified this session by running the suite directly):**
-
-```
-158 passed, 0 failed
-```
-
-| Package | Test count |
+| Check on `harti_all_markets.csv` | Result |
 |---|---|
-| `tests/preprocessing/` | 19 |
-| `tests/feature_engineering/` | 85 |
-| `tests/models/` | 27 |
-| `tests/prediction/` | 20 |
-| `tests/app/` | 7 |
-| **Total** | **158** |
+| Duplicate (bulletin, market, vegetable) rows | 0 |
+| Missing values | 0 |
+| Non-positive prices | 0 |
+| Unknown market or vegetable names | 0 |
+| Reported after its bulletin, or more than 7 days before it | 0 |
+| Bulletins with no PDF, or PDFs with no readings | 0 |
+| Dambulla rows or prices differing from `harti_prices.csv` | 0 |
+| Dates outside the fuel data | 0 |
+| Dates outside the weather data | 2 (2026-11-05 and 06, weather archive lag) |
+| Same reading repeated in a later bulletin | 53 |
+| At least 5× from the median (kept, needs review) | 275 |
+| At least 3× day-over-day change (kept, needs review) | 26 |
 
-After the run, `models/`, `data/processed/`, and `reports/` were checked directly and contain only `.gitkeep` files — no test leaves artifacts in the real project directories; all tests that write files use pytest's `tmp_path`.
+Most of the unusual values are Lime in October 2025, seen across several markets. They are kept as published, because removing them would mean replacing real records with a judgement call. `DATA_SOURCES.md` lists the most notable cases.
 
-**`tests/data_collection/` does not exist.** `src/data_collection/` has zero direct unit tests; it is only exercised indirectly through `tests/preprocessing/test_pipeline.py`'s fixture-based integration test.
+### 2.2 Known gaps
 
-**Not automated — manual/browser verification only, and not performed in this environment:** clicking through the Streamlit app's widgets, the train → rerun → predict interaction flow, uploading a real CSV file through the file uploader, `st.cache_resource` invalidation behavior after training, and whether the matplotlib chart renders as intended. What *was* verified automatically: both page scripts execute standalone with exit code 0 (no exceptions), and `streamlit run app/Home.py` was started headlessly and confirmed to serve HTTP 200 with a clean startup log before being shut down. This confirms the app boots and its Python executes without error; it does not confirm interactive correctness.
+Dambulla has no price on 63 of 926 calendar days (6.8%):
 
-## 21. Current Results
+- **50 days** have no bulletin listed.
+- **7 bulletins** exist, but with no Dambulla price.
+- **6 listings** link to a folder instead of a PDF.
 
-No real-world results are reported, and none should be inferred from this project. Specifically:
+Four of those six (2025-06-29, 07-02, 07-03 and 07-04) were later located on HARTI's server as valid PDFs, each with 28 Dambulla prices. They are **not** in the datasets or the model, because adding them would change the validated data and require retraining and re-evaluation. Missing records were never filled in the datasets.
 
-- **No real HARTI/Dambulla/weather data has been used anywhere in this project.** `data/raw/` contains only a `.gitkeep` file.
-- All 158 passing tests validate **correctness properties** (leakage-safety, column alignment, error handling, deterministic behavior, config consumption) against small, deterministic **synthetic** fixtures constructed for that purpose — they are not a sample of real market behavior and were never intended to be.
-- Model comparison metrics (MAE/RMSE/R²) are produced only transiently, in memory, during a training run (`ModelTrainingResult`), and are never written to `reports/metrics/` (which remains empty except its `.gitkeep`). No such values were captured or recorded as part of this report, and none are quoted here.
-- If a user runs the Streamlit app's demo-training action locally, it will produce metric numbers for models fit to the bundled **synthetic** sample dataset. Those numbers would describe how well a model fits synthetic data generated by a fixed formula, not real-world vegetable pricing, and are not reported here since doing so would risk being misread as a real accuracy claim.
+Some vegetables are sparse. Cabbage (Nuwara Eliya) has 103 rows and no reading since 2025-07-12, and Drumstick has 181.
 
-## 22. Limitations
+## 3. System design
 
-- **No real source data.** `data/raw/harti_prices.csv`, `dambulla_prices.csv`, and `weather_data.csv` are all absent. This is the project's central open blocker and has been true since the first investigation of this repository.
-- **No real-world accuracy claim is possible** as a direct consequence of the above.
-- **`src/visualization/` is unimplemented** — the package exists but contains no code beyond an empty `__init__.py`. The only chart in the project is the single matplotlib plot inline in `app/pages/1_Predict.py`.
-- **Evaluation metrics are not persisted** — `reports/metrics/` and `reports/figures/` exist as empty directories; comparison results only ever exist in memory during a single training run.
-- **`src/data_collection/` has no direct unit tests** (see §20).
-- **No version control.** This repository is not a git repository; there is no commit history to audit or reference.
-- **Streamlit interactivity is not machine-verified**, only its startup (see §20).
-- **`DataTransformer`'s vegetable/market alias tables are explicitly marked illustrative** in the code — built from general knowledge of Sri Lankan market naming variants, not validated against any real HARTI/Dambulla export, since none has been loaded.
-- **`LagFeatureGenerator` groups only by `(vegetable, market)`, not by data source.** The code documents that if HARTI and Dambulla DEC both report the same vegetable/market/date, lag lookups could draw from either source's series; this is flagged as an open question in the code, not resolved, pending real multi-source data to know how much it matters in practice.
+```
+config/                  Settings, and vegetable-to-region mapping
+src/
+  data_collection/       Raw data loaders; live HARTI, Open-Meteo and CEYPETCO clients
+  preprocessing/         Clean, standardize and merge
+  feature_engineering/   Features for both model families; chronological split; encoding
+  models/                Training, evaluation, selection, persistence; direct_forecaster.py
+  prediction/            Inference for the earlier models
+scripts/                 Rebuild datasets, validate, experiment, train and backtest
+app/                     Streamlit dashboard
+tests/                   Automated tests
+reports/                 This report, data documentation, saved metrics
+```
 
-## 23. Future Improvements
+Stack: Python 3.12, pandas 3.1, NumPy 2.5, scikit-learn 1.9, XGBoost 3.4, Streamlit 1.66 and PyMuPDF 2.1. Paths and settings live in `config/config.yaml`, and exact versions are pinned in `requirements.txt`.
 
-- Acquire and integrate real HARTI/Dambulla price data and real weather data (data sources previously researched include data.gov.lk, HARTI, meteo.gov.lk, Open-Meteo, and NASA POWER).
-- Add a `tests/data_collection/` suite.
-- Implement `src/visualization/` for exploratory data analysis and model-comparison charts.
-- Persist evaluation metrics and figures to `reports/metrics/` and `reports/figures/` rather than keeping them in memory only.
-- Add browser-based or Streamlit-native (`streamlit.testing.v1.AppTest`) automated UI tests.
-- Add hyperparameter search; hyperparameters are currently fixed, config-set values with no tuning process.
-- Revisit `LagFeatureGenerator`'s grouping to include `source` once real multi-source overlap is understood.
-- Adopt version control and a CI pipeline.
+## 4. Models
 
-## 24. Conclusion
+### 4.1 Earlier models, kept for comparison
 
-The project implements a complete, modular, and tested pipeline from raw-data ingestion through preprocessing, feature engineering, chronological splitting, leakage-safe categorical encoding, multi-model training and evaluation, best-model selection, artifact persistence, inference, and a Streamlit interface. Every stage is configuration-driven and backed by automated tests; 158 tests currently pass with no known failures. The system has not yet been validated against real Sri Lankan market or weather data — every result produced so far comes from deterministic synthetic fixtures built specifically to test correctness, not from real observations — so no claim of real-world predictive accuracy is made. The architecture is designed to accept real data without structural changes once it is acquired.
+Linear Regression, Random Forest (`n_estimators=200`, `max_depth=10`) and XGBoost (`n_estimators=200`, `learning_rate=0.05`, `max_depth=6`) were trained on 51 features: date, exact-day price lags, rolling price statistics, 14-day-old weather, fuel lags and categorical identity. Forecasting beyond one day feeds each prediction back in as the next day's input, so errors build up.
+
+Because these models didn't beat yesterday's price (section 6.2), a different design was developed.
+
+### 4.2 The direct forecaster
+
+`src/models/direct_forecaster.py` trains one model for each horizon from 1 to 30 days. Each one is a median imputer, a standard scaler and a Ridge regression, and predicts the **log change** from the last known price to the price that many days later. A forecast therefore uses only real data, never an earlier forecast, and needs no future weather.
+
+| Days ahead | Ridge α | Feature groups |
+|---|---|---|
+| 1 | 1000 | momentum, level, market, fuel, 14-day-old weather, other markets |
+| 2–10 | 1000 | momentum, rain totals, 14-day-old weather, level, other markets |
+| 11–21 | 1000 | rain totals, market, level, other markets |
+| 22–30 | 100 | momentum, calendar, rain totals, market, level |
+
+All models also receive each vegetable's identity.
+
+**Gaps.** A reading carries forward for up to 7 days, and the model is told how old it is. After that, the forecaster refuses rather than guesses.
+
+### 4.3 How the configuration was chosen
+
+Model type, regularization and feature groups were chosen on four consecutive 3-month validation windows before the test period (`scripts/model_experiments.py`), then scored on the test period once.
+
+Validation MAE reduction compared with holding the last price:
+
+| Days ahead | Linear | Ridge α=100 | Ridge α=1000 | Random Forest | XGBoost |
+|---|---|---|---|---|---|
+| 1 | 3.18% | 3.28% | **3.74%** | 3.59% | 3.26% |
+| 7 | 5.36% | 5.47% | **6.09%** | 5.05% | 5.44% |
+| 14 | 8.13% | 8.55% | **9.22%** | 7.65% | 8.96% |
+| 30 | 16.71% | **16.85%** | 15.58% | 10.33% | 12.09% |
+
+Percentage points of gain lost when each feature group is removed, on validation:
+
+| Days ahead | Price level | Momentum | Other markets | Rain totals | 14-day-old weather | Fuel |
+|---|---|---|---|---|---|---|
+| 1 | 0.12 | 1.23 | **3.81** | -0.18 | 0.05 | -0.04 |
+| 7 | **3.86** | 0.63 | 2.02 | 0.42 | 0.19 | -0.02 |
+| 14 | **8.38** | -0.56 | 0.22 | 1.18 | -0.04 | -0.59 |
+| 30 | **17.53** | 0.38 | -0.40 | 1.83 | 0.11 | -1.68 |
+
+Two findings stand out. Other markets' prices drive the next-day gain, and a vegetable's price level drives the longer-range gain, because prices tend to drift back toward their usual range. Weather and fuel added little, which is a useful result in itself: rainfall totals help slightly at longer ranges, while fuel changes didn't help at any range tested.
+
+Gains on the test period were lower than on validation at longer ranges, about 4–8% rather than 9–17%. The test scores in section 6 are the ones to rely on.
+
+## 5. Preventing data leakage
+
+A forecast is only meaningful if it uses what was actually known on the forecast date.
+
+- **Time-ordered evaluation.** Test scores come from models trained only on prices dated before the test period. Data is never shuffled.
+- **Backward-looking features.** Lag and rolling features look only at earlier dates. Tests change every later value and confirm that no earlier feature moves.
+- **Publication dates.** Meegoda and Veyangoda are reported 1 to 3 days late, so a reading dated one day may not be public until later. Other markets' prices are therefore keyed to the bulletin that published them, and a test confirms that a reading can't affect features before its bulletin appears.
+- **Training-only fitting.** The earlier models' categorical encoder is fitted once, on the training split, and never refitted at prediction time.
+
+## 6. Results
+
+The test period is 2026-05-14 to 2026-11-06. MAE, RMSE and MAPE are measured against the actual recorded price. "Hold" means repeating the last known price.
+
+### 6.1 Direct forecaster
+
+| Days ahead | Rows | MAE (Rs) | RMSE (Rs) | MAPE | R² | Hold MAE | Hold RMSE | Hold MAPE | MAE reduction (95% interval) |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 4,773 | 17.47 | 28.62 | 7.51% | 0.969 | 18.26 | 30.83 | 7.81% | 4.3% (2.6 to 6.0) |
+| 2–3 | 9,537 | 23.78 | 39.88 | 9.92% | 0.940 | 25.10 | 42.22 | 10.60% | 5.3% (3.5 to 6.9) |
+| 4–7 | 19,029 | 32.13 | 54.12 | 13.01% | 0.889 | 33.53 | 55.42 | 13.98% | 4.2% (2.5 to 5.9) |
+| 8–14 | 33,187 | 42.76 | 73.34 | 16.86% | 0.796 | 44.70 | 72.82 | 18.67% | 4.3% (2.0 to 6.4) |
+| 15–21 | 33,067 | 53.53 | 93.93 | 20.72% | 0.667 | 57.70 | 93.71 | 23.91% | 7.2% (4.5 to 9.8) |
+| 22–30 | 42,374 | 65.66 | 115.01 | 25.10% | 0.502 | 71.20 | 114.33 | 29.36% | 7.8% (4.4 to 11.2) |
+
+The intervals come from resampling whole dates, because vegetables on one date tend to move together.
+
+**Reading these results:**
+
+- **Average errors improve at every range,** with intervals above zero.
+- **The largest errors don't.** From 8 days ahead, RMSE is about the same as holding the price.
+- **Error grows with distance.** At 22–30 days it is about 25%, so distant forecasts are rough guides.
+
+### 6.2 Comparison with the earlier models
+
+Next-day, on the 3,836 rows every method can score:
+
+| Method | MAE (Rs) | RMSE (Rs) | MAPE | R² |
+|---|---|---|---|---|
+| **Direct forecaster** | **17.56** | **28.89** | **7.42%** | **0.9693** |
+| Hold last price | 18.27 | 30.97 | 7.69% | 0.9647 |
+| Earlier Linear Regression | 18.63 | 30.98 | 7.82% | 0.9647 |
+
+Earlier models on their own 3,915 test rows:
+
+| Method | MAE (Rs) | RMSE (Rs) | R² |
+|---|---|---|---|
+| Yesterday's price (no model) | 18.17 | 30.77 | 0.9649 |
+| Linear Regression (selected) | 18.56 | 30.82 | 0.9648 |
+| Random Forest | 18.75 | 31.23 | 0.9639 |
+| XGBoost | 19.84 | 37.74 | 0.9472 |
+
+None of these beats yesterday's price. Their high R² mostly reflects how closely today's price follows yesterday's and how much average price differs between vegetables, so **R² alone would have been misleading here**.
+
+For 15–30 days ahead, on the same sample of 8 vegetables and 6 start dates, error was 25.8% for the direct forecaster, 27.8% for holding the price, and 36.5% for forecasting one day at a time.
+
+### 6.3 Consistency
+
+**By vegetable.** Next-day, the model beats holding the price for 21 of 30 vegetables with test rows. It does worse for Big Onion (Local), Big Onion (Imported), Manioc, Beetroot, Beetroot (Nuwara Eliya), Brinjal, Lime, Ladies Fingers and Drumstick. Cabbage (Nuwara Eliya) has no test rows.
+
+**By month.** MAE reduction compared with holding the price, by the month of the predicted date:
+
+| Days ahead | May | Jun | Jul | Aug | Sep | Oct | Nov |
+|---|---|---|---|---|---|---|---|
+| 1 | 6.2% | 7.2% | 3.6% | 3.5% | 3.3% | 1.7% | 6.1% |
+| 7 | 11.0% | 10.4% | -1.8% | 8.5% | -3.0% | -4.8% | 11.2% |
+| 14 | 18.9% | 12.7% | 2.5% | 24.4% | -10.1% | -14.2% | 7.8% |
+| 30 | 37.8% | 18.4% | 18.4% | 14.0% | -6.3% | -15.5% | -17.9% |
+
+May and November are part months. Next-day gains stayed positive throughout, but longer-range gains turned negative in several months, particularly September and October. Longer-range forecasts should not be assumed to beat a simple baseline in any given month.
+
+## 7. Dashboard
+
+The Streamlit dashboard (`app/Home.py`) has five pages:
+
+- **Home:** the approach, and whether the forecaster is ready.
+- **Predict:** next-day and multi-day forecasts, with a chart, the weather used, the sources and the model behind each result.
+- **Model Performance:** the results above, read directly from the saved reports.
+- **Price History:** each vegetable's prices and weather. The line breaks across gaps longer than 7 days rather than implying prices were recorded.
+- **Cultivation Planner:** from a planting date, the expected harvest window, the price around it and a suggested selling period, for 18 crop entries (17 crops).
+  - **Harvest timing** is the Department of Agriculture's published guidance (`data/reference/doa_harvest_durations.csv`), shown with its source. It is not a model prediction: no farm-level planting and harvest records exist to train one.
+  - **Prices** are the direct forecaster's output, shown only when the harvest falls within its 30-day reach, and only when the price series is recent. Each forecast carries a likely range: the middle 80% of the forecaster's errors on the test period, from `scripts/forecast_error_bands.py`.
+  - **A selling day** is suggested only when its low estimate beats the first harvest day's forecast.
+  - **Otherwise**, the page shows recorded prices from the same weeks of earlier years, labelled as history.
+  - **Further reading:** `reports/CULTIVATION_DATA_PLAN.md` sets out the data a trained harvest-duration model, and longer price forecasts, would need.
+
+| Data source | Model |
+|---|---|
+| Historical dataset (real) | Direct forecaster |
+| Latest HARTI Data (real, adds the newest published bulletin) | Direct forecaster |
+| Upload a CSV | Earlier comparison model, or a temporary sandbox model |
+| Bundled sample (synthetic) | Temporary sandbox model |
+
+**No silent model changes.** The forecaster needs its model file, the all-markets dataset and the regional weather file. Final verification found that removing one of those datasets could change a forecast or switch model with no warning. This was corrected. The page now names the problem and gives no real-data prediction, and the earlier model is used only if the user explicitly asks for it. A sandbox model is saved separately and can't overwrite the project's models.
+
+**Uploaded data.** Uploads use the earlier model because the forecaster needs other markets' prices and regional weather for the same dates, and it has never been evaluated on uploads. No accuracy score applies to an upload, and the page says so. Section 9 of the `README.md` lists these limits in full.
+
+## 8. Testing and verification
+
+**Automated tests:** 554 passed, 0 failed, 0 skipped.
+
+| Area | Tests |
+|---|---|
+| Dashboard and services (`tests/app`) | 177 |
+| Data collection | 125 |
+| Feature engineering | 120 |
+| Models | 57 |
+| Prediction | 35 |
+| Preprocessing | 29 |
+| Scripts | 11 |
+
+Tests cover correctness rather than just whether code runs: leakage, error handling, damaged files and model selection on the Predict page. Hashes confirmed that running the suite leaves datasets, models and saved metrics unchanged. The suite still reports 345 warnings, all the same pandas deprecation in `date_features.py`, which doesn't affect current results.
+
+**Real-browser testing.** Every page was opened and used in a real browser against a running server. This covered several vegetables, forecast ranges of 1, 7 and 30 days, refusal of day 31, invalid uploads, and date ranges with no data. Damaged-file scenarios ran on a temporary copy of the project, including missing datasets, unreadable model files and corrupt reports. Each gave a clear message, with no crash.
+
+**End-to-end testing.** Every vegetable at 1, 7, 14 and 30 days ahead (124 cases) was run in the browser. Each displayed price matched one calculated independently from the saved model, and each named the Ridge forecaster. Latest HARTI mode matched for all 31 vegetables, and the 31 vegetables' weather inputs matched values recalculated from the raw files. Model Performance and Price History matched their source files on 475 values. 44 kinds of uploaded file and 63 damaged-file scenarios gave clear messages, and simulated HARTI, CEYPETCO and Open-Meteo outages were handled visibly.
+
+**Defects found by this verification, and fixed:**
+
+- A live bulletin's "Eggplant" rows didn't reach "Brinjal" in the forecaster's features.
+- Models could change silently when a dataset was missing (section 7).
+- Messages about missing files were misleading or contradicted each other.
+- A damaged regional weather file crashed the Predict and Price History pages.
+- Exact duplicate rows in an upload silently changed its prediction, and a day with two different prices wasn't flagged.
+- Home reported the forecaster as ready when a price file was damaged.
+
+**Not verified:**
+
+- Other browsers, mobile layouts and light theme.
+- Every vegetable at every horizon.
+- Behaviour during real outages of HARTI, Open-Meteo or CEYPETCO.
+- Very large uploads.
+- Whether future forecasts prove correct, which can't be known yet.
+
+## 9. Limitations
+
+- **Modest gain.** The improvement over the simple baseline is real but small, and it is inconsistent across months and vegetables.
+- **Evaluation.** There is one fixed test period and one training cut-off, covering under six months, so seasonal effects aren't fully tested. Earlier work had already reported other models' results on this period, so it isn't untouched in the strictest sense, although its results didn't influence the configuration.
+- **Saved model.** The saved models were refit on all data after scoring, so that exact version has no separate test score. The scores above come from models trained before the test period.
+- **Publication timing.** The model assumes a bulletin is available by the next day's forecast. HARTI sometimes publishes later.
+- **Scope.** Predictions cover Dambulla only.
+- **Data.** Known bulletins are missing, some vegetables are sparse, and some published values look unusual.
+- **Weather.** Each region uses one town's coordinates, not a district average, and only a fixed 14-day lag and recent totals are used.
+- **Uploaded data.** It uses an older model with no accuracy score for that data.
+- **Project setup.** The project isn't under version control, and `src/visualization/` is an unused empty package. `.gitignore` excludes the datasets, model files and metrics, so they need separate backups.
+
+## 10. Future work
+
+- Add the four located bulletins, then rebuild, revalidate, retrain and re-evaluate.
+- Evaluate over several test periods, including a full year, using rolling evaluation.
+- Investigate why longer-range gains fell in September and October 2026.
+- Add prediction intervals, so that each forecast shows its uncertainty.
+- Evaluate whether the direct forecaster can serve uploaded data.
+- Extend forecasts to other markets, which would need their own evaluation.
+- Adopt version control and automated test runs.
+
+## 11. Conclusion
+
+The project delivers a complete, tested system built on validated real data, from source PDFs to a working dashboard. Its Ridge direct forecaster beats the simple baseline on average at every range tested, by about 4–8%, with its largest measured benefit coming from other markets' published prices next-day and from price levels further ahead.
+
+The honest conclusion is that this is a useful but limited improvement. Prices follow their recent values closely, so a simple baseline is hard to beat, and the earlier models' high R² hid that they weren't beating it. Measuring against that baseline, keeping evaluation strictly time-ordered, and stating limits plainly are as important to this project's results as the model itself.
+
+## Appendix: reproducing the results
+
+Requires Python 3.12. Python 3.15 isn't supported, because PyMuPDF 2.1 depends on onnxruntime, which has no Python 3.15 build. The commands below are for Windows.
+
+```bash
+py -3.12 -m venv .venv312
+```
+
+```bash
+.venv312\Scripts\python.exe -m pip install -e ".[dev]"
+```
+
+```bash
+.venv312\Scripts\python.exe -m pytest
+```
+
+```bash
+.venv312\Scripts\python.exe -m streamlit run app/Home.py
+```
+
+Running `scripts/train_forecaster.py` retrains the model and overwrites the saved report, so back up `models/` and `reports/metrics/` first.
+
+| Evidence | Location |
+|---|---|
+| Direct forecaster results | `reports/metrics/direct_forecaster_metrics.json` |
+| Earlier model results | `reports/metrics/model_metrics.json` |
+| One-day-at-a-time backtest | `reports/metrics/forecast_backtest.json` |
+| Validation experiments | `reports/metrics/model_experiments_validation.json` |
+| Data sources and known issues | `reports/DATA_SOURCES.md` |
+| Measured data quality | `reports/DATA_QUALITY_REPORT.md` |
+| Monthly gains (section 6.3) | Recomputed from `score_on_test_period()` in `scripts/train_forecaster.py`; not stored in a saved report |

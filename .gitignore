@@ -2,24 +2,35 @@
 __pycache__/
 *.pyc
 .venv/
+.venv312/
 venv/
 *.egg-info/
+.pytest_cache/
 
-# Data & models (raw/processed data and trained models are regenerated, not committed)
-data/raw/*
-!data/raw/.gitkeep
+# Private settings and credentials (never commit)
+.env
+.env.*
+
+# Local tool state and archives
+.claude/
+*.rar
+
+# Data & models: the real datasets (data/raw), trained models (models/*.joblib) and evaluation
+# results (reports/metrics, reports/figures) ARE committed, so a fresh clone runs the app without
+# rebuilding from the 2 GB PDF archive. Every file is far below GitHub's 100 MB limit.
+# Only the derived processed dataset is regenerated locally (scripts/train.py).
 data/processed/*
 !data/processed/.gitkeep
-models/*.joblib
-models/**/*.joblib
-models/**/artifact_metadata.json
-reports/figures/*
-!reports/figures/.gitkeep
-reports/metrics/*
-!reports/metrics/.gitkeep
+# Sandbox models trained from the Predict page are local experiments only.
+models/demo/*
+!models/demo/.gitkeep
+
+# Daily update output (scripts/run_daily_update.bat)
+logs/
 
 # Editors / OS
 .vscode/
+.vs/
 .idea/
 .DS_Store
 

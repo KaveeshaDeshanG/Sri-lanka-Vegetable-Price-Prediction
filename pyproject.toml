@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "sl-veggie-price-prediction"
 version = "1.0.0"
 description = "AI-powered Sri Lankan vegetable price prediction system using historical market and weather data."
-requires-python = ">=3.12"
+# Upper bound: pymupdf 2.1 requires onnxruntime, which has no Python 3.15 build (checked 2026-11-08).
+requires-python = ">=3.12,<3.15"
 dependencies = [
     "pandas>=2.2.0",
     "numpy>=1.26.0",
@@ -19,6 +20,7 @@ dependencies = [
     "requests>=2.31.0",
     "pymupdf>=1.24.0",
     "beautifulsoup4>=4.12.0",
+    "pillow>=10.0.0",
 ]
 
 [project.optional-dependencies]

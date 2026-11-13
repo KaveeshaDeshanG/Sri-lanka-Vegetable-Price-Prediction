@@ -27,6 +27,8 @@ def save_metrics_report(
     dataset_summary: dict[str, Any] | None = None,
     filename: str = DEFAULT_METRICS_FILENAME,
     config_path: str = "config/config.yaml",
+    naive_baseline: dict[str, float] | None = None,
+    per_vegetable: list[dict[str, Any]] | None = None,
 ) -> str:
     """Write every trained model's evaluation metrics plus the best-model selection to JSON.
 
@@ -40,6 +42,9 @@ def save_metrics_report(
         best_model_metric: config.evaluation.best_model_metric, the metric used to choose it.
         dataset_summary: optional extra context (row counts, feature count, ...) to
             include verbatim under the report's "dataset" key.
+        naive_baseline: optional metrics for predicting yesterday's price on the same test
+            rows, the comparison any claim of predictive skill has to beat.
+        per_vegetable: optional best-model vs baseline results for each vegetable.
     """
     config = ConfigLoader(config_path)
     resolved_dir = Path(config.get("paths.metrics_dir", "reports/metrics"))
@@ -56,6 +61,10 @@ def save_metrics_report(
             "selection_value": metrics[best_model_name][best_model_metric],
         },
     }
+    if naive_baseline is not None:
+        report["naive_baseline"] = naive_baseline
+    if per_vegetable is not None:
+        report["per_vegetable"] = per_vegetable
     resolved_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     logger.info("Metrics report: saved to '%s'", resolved_path)
     return str(resolved_path)

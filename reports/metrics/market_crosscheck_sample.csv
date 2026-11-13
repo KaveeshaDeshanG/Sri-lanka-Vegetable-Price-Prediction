@@ -1,0 +1,41 @@
+id,market,published,reported,vegetable,csv_price,position_reread,position_match
+1,Bandarawela,2024-05-31,2024-05-31,Brinjals,175.0,150 - 200,True
+2,Bandarawela,2026-02-11,2026-02-11,Big Onion (Imported),162.5,160 - 165,True
+3,Bandarawela,2026-04-05,2026-04-05,Ladies Fingers,120.0,110 - 130,True
+4,Bandarawela,2026-05-21,2026-05-21,Carrot,300.0,290 - 310,True
+5,Dambulla,2024-10-01,2024-10-01,Snake Gourd,170.0,160 - 180,True
+6,Dambulla,2024-11-11,2024-11-11,Big Onion (Local),295.0,270 - 320,True
+7,Dambulla,2025-05-21,2025-05-21,Cabbage (Kandy),255.0,250 - 260,True
+8,Dambulla,2025-12-24,2025-12-24,Cabbage (Kandy),195.0,160 - 230,True
+9,Kandy,2024-05-27,2024-05-27,Beetroot (Nuwara Eliya),245.0,240 - 250,True
+10,Kandy,2024-06-05,2024-06-05,Luffa,250.0,240 - 260,True
+11,Kandy,2024-08-12,2024-08-12,Manioc,75.0,70 - 80,True
+12,Kandy,2025-03-17,2025-03-17,Brinjals,140.0,120 - 160,True
+13,Keppetipola,2024-11-29,2024-11-29,Cabbage (Nuwara Eliya),70.0,60 - 80,True
+14,Keppetipola,2025-01-21,2025-01-21,Manioc,95.0,90 - 100,True
+15,Keppetipola,2025-09-16,2025-09-16,Cucumber,105.0,100 - 110,True
+16,Keppetipola,2025-09-24,2025-09-24,Carrot,105.0,90 - 120,True
+17,Meegoda,2024-11-22,2024-11-21,Tomato,210.0,190 - 230,True
+18,Meegoda,2024-11-25,2024-11-24,Pumpkin,110.0,100 - 120,True
+19,Meegoda,2025-01-20,2025-01-19,Bitter Gourd,305.0,280 - 330,True
+20,Meegoda,2026-08-11,2026-08-10,Ash Plantain,140.0,130 - 150,True
+21,Norochchole,2024-07-16,2024-07-16,Radish,35.0,30 - 40,True
+22,Norochchole,2024-10-16,2024-10-16,Brinjal,135.0,130 - 140,True
+23,Norochchole,2025-06-15,2025-06-15,Bitter Gourd,325.0,300 - 350,True
+24,Norochchole,2026-01-08,2026-01-08,Tomato,275.0,200 - 350,True
+25,Nuwaraeliya,2024-09-10,2024-09-10,Tomato,150.0,140 - 160,True
+26,Nuwaraeliya,2025-01-26,2025-01-26,Radish,70.0,60 - 80,True
+27,Nuwaraeliya,2025-10-18,2025-10-18,Beetroot (Nuwara Eliya),85.0,80 - 90,True
+28,Nuwaraeliya,2026-06-25,2026-06-25,Tomato,480.0,460 - 500,True
+29,Peliyagoda,2024-08-27,2024-08-27,Pumpkin,80.0,70 - 90,True
+30,Peliyagoda,2025-05-03,2025-05-03,Cabbage (Kandy),360.0,320 - 400,True
+31,Peliyagoda,2025-07-21,2025-07-21,Drumstick,325.0,200 - 450,True
+32,Peliyagoda,2026-03-09,2026-03-09,Beetroot,65.0,60 - 70,True
+33,Thambuththegama,2024-06-27,2024-06-27,Luffa,175.0,150 - 200,True
+34,Thambuththegama,2024-10-28,2024-10-28,Big Onion (Local),212.5,150 - 275,True
+35,Thambuththegama,2025-04-08,2025-04-08,Beans,505.0,480 - 530,True
+36,Thambuththegama,2026-04-12,2026-04-12,Sweet Potato,125.0,110 - 140,True
+37,Veyangoda,2024-09-24,2024-09-23,Knol Khol,175.0,150 - 200,True
+38,Veyangoda,2025-01-17,2025-01-16,Ladies Fingers,180.0,160 - 200,True
+39,Veyangoda,2025-09-09,2025-09-08,Capsicum,260.0,240 - 280,True
+40,Veyangoda,2026-07-28,2026-07-27,Luffa,195.0,170 - 220,True

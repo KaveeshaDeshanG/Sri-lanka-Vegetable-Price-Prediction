@@ -302,7 +302,7 @@ def test_forecast_fetches_live_weather_when_historical_coverage_falls_short(mock
     required_date = (latest + pd.Timedelta(days=1)) - pd.Timedelta(days=14)
 
     mock_client = MagicMock()
-    mock_client.fetch_recent_daily_weather.return_value = pd.DataFrame(
+    mock_client.fetch_historical_daily_weather.return_value = pd.DataFrame(
         {
             "date": [required_date],
             "rainfall_mm": [9.9],
@@ -316,8 +316,8 @@ def test_forecast_fetches_live_weather_when_historical_coverage_falls_short(mock
         history, "Tomato", "Dambulla", latest + pd.Timedelta(days=1), pipeline, config_path
     )
 
-    assert mock_client.fetch_recent_daily_weather.called
-    assert "Open-Meteo weather forecast" in result.data_sources
+    assert mock_client.fetch_historical_daily_weather.called  # the fixture's dates are long past
+    assert "Open-Meteo historical weather archive" in result.data_sources
     assert pd.notna(result.predicted_price)
 
 
@@ -731,4 +731,4 @@ def test_max_supported_forecast_date_uses_the_real_provider_constant_and_config(
     estimate = max_supported_forecast_date(latest_actual, str(config_path))
 
     today = pd.Timestamp.now().normalize()
-    assert estimate == today + pd.Timedelta(days=MAX_FORECAST_DAYS - 1 + 14)
+    assert estimate == today + pd.Timedelta(days=MAX_SEASONAL_FORECAST_DAYS - 1 + 14)

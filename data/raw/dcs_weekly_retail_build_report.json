@@ -1,0 +1,17 @@
+{
+  "rows": 11439,
+  "problems": [
+    {
+      "file": "DCSB-WRP-2020-08-W2.pdf",
+      "reason": "no priced rows found"
+    },
+    {
+      "file": "DCSB-WRP-2022-06-W4.pdf",
+      "reason": "no 'RETAIL PRICES - <n> Week of <Month> <Year>' title"
+    },
+    {
+      "file": "DCSB-WRP-2024-01-W4.pdf",
+      "reason": "title week 2023-01 W4 doesn't match the file name DCSB-WRP-2024-01-W4.pdf"
+    }
+  ]
+}

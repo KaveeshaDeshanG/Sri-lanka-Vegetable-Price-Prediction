@@ -1,0 +1,43 @@
+id,date,vegetable,csv_price,csv_raw_cell,position_reread,position_match,source_pdf
+1,2024-05-16,Leeks,185.0,170 - 200,170 - 200,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/May/daily_16-05-2024.pdf
+2,2024-05-30,Ash Plantain,135.0,120 - 150,120 - 150,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/May/daily_30-05-2024.pdf
+3,2024-06-03,Big Onion (Imported),190.0,170 - 210,170 - 210,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/June/daily_03-06-2024.pdf
+4,2024-06-08,Manioc,100.0,90 - 110,90 - 110,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/June/daily_08-06-2024.pdf
+5,2024-06-11,Sweet Potato,140.0,130 - 150,130 - 150,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/June/daily_11-06-2024.pdf
+6,2024-09-01,Manioc,75.0,70 - 80,70 - 80,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/September/daily_01-09-2024.pdf
+7,2024-09-09,Snake Gourd,140.0,130 - 150,130 - 150,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/September/daily_09-09-2024.pdf
+8,2024-09-23,Capsicum,425.0,400 - 450,400 - 450,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/September/daily_23-09-2024.pdf
+9,2024-09-27,Potato (Welimada),215.0,210 - 220,210 - 220,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/September/daily_27-09-2024.pdf
+10,2024-10-22,Potato (Imported),155.0,150 - 160,150 - 160,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/October/daily_22-10-2024.pdf
+11,2024-10-23,Radish,42.5,35 - 50,35 - 50,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/October/daily_23-10-2024.pdf
+12,2024-11-01,Leeks,135.0,120 - 150,120 - 150,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/November/daily_01-11-2024.pdf
+13,2024-12-08,Radish,85.0,80 - 90,80 - 90,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/December/daily_08-12-2024.pdf
+14,2024-12-19,Long Beans,275.0,250 - 300,250 - 300,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2024/December/daily_19-12-2024.pdf
+15,2025-01-02,Capsicum,500.0,450 - 550,450 - 550,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/January/daily_02-01-2025.pdf
+16,2025-01-30,Potato (Nuwara Eliya),355.0,350 - 360,350 - 360,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/January/daily_30-01-2025.pdf
+17,2025-03-04,Cabbage (Kandy),275.0,250 - 300,250 - 300,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/March/daily_04-03-2025.pdf
+18,2025-04-23,Potato (Nuwara Eliya),210.0,200 - 220,200 - 220,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/April/daily_23-04-2025.pdf
+19,2025-04-27,Cabbage (Kandy),255.0,230 - 280,230 - 280,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/April/daily_27-04-2025.pdf
+20,2025-04-28,Leeks,165.0,150 - 180,150 - 180,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/April/daily_28-04-2025.pdf
+21,2025-05-11,Leeks,190.0,180 - 200,180 - 200,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/May/daily_11-05-2025.pdf
+22,2025-05-24,Manioc,70.0,60 - 80,60 - 80,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/May/daily_24-05-2025.pdf
+23,2025-06-16,Long Beans,100.0,80 - 120,80 - 120,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/June/daily_16-06-2025.pdf
+24,2025-08-03,Potato (Nuwara Eliya),305.0,300 - 310,300 - 310,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_03-08-2025.pdf
+25,2025-08-06,Potato (Imported),152.5,130 - 175,130 - 175,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_06-08-2025.pdf
+26,2025-08-14,Beetroot,60.0,50 - 70,50 - 70,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_14-08-2025.pdf
+27,2025-10-18,Snake Gourd,190.0,180 - 200,180 - 200,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_18-10-2025.pdf
+28,2025-11-15,Green Chillies,225.0,200 - 250,200 - 250,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_15-11-2025.pdf
+29,2026-01-11,Radish,90.0,80 - 100,80 - 100,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/February/daily_11-01-2026.pdf
+30,2026-01-12,Cabbage (Kandy),175.0,150 - 200,150 - 200,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/February/daily_12-01-2026.pdf
+31,2026-01-26,Tomato,425.0,400 - 450,400 - 450,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/February/daily_26-01-2026.pdf
+32,2026-03-18,Luffa,80.0,70 - 90,70 - 90,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/March/daily_18-03-2026.pdf
+33,2026-04-28,Tomato,115.0,100 - 130,100 - 130,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/April/Vegetable Pricenew ex1(2026.04.28).pdf
+34,2026-04-29,Tomato,115.0,100 - 130,100 - 130,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/April/Vegetable Pricenew ex1(2026.04.29).pdf
+35,2026-06-11,Knol Khol,265.0,250 - 280,250 - 280,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/June/Vegetable Pricenew ex1(2026.06.11).pdf
+36,2026-07-28,Leeks,180.0,160 - 200,160 - 200,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/July/Vegetable Pricenew ex1(2026.07.28).pdf
+37,2026-08-24,Beetroot (Nuwara Eliya),210.0,200 - 220,200 - 220,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/August/Vegetable Pricenew ex1(2026.08.24).pdf
+38,2026-08-24,Snake Gourd,140.0,120 - 160,120 - 160,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/August/Vegetable Pricenew ex1(2026.08.24).pdf
+39,2026-09-05,Radish,85.0,70 - 100,70 - 100,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/September/Vegetables Wholesale Prices (2026.09.05).pdf
+40,2026-09-14,Knol Khol,140.0,130 - 150,130 - 150,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/September/Vegetable Pricenew ex1(2026.09.14).pdf
+41,2026-09-24,Green Chillies,290.0,250 - 330,250 - 330,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/September/Vegetable Pricenew ex1(2026.09.24).pdf
+42,2026-10-02,Big Onion (Imported),272.5,265 - 280,265 - 280,True,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/October/Vegetable Pricenew ex1(2026.10.02).pdf

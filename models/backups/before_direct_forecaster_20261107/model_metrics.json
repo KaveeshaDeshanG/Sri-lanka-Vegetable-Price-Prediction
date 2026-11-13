@@ -1,0 +1,252 @@
+{
+  "generated_at": "2026-11-07T01:11:15",
+  "dataset": {
+    "market_rows": 23809,
+    "weather_rows": 924,
+    "fuel_configured": true,
+    "fuel_rows": 926,
+    "merged_rows": 23809,
+    "train_rows": 13749,
+    "test_rows": 3915,
+    "feature_count": 51
+  },
+  "models": {
+    "linear_regression": {
+      "mae": 18.563495157655137,
+      "rmse": 30.820839869278053,
+      "r2": 0.9648140733062683
+    },
+    "random_forest": {
+      "mae": 18.746100329999773,
+      "rmse": 31.23180063724823,
+      "r2": 0.9638694890858075
+    },
+    "xgboost": {
+      "mae": 19.843716169530254,
+      "rmse": 37.738542836657615,
+      "r2": 0.9472466177158216
+    }
+  },
+  "best_model": {
+    "name": "linear_regression",
+    "selection_metric": "rmse",
+    "selection_value": 30.820839869278053
+  },
+  "naive_baseline": {
+    "mae": 18.170242656449552,
+    "rmse": 30.772417821730336,
+    "r2": 0.9649245463652966
+  },
+  "per_vegetable": [
+    {
+      "vegetable": "(not seen in training)",
+      "test_rows": 79,
+      "mae": 15.55488535869492,
+      "mape": 13.991261823613327,
+      "baseline_mae": 13.291139240506329
+    },
+    {
+      "vegetable": "Ash Plantain",
+      "test_rows": 142,
+      "mae": 8.380673527545396,
+      "mape": 7.513555248284239,
+      "baseline_mae": 8.450704225352112
+    },
+    {
+      "vegetable": "Beans",
+      "test_rows": 142,
+      "mae": 38.90229128401903,
+      "mape": 10.287893387427525,
+      "baseline_mae": 41.056338028169016
+    },
+    {
+      "vegetable": "Beetroot",
+      "test_rows": 142,
+      "mae": 20.074098969442744,
+      "mape": 8.393680217780162,
+      "baseline_mae": 18.661971830985916
+    },
+    {
+      "vegetable": "Beetroot (Nuwara Eliya)",
+      "test_rows": 142,
+      "mae": 14.326998026415664,
+      "mape": 5.022001193731174,
+      "baseline_mae": 12.570422535211268
+    },
+    {
+      "vegetable": "Big Onion (Imported)",
+      "test_rows": 142,
+      "mae": 7.888234738878871,
+      "mape": 3.729394554800859,
+      "baseline_mae": 6.954225352112676
+    },
+    {
+      "vegetable": "Big Onion (Local)",
+      "test_rows": 33,
+      "mae": 8.120850389088753,
+      "mape": 3.2990332615611626,
+      "baseline_mae": 6.666666666666667
+    },
+    {
+      "vegetable": "Bitter Gourd",
+      "test_rows": 142,
+      "mae": 23.225026181723806,
+      "mape": 6.219502275027449,
+      "baseline_mae": 22.288732394366196
+    },
+    {
+      "vegetable": "Brinjal",
+      "test_rows": 132,
+      "mae": 17.44755936891388,
+      "mape": 6.706895658672502,
+      "baseline_mae": 16.96969696969697
+    },
+    {
+      "vegetable": "Brinjals",
+      "test_rows": 142,
+      "mae": 22.970580732803676,
+      "mape": 8.344014300665423,
+      "baseline_mae": 22.464788732394368
+    },
+    {
+      "vegetable": "Cabbage (Kandy)",
+      "test_rows": 142,
+      "mae": 14.052768900258886,
+      "mape": 7.88547128363489,
+      "baseline_mae": 12.95774647887324
+    },
+    {
+      "vegetable": "Capsicum",
+      "test_rows": 142,
+      "mae": 35.90575172053082,
+      "mape": 8.73433764936066,
+      "baseline_mae": 35.563380281690144
+    },
+    {
+      "vegetable": "Carrot",
+      "test_rows": 142,
+      "mae": 20.43868779410441,
+      "mape": 8.141761725028228,
+      "baseline_mae": 22.077464788732396
+    },
+    {
+      "vegetable": "Cucumber",
+      "test_rows": 142,
+      "mae": 7.910071343347653,
+      "mape": 10.487413451916055,
+      "baseline_mae": 7.834507042253521
+    },
+    {
+      "vegetable": "Green Chillies",
+      "test_rows": 142,
+      "mae": 56.14889774498615,
+      "mape": 12.63180292390375,
+      "baseline_mae": 55.563380281690144
+    },
+    {
+      "vegetable": "Knol Khol",
+      "test_rows": 142,
+      "mae": 14.159363459658705,
+      "mape": 8.84265407287583,
+      "baseline_mae": 14.014084507042254
+    },
+    {
+      "vegetable": "Ladies Fingers",
+      "test_rows": 142,
+      "mae": 13.193859551850613,
+      "mape": 10.66091529679504,
+      "baseline_mae": 12.570422535211268
+    },
+    {
+      "vegetable": "Leeks",
+      "test_rows": 142,
+      "mae": 20.950771315807838,
+      "mape": 10.621946391834665,
+      "baseline_mae": 22.183098591549296
+    },
+    {
+      "vegetable": "Lime",
+      "test_rows": 142,
+      "mae": 41.26140589489609,
+      "mape": 8.133365105287183,
+      "baseline_mae": 38.90845070422535
+    },
+    {
+      "vegetable": "Long Beans",
+      "test_rows": 142,
+      "mae": 15.700228203560451,
+      "mape": 8.492079070834311,
+      "baseline_mae": 15.0
+    },
+    {
+      "vegetable": "Luffa",
+      "test_rows": 142,
+      "mae": 19.367911760214778,
+      "mape": 8.930392816687025,
+      "baseline_mae": 20.176056338028168
+    },
+    {
+      "vegetable": "Manioc",
+      "test_rows": 138,
+      "mae": 4.887217128896414,
+      "mape": 4.372654470831956,
+      "baseline_mae": 4.565217391304348
+    },
+    {
+      "vegetable": "Potato (Imported)",
+      "test_rows": 142,
+      "mae": 5.393509316465124,
+      "mape": 3.2149688120170334,
+      "baseline_mae": 5.450704225352113
+    },
+    {
+      "vegetable": "Potato (Nuwara Eliya)",
+      "test_rows": 83,
+      "mae": 7.386883833022277,
+      "mape": 2.5594102087558666,
+      "baseline_mae": 7.650602409638554
+    },
+    {
+      "vegetable": "Potato (Welimada)",
+      "test_rows": 42,
+      "mae": 5.532091846550656,
+      "mape": 2.7063424473706124,
+      "baseline_mae": 5.773809523809524
+    },
+    {
+      "vegetable": "Pumpkin",
+      "test_rows": 142,
+      "mae": 10.29585020344394,
+      "mape": 8.129367906570696,
+      "baseline_mae": 9.894366197183098
+    },
+    {
+      "vegetable": "Radish",
+      "test_rows": 142,
+      "mae": 7.30129780895574,
+      "mape": 9.424904161786209,
+      "baseline_mae": 7.27112676056338
+    },
+    {
+      "vegetable": "Snake Gourd",
+      "test_rows": 142,
+      "mae": 13.99283586779392,
+      "mape": 7.689938100864137,
+      "baseline_mae": 14.964788732394366
+    },
+    {
+      "vegetable": "Sweet Potato",
+      "test_rows": 142,
+      "mae": 6.286800763930727,
+      "mape": 5.773741992741186,
+      "baseline_mae": 5.721830985915493
+    },
+    {
+      "vegetable": "Tomato",
+      "test_rows": 142,
+      "mae": 36.212130803891135,
+      "mape": 10.52718335572435,
+      "baseline_mae": 33.028169014084504
+    }
+  ]
+}

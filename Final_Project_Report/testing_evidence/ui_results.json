@@ -1,0 +1,232 @@
+{
+ "executed_at": "2026-11-13 00:21",
+ "results": [
+  {
+   "id": "TC01",
+   "category": "Functional / UI",
+   "description": "Home page loads with model summary and datasets in use",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open http://localhost:8501",
+   "input": "None",
+   "expected": "Page loads without errors; shows model accuracy cards and the 'Data in use' table",
+   "actual": "Home page rendered; 'Data in use' table shown; model summary 'NEXT-DAY ERROR 7.5%'; last update line 'Last daily update 2026-11-11 03:45; newest HARTI bulletin listed 2026-'; exceptions on page: 0",
+   "status": "Pass",
+   "screenshot": "TC01_home.png"
+  },
+  {
+   "id": "TC02",
+   "category": "UI / Navigation",
+   "description": "All four pages load from the sidebar without exceptions",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open each page in turn: Predict, Model Performance, Price History, Cultivation Planner",
+   "input": "None",
+   "expected": "Each page renders its heading; no Streamlit exception boxes",
+   "actual": "Predict: loaded, exceptions 0; Model_Performance: loaded, exceptions 0; Price_History: loaded, exceptions 0; Cultivation_Planner: loaded, exceptions 0",
+   "status": "Pass",
+   "screenshot": null
+  },
+  {
+   "id": "TC04",
+   "category": "Input validation / Warning",
+   "description": "A target date that has already passed is flagged",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present; latest Dambulla data 2026-11-09; today 2026-11-13",
+   "steps": "1. Open Predict; 2. Select Beans; 3. Leave the default date (day after the latest data)",
+   "input": "Vegetable = Beans, date = 2026-11-10",
+   "expected": "A warning states that the date has already passed and that the result is a forecast, not the recorded price",
+   "actual": "Warning shown: '2026-11-10 has already passed (3 day(s) ago) ...'",
+   "status": "Pass",
+   "screenshot": "TC04_past_date_warning.png"
+  },
+  {
+   "id": "TC03",
+   "category": "Functional / Prediction",
+   "description": "Next-day price prediction for a real series",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select data source 'Historical dataset (real)'; 2. Select Beans; 3. Click Predict",
+   "input": "Beans, Dambulla, 2026-11-10",
+   "expected": "A price in Rs/kg with the model used, data sources and weather used",
+   "actual": "Predicted Price \u2014 Beans at Dambulla on 2026-11-10: Rs. 453.74 / kg; model stated: True; weather panel: True",
+   "status": "Pass",
+   "screenshot": "TC03_next_day_prediction.png"
+  },
+  {
+   "id": "TC05",
+   "category": "Functional / Prediction",
+   "description": "Multi-day forecast within the 30-day reach",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Choose 'Future Date Forecast (multi-step)'; 2. Set the forecast date to 2026-11-25; 3. Click Generate Forecast",
+   "input": "Beans, 2026-11-25",
+   "expected": "A forecast price, the horizon and a forecast warning are shown",
+   "actual": "Forecasted Price \u2014 Beans at Dambulla on 2026-11-25: Rs. 507.96 / kg; horizon 16 day(s) ahead; forecast warning shown: True",
+   "status": "Pass",
+   "screenshot": "TC05_multi_day_forecast.png"
+  },
+  {
+   "id": "TC06",
+   "category": "Input validation / Error handling",
+   "description": "A forecast beyond the 30-day reach is refused with a reason",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Set the forecast date to 2026-12-25 (46 days after the latest data); 2. Click Generate Forecast",
+   "input": "Beans, 2026-12-25",
+   "expected": "No price is produced; a clear message explains the date is beyond reach",
+   "actual": "Message: 'Cannot forecast that date: 2026-12-25 is 46 days after the latest known price (2026-11-09). The forecaster reaches at most 30 days ahead.'; price shown: False",
+   "status": "Pass",
+   "screenshot": "TC06_beyond_reach.png"
+  },
+  {
+   "id": "TC07",
+   "category": "Error handling / Data",
+   "description": "Series that cannot be forecast are excluded and explained",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open Predict; 2. Expand the 'recorded price series can't be forecast' panel",
+   "input": "None",
+   "expected": "Stale or untrained series are not offered; each is listed with a reason",
+   "actual": "Panel heading: '5 recorded price series can't be forecast'. Table rows (checked in the screenshot, as the table is drawn on a canvas): Bitter Gourd (Other), Bitter Gourd (Village), Brinjals (Other), Brinjals (Village) - 'not trained on this series (too few prices)'; Cabbage (Nuwara Eliya) - 'latest Dambulla price is 2025-07-12'",
+   "status": "Pass",
+   "screenshot": "TC07_unsupported_series.png"
+  },
+  {
+   "id": "TC08",
+   "category": "Integration (external source)",
+   "description": "Fetch the latest published HARTI bulletin live",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present; internet access",
+   "steps": "1. Open Predict; 2. Select 'Latest HARTI Data (real)'",
+   "input": "None",
+   "expected": "The newest bulletin is downloaded and its date and number of prices are shown, labelled as not real-time",
+   "actual": "Latest HARTI bulletin: 2026-11-12 (30 vegetable prices, fetched 2026-11-13 00:05); 'not a real-time feed' label: True",
+   "status": "Pass",
+   "screenshot": "TC08_latest_harti.png"
+  },
+  {
+   "id": "TC09",
+   "category": "Functional / Data source",
+   "description": "Synthetic sample data is clearly labelled as not real",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select 'Bundled sample data (synthetic)'",
+   "input": "app/sample_data/sample_history.csv",
+   "expected": "The data loads and is labelled synthetic; the earlier model, not the direct forecaster, is used",
+   "actual": "Caption: 'Loaded app/sample_data/sample_history.csv \u2014 360 synthetic row(s), 2026-05-15 to 2026-08-12. Not real market data.'; earlier-model notice: True",
+   "status": "Pass",
+   "screenshot": "TC09_sample_data.png"
+  },
+  {
+   "id": "TC10",
+   "category": "Input validation",
+   "description": "A valid CSV upload is accepted",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select 'Upload my own CSV'; 2. Upload the file",
+   "input": "valid_upload.csv",
+   "expected": "The file is loaded and a model option is offered, with no error",
+   "actual": "Observed: 'Preview loaded data'",
+   "status": "Pass",
+   "screenshot": "TC10_upload_valid_upload.png"
+  },
+  {
+   "id": "TC11",
+   "category": "Input validation",
+   "description": "A CSV without the price column is rejected",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select 'Upload my own CSV'; 2. Upload the file",
+   "input": "missing_price_column.csv",
+   "expected": "A clear error names the missing column; no prediction is made",
+   "actual": "Observed: 'The CSV is missing required column(s): ['price']. Columns found: ['date', 'vegetable', 'market', 'source', 'rainfall_mm', 'temperature_c', 'humidity_pct']. Headers must be lowercase, and values separa'",
+   "status": "Pass",
+   "screenshot": "TC11_upload_missing_price_column.png"
+  },
+  {
+   "id": "TC12",
+   "category": "Input validation",
+   "description": "An empty CSV is rejected",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select 'Upload my own CSV'; 2. Upload the file",
+   "input": "empty.csv",
+   "expected": "A clear error says the file is empty",
+   "actual": "Observed: 'That file is empty. It needs a header row and at least one row of data.'",
+   "status": "Pass",
+   "screenshot": "TC12_upload_empty.png"
+  },
+  {
+   "id": "TC13",
+   "category": "Functional / UI",
+   "description": "Price history for a market other than Dambulla",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open Price History; 2. Select market Kandy",
+   "input": "Market = Kandy",
+   "expected": "Chart and statistics for Kandy are shown",
+   "actual": "Heading: 'Ash Plantain wholesale price at Kandy'; latest/average/lowest/highest cards: True",
+   "status": "Pass",
+   "screenshot": "TC13_history_kandy.png"
+  },
+  {
+   "id": "TC14",
+   "category": "Functional / Data separation",
+   "description": "CBSL retail prices shown separately from wholesale",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Select 'CBSL daily report'; 2. Choose price type 'retail'",
+   "input": "Item Beans (default)",
+   "expected": "A retail-only chart with the source panel stating retail",
+   "actual": "Heading: 'Beans: retail price, CBSL'; markets include Narahenpita: True",
+   "status": "Pass",
+   "screenshot": "TC14_history_cbsl_retail.png"
+  },
+  {
+   "id": "TC15",
+   "category": "Functional / Planner",
+   "description": "A harvest beyond the forecast reach shows history, not a forecast",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open Cultivation Planner (Beans, bush types); 2. Keep today's planting date; 3. Generate",
+   "input": "Beans, bush types (45 days), planting 2026-11-13",
+   "expected": "First harvest 28 Dec 2026 (45 days later); price 'Not available'; prices from earlier years labelled as history",
+   "actual": "EXPECTED FIRST HARVEST 28 Dec 2026; forecast price not available: True; history table shown: True",
+   "status": "Pass",
+   "screenshot": "TC15_planner_beyond_reach.png"
+  },
+  {
+   "id": "TC16",
+   "category": "Functional / Planner + prediction",
+   "description": "A harvest within reach shows a forecast price and range",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Set planting date 2026-10-20; 2. Generate",
+   "input": "Beans, bush types, planting 2026-10-20",
+   "expected": "First harvest 4 Dec 2026; a forecast price with a likely range",
+   "actual": "EXPECTED FIRST HARVEST 4 Dec 2026; FORECAST PRICE AT HARVEST Rs. 450 / kg",
+   "status": "Pass",
+   "screenshot": "TC16_planner_within_reach.png"
+  },
+  {
+   "id": "TC17",
+   "category": "Functional / Evaluation display",
+   "description": "Model accuracy is shown against the naive baseline",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Open Model Performance",
+   "input": "None",
+   "expected": "Error by horizon for the model and for holding the last price",
+   "actual": "Next-day error shown: NEXT-DAY ERROR 7.51%; 'Hold last price' series present: True",
+   "status": "Pass",
+   "screenshot": null
+  },
+  {
+   "id": "TC18",
+   "category": "UI / Responsive",
+   "description": "Predict page usable on a phone-sized screen",
+   "preconditions": "App running at http://localhost:8501 (started with start_app.bat); stored datasets and saved models present",
+   "steps": "1. Set the viewport to 390 x 844; 2. Open Predict",
+   "input": "Viewport 390 px",
+   "expected": "No horizontal scrolling; controls stacked vertically",
+   "actual": "clientWidth 390, scrollWidth 390",
+   "status": "Pass",
+   "screenshot": "TC18_mobile_predict.png"
+  }
+ ],
+ "state": {
+  "beans_next_day": {
+   "heading": "Predicted Price \u2014 Beans at Dambulla on 2026-11-10",
+   "price": "Rs. 453.74 / kg"
+  },
+  "beans_multi": {
+   "heading": "Forecasted Price \u2014 Beans at Dambulla on 2026-11-25",
+   "price": "Rs. 507.96 / kg",
+   "horizon": "16 day(s) ahead"
+  }
+ }
+}

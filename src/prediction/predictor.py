@@ -181,6 +181,22 @@ class Predictor:
     def feature_columns(self) -> list[str]:
         return list(self._artifact.feature_columns)
 
+    def known_vegetables(self) -> list[str]:
+        """The vegetables training saw."""
+        encoder = self._artifact.categorical_encoder
+        return list(dict(zip(encoder.categorical_columns, encoder.encoder_.categories_))["vegetable"])
+
+    def unseen_categories(self, **categories: str) -> list[str]:
+        """Which of the given categories (e.g. vegetable="Drumstick") training never saw.
+
+        The encoder turns such a value into all zeros rather than failing, so the model
+        still returns a number, with nothing vegetable-specific behind it. Callers should
+        warn about any value returned here.
+        """
+        encoder = self._artifact.categorical_encoder
+        known = dict(zip(encoder.categorical_columns, encoder.encoder_.categories_))
+        return [value for column, value in categories.items() if column in known and value not in known[column]]
+
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """Encode X with the training-fitted encoder, align to the training feature schema, and predict.
 

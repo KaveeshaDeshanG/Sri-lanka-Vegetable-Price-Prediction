@@ -1,0 +1,19 @@
+crop,price_labels,min_days,max_days,counted_from,stage,scope,source_url,source_text
+Beans (bush types),Beans,45,45,planting,first harvest,crop guidance,https://doa.gov.lk/hordi-crop-bean/,Bush types can be harvested from 45 days after planting
+Beans (vine types),Beans,60,60,planting,first harvest,crop guidance,https://doa.gov.lk/hordi-crop-bean/,Vine types can be harvested from 60 days after planting
+Beetroot,Beetroot;Beetroot (Nuwara Eliya),75,90,transplanting,harvest,crop guidance,https://doa.gov.lk/hordi-crop-beet-root/,Crop cab be harvest 75- 90 days after transplanting
+Brinjal,Brinjal;Brinjals,70,84,transplanting,first harvest,crop guidance,https://doa.gov.lk/hordi-crop-brinjal/,Harvesting can be started 10-12 weeks after transplanting
+Cabbage,Cabbage (Kandy);Cabbage (Nuwara Eliya),90,110,planting,harvest,crop guidance,https://doa.gov.lk/hordi-crop-cabbage/,Crop can be harvest 90-110 days after planting
+Capsicum,Capsicum,75,75,nursery sowing,first harvest,crop guidance,https://doa.gov.lk/hordi-crop-capsicum/,First harvesting can be done 75 days after nursery sowing and at 5-7 day intervals
+Carrot,Carrot,110,110,planting,harvest,one released variety,https://doa.gov.lk/hordi-variety-carrot/,"medium maturity variety, harvest 110 days after planting"
+Knol Khol,Knol Khol,50,60,transplanting,harvest,crop guidance,https://doa.gov.lk/hordi-crop-knol-khol/,Harvest can be taken around 50 – 60 days after transplant
+Leeks,Leeks,137,137,transplanting,harvest,crop guidance,https://doa.gov.lk/hordi-crop-leeks/,Crop cab be harvest about 4 ½ months after transplanting
+Luffa,Luffa,60,70,planting,first harvest,crop guidance,https://doa.gov.lk/hordi-crop-luffa/,First harvesting can be taken around 60-70 days after planting
+Okra,Ladies Fingers,50,100,planting,harvesting period,crop guidance,https://doa.gov.lk/hordi-crop-okra/,Can be harvested every 2 days up to 25 times over 50-100 days after planting
+Snake Gourd,Snake Gourd,60,75,planting,harvest,crop guidance,https://doa.gov.lk/hordi-crop-snake-gourd/,Harvest the crop 60-75 days after planting with 4 days interval
+Radish,Radish,45,55,not stated,harvest,released varieties,https://doa.gov.lk/hordi-variety-raddish/,Can be harvested withing 45-55 days
+Potato,Potato (Nuwara Eliya);Potato (Welimada),100,110,not stated,maturity,released varieties,https://doa.gov.lk/hordi-variety-potato/,Medium maturity : 100- 110 days
+Pumpkin,Pumpkin,75,80,not stated,maturity for consumption,one released variety,https://doa.gov.lk/hordi-variety-pumpkin/,Maturity for consumption – 75-80 days
+Long Beans,Long Beans,45,70,not stated,first harvest,released varieties,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 45-50 days ... First harvest in 60-70 days
+Sweet Potato,Sweet Potato,91,122,not stated,harvest,released varieties,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest within 3- 3 ½ month ... Harvest at 3 ½ month – 4month
+Manioc,Manioc,274,365,not stated,harvest,released varieties,https://doa.gov.lk/hordi-variety-cassava/,Age 9-12 month

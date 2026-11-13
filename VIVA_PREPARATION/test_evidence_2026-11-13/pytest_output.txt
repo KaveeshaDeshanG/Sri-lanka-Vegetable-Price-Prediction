@@ -1,0 +1,36 @@
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 33%]
+........................................................................ [ 40%]
+........................................................................ [ 47%]
+........................................................................ [ 54%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 74%]
+........................................................................ [ 81%]
+........................................................................ [ 88%]
+........................................................................ [ 95%]
+....................................................                     [100%]
+============================== warnings summary ===============================
+tests/app/test_forecasting.py: 231 warnings
+tests/app/test_harti_live_services.py: 7 warnings
+tests/app/test_model_availability.py: 2 warnings
+tests/app/test_services.py: 6 warnings
+tests/feature_engineering/test_categorical_features.py: 1 warning
+tests/feature_engineering/test_dataset_builder.py: 14 warnings
+tests/feature_engineering/test_date_features.py: 4 warnings
+tests/feature_engineering/test_feature_engineer.py: 12 warnings
+tests/feature_engineering/test_train_test_split.py: 2 warnings
+tests/models/test_pipeline.py: 5 warnings
+tests/models/test_trainer.py: 2 warnings
+tests/prediction/test_pipeline.py: 22 warnings
+tests/prediction/test_pipeline_live_weather.py: 14 warnings
+tests/prediction/test_predictor.py: 14 warnings
+tests/scripts/test_train.py: 9 warnings
+  D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegetable-Price-Prediction-main\src\feature_engineering\date_features.py:45: Pandas4Warning: Series.dt.dayofweek is deprecated and will be removed in a future version. Use Series.dt.day_of_week instead.
+    df["day_of_week"] = date_series.dt.dayofweek
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1060 passed, 345 warnings in 516.80s (0:08:36)

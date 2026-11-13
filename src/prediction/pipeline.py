@@ -127,6 +127,9 @@ class PredictionPipeline:
                 "every row with an unknown price (previous default behavior)."
             )
 
+        if identity_given:
+            vegetable, market = self._normalize_identity(vegetable, market)
+
         normalized_df = self._normalize(input_df)
         predictor = self._require_predictor()
 
@@ -206,6 +209,7 @@ class PredictionPipeline:
                 f"PredictionPipeline: could not parse target_date {target_date!r} as a date"
             ) from error
 
+        vegetable, market = self._normalize_identity(vegetable, market)
         normalized_df = self._normalize(input_df)
         featured_df = self._feature_engineer.build_features(normalized_df)
 
@@ -225,6 +229,14 @@ class PredictionPipeline:
         if self._predictor is None:
             self._predictor = Predictor.load(config_path=self._config_path)
         return self._predictor
+
+    def _normalize_identity(self, vegetable: str, market: str) -> tuple[str, str]:
+        """Apply the same text and alias steps to a requested name that the input rows get,
+        so asking for "carrot" or "Eggplant" finds the row normalized to "Carrot"/"Brinjal"."""
+        identity = pd.DataFrame({self._vegetable_column: [vegetable], self._market_column: [market]})
+        identity = self._cleaner.clean_text_columns(identity, [self._vegetable_column, self._market_column])
+        identity = self._transformer.standardize_market_names(self._transformer.standardize_vegetable_names(identity))
+        return identity[self._vegetable_column].iloc[0], identity[self._market_column].iloc[0]
 
     def _normalize(self, input_df: pd.DataFrame) -> pd.DataFrame:
         """Apply the same non-destructive normalization training data went through.

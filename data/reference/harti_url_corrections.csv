@@ -1,0 +1,5 @@
+bulletin_date,listed_url,corrected_url,evidence
+2025-06-29,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_29-06-2025.pdf,"The archive page links this date to a folder (HTTP 403). The PDF at the corrected URL is a valid bulletin whose own date is 2025-06-29 (located 2026-11-07, re-checked by scripts/update_data.py on every run)."
+2025-07-02,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_02-07-2025.pdf,"As above; the PDF's own date is 2025-07-02."
+2025-07-03,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_03-07-2025.pdf,"As above; the PDF's own date is 2025-07-03."
+2025-07-04,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/,https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2025/December/daily_04-07-2025.pdf,"As above; the PDF's own date is 2025-07-04."

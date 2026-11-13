@@ -58,3 +58,42 @@ class ModelEvaluator:
     ) -> dict[str, dict[str, float]]:
         """Evaluate every model in models against the same held-out test set."""
         return {name: self.evaluate(model, X_test, y_test) for name, model in models.items()}
+
+    def evaluate_predictions(self, y_test: pd.Series, y_pred) -> dict[str, float]:
+        """Compute each configured metric for predictions that didn't come from a model,
+        such as a baseline read straight from a feature column."""
+        return {name: float(_METRIC_FUNCTIONS[name](y_test, y_pred)) for name in self._metrics}
+
+    def per_vegetable(
+        self,
+        model,
+        X_test: pd.DataFrame,
+        y_test: pd.Series,
+        baseline_column: str,
+        category_prefix: str = "vegetable_",
+    ) -> list[dict[str, object]]:
+        """Best-model vs baseline MAE and percentage error for each vegetable.
+
+        Rows whose one-hot columns are all zero are vegetables absent from training; they're
+        grouped under one label rather than attributed to a vegetable the model doesn't know.
+        """
+        category_columns = [column for column in X_test.columns if column.startswith(category_prefix)]
+        names = X_test[category_columns].idxmax(axis=1).str.removeprefix(category_prefix)
+        names = names.where(X_test[category_columns].sum(axis=1) > 0, "(not seen in training)")
+        frame = pd.DataFrame(
+            {"vegetable": names, "actual": y_test, "model": model.predict(X_test), "baseline": X_test[baseline_column]}
+        )
+        results = []
+        for vegetable, group in frame.groupby("vegetable"):
+            model_error = (group["actual"] - group["model"]).abs()
+            baseline_error = (group["actual"] - group["baseline"]).abs()
+            results.append(
+                {
+                    "vegetable": vegetable,
+                    "test_rows": len(group),
+                    "mae": float(model_error.mean()),
+                    "mape": float((model_error / group["actual"]).mean() * 100),
+                    "baseline_mae": float(baseline_error.mean()),
+                }
+            )
+        return results

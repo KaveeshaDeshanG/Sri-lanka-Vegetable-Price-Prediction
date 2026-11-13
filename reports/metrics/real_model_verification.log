@@ -1,0 +1,137 @@
+
+=== A. Artifact checks
+loaded LinearRegression | run id 26595ccbd6124745b0905f40c892da3b | artifact run id matches: True
+feature columns 51 | identical to earlier real-data schema: True
+training data {'source': 'HARTI historical dataset (paths.raw_files.harti_prices, + weather_data, + fuel_prices, + weather_data_by_region)', 'start_date': '2024-04-25', 'end_date': '2026-11-06', 'row_count': 23809, 'train_rows': 13749, 'test_rows': 3915}
+Drumstick in schema: False | test rows with Drumstick (all-zero vegetable encoding): 79
+X/y NaN 0 0
+
+=== B. Metrics recomputed; retrain reproduces
+saved model manual: {'MAE': 18.56, 'RMSE': 30.82, 'R2': 0.9648, 'MAPE%': 7.95}
+  linear_regression  {'MAE': 18.56, 'RMSE': 30.82, 'R2': 0.9648, 'MAPE%': 7.95} | persisted {'mae': 18.56, 'rmse': 30.82, 'r2': 0.9648}
+  random_forest      {'MAE': 18.75, 'RMSE': 31.23, 'R2': 0.9639, 'MAPE%': 8.02} | persisted {'mae': 18.75, 'rmse': 31.23, 'r2': 0.9639}
+  xgboost            {'MAE': 19.84, 'RMSE': 37.74, 'R2': 0.9472, 'MAPE%': 8.12} | persisted {'mae': 19.84, 'rmse': 37.74, 'r2': 0.9472}
+
+=== C. Baselines on the same test rows
+  yesterday (price_lag_1d)   {'MAE': 18.17, 'RMSE': 30.77, 'R2': 0.9649, 'MAPE%': 7.79}
+  last 7-day mean            {'MAE': 24.14, 'RMSE': 40.42, 'R2': 0.9395, 'MAPE%': 10.15}
+  same day last week         {'MAE': 36.65, 'RMSE': 59.63, 'R2': 0.8683, 'MAPE%': 15.22}
+  linear_regression  MAE reduction vs yesterday: -2.2%
+  random_forest      MAE reduction vs yesterday: -3.2%
+  xgboost            MAE reduction vs yesterday: -9.2%
+
+=== D. Per-vegetable test results (saved model vs yesterday)
+                    veg   n  mean_price  MAE  MAPE%    R2  base_MAE  beats_base
+  Potato (Nuwara Eliya)  83       290.0  7.4    2.6 0.778       7.7        True
+      Potato (Welimada)  42       208.0  5.5    2.7 0.863       5.8        True
+      Potato (Imported) 142       168.0  5.4    3.2 0.806       5.5        True
+      Big Onion (Local)  33       248.0  8.1    3.3 0.911       6.7       False
+   Big Onion (Imported) 142       216.0  7.9    3.7 0.952       7.0       False
+                 Manioc 138       111.0  4.9    4.4 0.631       4.6       False
+Beetroot (Nuwara Eliya) 142       293.0 14.3    5.0 0.909      12.6       False
+           Sweet Potato 142       108.0  6.3    5.8 0.774       5.7       False
+           Bitter Gourd 142       370.0 23.2    6.2 0.930      22.3       False
+                Brinjal 132       265.0 17.4    6.7 0.802      17.0       False
+           Ash Plantain 142       116.0  8.4    7.5 0.799       8.5        True
+            Snake Gourd 142       192.0 14.0    7.7 0.897      15.0        True
+        Cabbage (Kandy) 142       191.0 14.1    7.9 0.970      13.0       False
+                Pumpkin 142       136.0 10.3    8.1 0.911       9.9       False
+                   Lime 142       587.0 41.3    8.1 0.974      38.9       False
+                 Carrot 142       251.0 20.4    8.1 0.818      22.1        True
+               Brinjals 142       300.0 23.0    8.3 0.812      22.5       False
+               Beetroot 142       235.0 20.1    8.4 0.615      18.7       False
+             Long Beans 142       198.0 15.7    8.5 0.810      15.0       False
+               Capsicum 142       409.0 35.9    8.7 0.758      35.6       False
+              Knol Khol 142       166.0 14.2    8.8 0.923      14.0       False
+                  Luffa 142       216.0 19.4    8.9 0.871      20.2        True
+                 Radish 142        82.0  7.3    9.4 0.914       7.3       False
+                  Beans 142       400.0 38.9   10.3 0.675      41.1        True
+               Cucumber 142        80.0  7.9   10.5 0.897       7.8       False
+                 Tomato 142       355.0 36.2   10.5 0.818      33.0       False
+                  Leeks 142       200.0 21.0   10.6 0.762      22.2        True
+         Ladies Fingers 142       139.0 13.2   10.7 0.854      12.6       False
+         Green Chillies 142       495.0 56.1   12.6 0.925      55.6       False
+   (unseen in training)  79       119.0 15.6   14.0 0.864      13.3       False
+vegetables beating yesterday: 9 of 30 | median within-veg R2 0.8585
+largest errors:
+            veg      y      p   err
+Green Chillies  725.0  995.5 270.5
+Green Chillies 1100.0  836.9 263.1
+Green Chillies 1200.0  968.1 231.9
+Green Chillies  525.0  294.4 230.6
+          Lime 1425.0 1212.4 212.6
+Green Chillies 1250.0 1038.1 211.9
+
+=== E. Does the ranking hold? Expanding-window validation inside the data (in-memory)
+train to 2025-08-10, test 2025-08-10..2026-01-07 n=3187:
+    linear_regression  {'MAE': 20.91, 'RMSE': 49.21, 'R2': 0.9519, 'MAPE%': 10.04}
+    random_forest      {'MAE': 24.43, 'RMSE': 67.51, 'R2': 0.9095, 'MAPE%': 10.35}
+    xgboost            {'MAE': 27.83, 'RMSE': 83.61, 'R2': 0.8612, 'MAPE%': 10.92}
+    yesterday          {'MAE': 20.42, 'RMSE': 53.83, 'R2': 0.9425, 'MAPE%': 9.68}
+train to 2026-01-07, test 2026-01-07..2026-06-13 n=3002:
+    linear_regression  {'MAE': 19.07, 'RMSE': 30.17, 'R2': 0.9434, 'MAPE%': 10.72}
+    random_forest      {'MAE': 18.95, 'RMSE': 30.6, 'R2': 0.9418, 'MAPE%': 10.93}
+    xgboost            {'MAE': 19.31, 'RMSE': 30.56, 'R2': 0.9419, 'MAPE%': 11.31}
+    yesterday          {'MAE': 18.06, 'RMSE': 30.46, 'R2': 0.9423, 'MAPE%': 9.78}
+train to 2026-06-13, test 2026-06-13..2026-11-06 n=3327:
+    linear_regression  {'MAE': 17.46, 'RMSE': 29.37, 'R2': 0.97, 'MAPE%': 7.62}
+    random_forest      {'MAE': 17.74, 'RMSE': 30.12, 'R2': 0.9684, 'MAPE%': 7.72}
+    xgboost            {'MAE': 18.81, 'RMSE': 37.1, 'R2': 0.9521, 'MAPE%': 7.74}
+    yesterday          {'MAE': 17.08, 'RMSE': 29.31, 'R2': 0.9701, 'MAPE%': 7.5}
+
+=== F. Learned weights: what drives the model?
+std-scaled effect (Rs per 1 SD): {'price_lag_1d': 116.15, 'price_rolling_mean_7d': 76.78, 'price_rolling_std_7d': -12.44, 'price_lag_7d': -6.73, 'price_rolling_mean_14d': -6.4, 'price_lag_30d': -4.56, 'price_rolling_std_14d': 3.8, 'price_rolling_std_30d': 3.51, 'price_lag_14d': -3.12, 'petrol_price_lag_1d': 1.91, 'diesel_price_lag_1d': -1.69, 'day_of_week': 1.23, 'temperature_c_lag14d': 0.86, 'humidity_pct_lag14d': 0.76, 'price_rolling_mean_30d': -0.57, 'week_of_year': -0.43, 'month': 0.38, 'day_of_month': 0.32, 'rainfall_mm_lag14d': 0.18, 'quarter': -0.09}
+random_forest top {'price_lag_1d': 0.96, 'price_rolling_mean_7d': 0.018, 'price_rolling_std_14d': 0.002, 'price_rolling_std_7d': 0.002} | weather total 0.0036 | fuel total 0.0008
+xgboost top {'price_lag_1d': 0.8730000257492065, 'price_rolling_mean_7d': 0.01899999938905239, 'price_lag_7d': 0.00800000037997961, 'humidity_pct_lag14d': 0.007000000216066837} | weather total 0.014 | fuel total 0.0067
+
+=== G. Next-day prediction, every vegetable, real saved model
+                    veg       date   pred   last  ratio                                                  refused_for
+           Ash Plantain 2026-11-07  176.1  175.0   1.01                                                             
+                  Beans 2026-11-07  462.8  440.0   1.05                                                             
+               Beetroot 2026-11-07  311.9  330.0   0.95                                                             
+Beetroot (Nuwara Eliya) 2026-11-07  303.6  315.0   0.96                                                             
+   Big Onion (Imported) 2026-11-07  280.8  285.0   0.99                                                             
+      Big Onion (Local) 2026-11-07  300.2  290.0   1.04                                                             
+           Bitter Gourd 2026-11-07  585.5  575.0   1.02                                                             
+                Brinjal 2026-11-07  364.7  365.0   1.00                                                             
+               Brinjals 2026-11-07  422.9  425.0   0.99                                                             
+        Cabbage (Kandy) 2026-11-07  527.2  540.0   0.98                                                             
+ Cabbage (Nuwara Eliya) 2025-07-13    NaN  245.0    NaN Open-Meteo response has missing (null) weather value(s) for 
+               Capsicum 2026-11-07  677.3  700.0   0.97                                                             
+                 Carrot 2026-11-07  432.6  460.0   0.94                                                             
+               Cucumber 2026-11-07  175.3  170.0   1.03                                                             
+              Drumstick 2026-11-07  324.7  325.0   1.00                                                             
+         Green Chillies 2026-11-07  285.4  260.0   1.10                                                             
+              Knol Khol 2026-11-07  322.3  350.0   0.92                                                             
+         Ladies Fingers 2026-11-07  157.9  150.0   1.05                                                             
+                  Leeks 2026-11-07  254.1  250.0   1.02                                                             
+                   Lime 2026-11-07 1175.5 1200.0   0.98                                                             
+             Long Beans 2026-11-07  311.1  305.0   1.02                                                             
+                  Luffa 2026-11-07  384.8  375.0   1.03                                                             
+                 Manioc 2026-11-07  113.6  110.0   1.03                                                             
+      Potato (Imported) 2026-11-07  204.8  200.0   1.02                                                             
+  Potato (Nuwara Eliya) 2026-11-07    NaN  265.0    NaN ['humidity_pct_lag14d', 'price_lag_14d', 'price_lag_30d', 'p
+      Potato (Welimada) 2026-11-07  224.6  225.0   1.00                                                             
+                Pumpkin 2026-11-07  216.4  215.0   1.01                                                             
+                 Radish 2026-11-07  154.4  155.0   1.00                                                             
+            Snake Gourd 2026-11-07  315.2  315.0   1.00                                                             
+           Sweet Potato 2026-11-07  150.7  150.0   1.00                                                             
+                 Tomato 2026-11-07  537.8  575.0   0.94                                                             
+ok 29 of 31 | negatives 0 | ratio range 0.92 1.1
+
+=== H. Page-flow 7-day forecast, every vegetable
+{'OK': 29, 'REFUSED': 2}
+                   veg  status  imputed  d7                                                     min
+Cabbage (Nuwara Eliya) REFUSED      NaN NaN t least one day Forecasting succeeded up to 2025-07-12.
+ Potato (Nuwara Eliya) REFUSED      NaN NaN d value for it. Forecasting succeeded up to 2026-11-06.
+
+=== I. Real multi-day forecast backtest: saved model, forecast from past dates, compared to what happened
+seconds 93 | failures 0 | scored 1360
+horizon  1- 1 days n=  48: model MAE   28.7 MAPE  10.8% | hold last price MAE   25.2 MAPE   9.7% | 7-day mean MAE   41.8
+horizon  2- 3 days n=  96: model MAE   30.1 MAPE  10.7% | hold last price MAE   27.9 MAPE   9.7% | 7-day mean MAE   37.8
+horizon  4- 7 days n= 168: model MAE   39.0 MAPE  15.4% | hold last price MAE   42.5 MAPE  15.0% | 7-day mean MAE   40.0
+horizon  8-14 days n= 296: model MAE   63.9 MAPE  24.2% | hold last price MAE   59.5 MAPE  20.9% | 7-day mean MAE   61.6
+horizon 15-30 days n= 752: model MAE  107.0 MAPE  36.5% | hold last price MAE   96.6 MAPE  27.8% | 7-day mean MAE   95.0
+per-origin at h 8-14 (model vs hold): {'2026-05-20': (np.float64(72.8), np.float64(89.8)), '2026-06-20': (np.float64(103.9), np.float64(87.5)), '2026-07-20': (np.float64(74.5), np.float64(66.4)), '2026-08-20': (np.float64(39.2), np.float64(39.6)), '2026-09-20': (np.float64(45.2), np.float64(48.1)), '2026-10-05': (np.float64(63.1), np.float64(43.2))}
+negative forecast values: 0 | min 97.8
+done

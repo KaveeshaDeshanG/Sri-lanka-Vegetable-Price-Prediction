@@ -1,0 +1,42 @@
+# Dashboard theme. Streamlit reads this automatically when started from the project folder,
+# so the usual command (or start_app.bat) is all that's needed. Shared CSS is in app/ui.py.
+
+[theme]
+base = "dark"
+primaryColor = "#22C55E"
+backgroundColor = "#0B0F0E"
+secondaryBackgroundColor = "#17221D"
+textColor = "#F8FAFC"
+linkColor = "#86EFAC"
+linkUnderline = false
+borderColor = "#24352C"
+showWidgetBorder = true
+baseRadius = "0.75rem"
+buttonRadius = "0.625rem"
+font = "'Segoe UI', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
+headingFont = "'Segoe UI', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
+headingFontWeights = [700, 650, 600, 600, 600, 600]
+codeFont = "'Cascadia Code', Consolas, 'SFMono-Regular', monospace"
+greenColor = "#22C55E"
+greenTextColor = "#86EFAC"
+greenBackgroundColor = "#123222"
+blueColor = "#38BDF8"
+blueTextColor = "#BAE6FD"
+blueBackgroundColor = "#10242C"
+yellowTextColor = "#FDE68A"
+yellowBackgroundColor = "#2B2510"
+redTextColor = "#FECACA"
+redBackgroundColor = "#2D1515"
+dataframeBorderColor = "#24352C"
+dataframeHeaderBackgroundColor = "#111916"
+dataframeHeaderTextColor = "#86EFAC"
+chartCategoricalColors = ["#22C55E", "#86EFAC", "#38BDF8", "#FBBF24", "#F472B6", "#A78BFA", "#2DD4BF"]
+
+[theme.sidebar]
+backgroundColor = "#111916"
+secondaryBackgroundColor = "#17221D"
+borderColor = "#1E2B25"
+
+[client]
+# Hide developer-only toolbar items (such as Deploy) for a cleaner demonstration.
+toolbarMode = "minimal"

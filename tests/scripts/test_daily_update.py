@@ -1,0 +1,190 @@
+"""scripts/daily_update.py: incremental, validated, idempotent imports that never change stored rows.
+
+Network access is replaced with the real bulletins in tests/fixtures; every file is written to a
+temporary folder.
+"""
+
+import json
+from pathlib import Path
+
+import pandas as pd
+import pytest
+
+from scripts import daily_update
+from scripts.daily_update import Backup, import_cbsl, import_harti, single_run, validate_dambulla_rows, UpdateError
+from config.config_loader import ConfigLoader
+
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
+HARTI_URL = "https://www.harti.gov.lk/assets/pdf/food_price/daily/eng/2026/November/Vegetable%20Pricenew%20ex1(2026.11.09).pdf"
+TODAY = pd.Timestamp("2026-11-09")
+
+
+@pytest.fixture
+def raw_dir(tmp_path):
+    """A small stored dataset ending 2026-11-06, in the project's real formats."""
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    pd.DataFrame(
+        [
+            {"date": "2026-11-06", "vegetable": "Beans", "market": "Dambulla", "price": 450.0, "low": 400.0, "high": 500.0,
+             "raw_cell": "400.00 - 500.00", "bulletin_date": "2026-11-06", "source_pdf": "https://example/old.pdf"},
+            {"date": "2026-11-06", "vegetable": "Carrot", "market": "Dambulla", "price": 500.0, "low": 480.0, "high": 520.0,
+             "raw_cell": "480.00 - 520.00", "bulletin_date": "2026-11-06", "source_pdf": "https://example/old.pdf"},
+        ]
+    ).to_csv(raw / "harti_prices_detail.csv", index=False)
+    pd.read_csv(raw / "harti_prices_detail.csv")[["date", "vegetable", "market", "price"]].to_csv(raw / "harti_prices.csv", index=False)
+    pd.DataFrame(
+        [{"published": "2026-11-06", "reported": "2026-11-06", "market": "Kandy", "vegetable": "Carrot", "price": 510.0}]
+    ).to_csv(raw / "harti_all_markets.csv", index=False)
+    return raw
+
+
+@pytest.fixture
+def offline_harti(monkeypatch, tmp_path):
+    """The archive lists 2026-11-09 (and an older, already stored day); downloads read the fixture."""
+    entries = pd.DataFrame({"date": pd.to_datetime(["2026-11-06", "2026-11-09"]), "url": ["https://example/old.pdf", HARTI_URL]})
+    monkeypatch.setattr(daily_update, "harti_entries", lambda config, offline, cache_dir: entries)
+    calls = []
+
+    def fake_download(url, path, timeout, attempts=3):
+        calls.append(url)
+        data = (FIXTURES / "harti_daily_2026-11-09.pdf").read_bytes()
+        path.write_bytes(data)
+        return data
+
+    monkeypatch.setattr(daily_update, "download_pdf", fake_download)
+    return calls
+
+
+def _run_harti(raw_dir, tmp_path):
+    backup = Backup(tmp_path / "backups", keep=3)
+    cache = tmp_path / "cache"
+    cache.mkdir(exist_ok=True)
+    summary = import_harti(ConfigLoader("config/config.yaml"), raw_dir, cache, backup, 30, TODAY)
+    return summary, backup
+
+
+def test_new_bulletin_is_added_and_stored_rows_are_untouched(raw_dir, tmp_path, offline_harti):
+    before = pd.read_csv(raw_dir / "harti_prices_detail.csv")
+    summary, backup = _run_harti(raw_dir, tmp_path)
+
+    assert offline_harti == [HARTI_URL]  # the stored 2026-11-06 bulletin isn't fetched again
+    detail = pd.read_csv(raw_dir / "harti_prices_detail.csv")
+    pd.testing.assert_frame_equal(detail.iloc[: len(before)].reset_index(drop=True), before)
+    new = detail[detail["bulletin_date"] == "2026-11-09"]
+    assert summary["dambulla_rows_added"] == len(new) > 20
+    carrot = new[new["vegetable"] == "Carrot"].iloc[0]
+    assert (carrot["date"], carrot["price"]) == ("2026-11-09", 615.0)  # the bulletin's own Dambulla reading
+    assert carrot["source_pdf"] == HARTI_URL
+    prices = pd.read_csv(raw_dir / "harti_prices.csv")
+    assert list(prices.columns) == ["date", "vegetable", "market", "price"] and len(prices) == len(detail)
+
+    panel = pd.read_csv(raw_dir / "harti_all_markets.csv")
+    assert set(panel.loc[panel["published"] == "2026-11-09", "market"]) >= {"Dambulla", "Kandy", "Peliyagoda", "Meegoda"}
+    assert "Brinjal" in set(panel["vegetable"]) and "Eggplant" not in set(panel["vegetable"])  # training's name
+    assert not panel.duplicated(["published", "market", "vegetable"]).any()
+
+    log = pd.read_csv(raw_dir / "harti_import_log.csv")
+    assert log.iloc[-1]["status"] == "imported" and len(log.iloc[-1]["sha256"]) == 64
+    assert set(backup.saved) >= {"harti_prices_detail.csv", "harti_prices.csv", "harti_all_markets.csv"}
+    pd.testing.assert_frame_equal(pd.read_csv(backup.folder / "harti_prices_detail.csv"), before)
+
+
+def test_running_twice_adds_nothing_the_second_time(raw_dir, tmp_path, offline_harti):
+    _run_harti(raw_dir, tmp_path)
+    first = (raw_dir / "harti_prices_detail.csv").read_bytes(), (raw_dir / "harti_all_markets.csv").read_bytes()
+    summary, _ = _run_harti(raw_dir, tmp_path)
+    assert summary["bulletins_read"] == 0 and summary["dambulla_rows_added"] == 0
+    assert ((raw_dir / "harti_prices_detail.csv").read_bytes(), (raw_dir / "harti_all_markets.csv").read_bytes()) == first
+
+
+def test_an_unreadable_bulletin_is_reported_and_nothing_is_written(raw_dir, tmp_path, monkeypatch, offline_harti):
+    def broken(url, path, timeout, attempts=3):
+        path.write_bytes(b"%PDF-1.4 broken")
+        return b"%PDF-1.4 broken"
+
+    monkeypatch.setattr(daily_update, "download_pdf", broken)
+    before = (raw_dir / "harti_prices_detail.csv").read_bytes()
+    summary, _ = _run_harti(raw_dir, tmp_path)
+    assert summary["unreadable"] == ["2026-11-09"]
+    assert (raw_dir / "harti_prices_detail.csv").read_bytes() == before
+    assert pd.read_csv(raw_dir / "harti_import_log.csv").iloc[-1]["status"] == "unreadable"
+
+
+def test_validation_rejects_impossible_rows():
+    bulletin = pd.Timestamp("2026-11-09")
+    good = {"vegetable": "Carrot", "low": 500.0, "high": 600.0, "raw_cell": "500 - 600", "date": bulletin}
+    assert validate_dambulla_rows([good], bulletin) == []
+    assert validate_dambulla_rows([{**good, "low": 700.0}], bulletin)
+    assert validate_dambulla_rows([{**good, "low": 0.0}], bulletin)
+    assert validate_dambulla_rows([{**good, "date": pd.Timestamp("2026-11-10")}], bulletin)  # after its bulletin
+    assert validate_dambulla_rows([{**good, "date": pd.Timestamp("2026-10-01")}], bulletin)  # far too old
+
+
+def test_cbsl_import_adds_published_days_and_settles_missing_ones(tmp_path, monkeypatch):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    pdf = (FIXTURES / "price_report_20261109_e.pdf").read_bytes()
+
+    def fake_fetch(day, session):
+        if day == TODAY:
+            return pdf, daily_update.CBSL_BASE + "price_report_20261109_e.pdf"
+        return None  # a holiday, or not uploaded yet
+
+    monkeypatch.setattr(daily_update, "fetch_cbsl_report", fake_fetch)
+    backup = Backup(tmp_path / "backups", keep=3)
+    summary = import_cbsl(raw, tmp_path / "cbsl_cache", backup, pd.Timestamp("2026-11-02"), TODAY)
+
+    table = pd.read_csv(raw / "cbsl_daily_prices.csv")
+    assert summary["days_added"] == ["2026-11-09"]
+    assert set(table["date"]) == {"2026-11-09"}
+    assert set(table["price_type"]) == {"wholesale", "retail"}
+    assert table["source_url"].str.endswith("price_report_20261109_e.pdf").all()
+    state = json.loads((raw / "cbsl_import_state.json").read_text())
+    # More than 3 days old and still missing: settled as not published. Recent days are retried.
+    assert "2026-11-02" in state["not_published"] and "2026-11-06" not in state["not_published"]
+
+    again = import_cbsl(raw, tmp_path / "cbsl_cache", backup, pd.Timestamp("2026-11-02"), TODAY)
+    assert again["days_added"] == [] and len(pd.read_csv(raw / "cbsl_daily_prices.csv")) == len(table)
+
+
+def test_dcs_skips_links_known_to_have_no_pdf_and_rebuilds_only_on_news(tmp_path, monkeypatch):
+    raw, cache = tmp_path / "raw", tmp_path / "dcs"
+    raw.mkdir()
+    cache.mkdir()
+    (cache / "listing.json").write_text(json.dumps([{"link": "https://x/retail/DCSB-WRP-2019-12-W3", "error": "not a PDF"}]))
+    (cache / "DCSB-WRP-2026-11-W1.pdf").write_bytes(b"%PDF")
+    listing = [{"link": f"https://x/retail/{name}"} for name in ("DCSB-WRP-2019-12-W3", "DCSB-WRP-2026-11-W1", "DCSB-WRP-2026-11-W2")]
+    requested, rebuilt = [], []
+    monkeypatch.setattr(daily_update, "dcs_listing", lambda: listing)
+    monkeypatch.setattr(daily_update, "download_new_dcs", lambda items, cache_dir, delay: requested.extend(i["link"] for i in items) or [])
+    monkeypatch.setattr(daily_update, "rebuild_dcs", lambda cache_dir, raw_dir, items: rebuilt.append(True) or (raw_dir / "dcs_weekly_retail_prices.csv").write_text("x"))
+    monkeypatch.setattr(daily_update, "_resolve", lambda path: cache)
+    backup = Backup(tmp_path / "backups", keep=3)
+
+    summary = daily_update.import_dcs(ConfigLoader("config/config.yaml"), raw, backup)
+    assert requested == ["https://x/retail/DCSB-WRP-2026-11-W2"]  # neither the cached nor the known-missing one
+    assert summary["new_bulletins"] == 1 and rebuilt == [True]
+    assert "dcs_weekly_retail_prices.csv" in backup.changed  # a brand-new file still counts as a change
+
+    requested.clear()
+    (cache / "DCSB-WRP-2026-11-W2.pdf").write_bytes(b"%PDF")
+    summary = daily_update.import_dcs(ConfigLoader("config/config.yaml"), raw, Backup(tmp_path / "backups", keep=3))
+    assert requested == [] and summary["new_bulletins"] == 0 and rebuilt == [True]  # nothing new: no rebuild
+
+
+def test_only_one_update_runs_at_a_time(tmp_path):
+    lock = tmp_path / ".update.lock"
+    with single_run(lock):
+        with pytest.raises(UpdateError):
+            with single_run(lock):
+                pass
+    assert not lock.exists()
+
+
+def test_backups_keep_only_the_newest_folders(tmp_path):
+    for stamp in ("20260101_000000", "20260102_000000", "20260103_000000"):
+        (tmp_path / "daily" / stamp).mkdir(parents=True)
+    backup = Backup(tmp_path, keep=2)
+    backup.prune()
+    assert sorted(p.name for p in (tmp_path / "daily").iterdir()) == ["20260102_000000", "20260103_000000"]

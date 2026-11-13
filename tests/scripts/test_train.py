@@ -244,7 +244,7 @@ def test_full_run_discovers_models_from_config_and_never_hardcodes_them(tmp_path
         models={"linear_regression": object()},
         metrics={"linear_regression": {"mae": 1.0, "rmse": 1.5, "r2": 0.9}},
         best_model_name="linear_regression",
-        best_model=object(),
+        best_model=SimpleNamespace(predict=lambda X: X["price_lag_1d"].to_numpy()),
         saved_model_path=str(tmp_path / "models" / "best_model.joblib"),
     )
 
@@ -304,7 +304,8 @@ def test_full_run_persists_artifact_metadata_for_the_same_training_run(tmp_path)
         tmp_path, market_path, weather_path, fuel_path, models_to_train=["linear_regression"]
     )
 
-    fake_best_model = SimpleNamespace()  # type(fake_best_model).__name__ == "SimpleNamespace"
+    # type(fake_best_model).__name__ == "SimpleNamespace"
+    fake_best_model = SimpleNamespace(predict=lambda X: X["price_lag_1d"].to_numpy())
     fake_result = SimpleNamespace(
         models={"linear_regression": object()},
         metrics={"linear_regression": {"mae": 1.0, "rmse": 1.5, "r2": 0.9}},

@@ -95,10 +95,188 @@ HARTI_LIVE_VEGETABLE_ALIASES: dict[str, str] = {
     "big onion imported": "Big Onion (Imported)",
     "big-onion local": "Big Onion (Local)",
     "big onion local": "Big Onion (Local)",
+    # Rows printed only in older bulletins (2015 to 2023). Each is its own HARTI row, so each
+    # stays its own series: none is merged into a later label without evidence they're the same.
+    "brinjals (other)": "Brinjals (Other)",
+    "brinjals (village)": "Brinjals (Village)",
+    "bitter gourd (other)": "Bitter Gourd (Other)",
+    "bitter gourd (village)": "Bitter Gourd (Village)",
+    "dambala (wing beans)": "Wing Beans",
+    "thithbatu": "Thibbatu",
 }
 
 _RANGE_PATTERN = re.compile(r"^\s*([\d,]+(?:\.\d+)?)\s*-\s*([\d,]+(?:\.\d+)?)\s*$")
+# Some cells lose their dash in text extraction ("200 250").
+_DASHLESS_RANGE_PATTERN = re.compile(r"^\s*([\d,]+(?:\.\d+)?)\s+([\d,]+(?:\.\d+)?)\s*$")
+_SCRAMBLED_RANGE_PATTERN = re.compile(r"^\s*-\s*([\d,]+(?:\.\d+)?)\s+([\d,]+(?:\.\d+)?)\s*$|^\s*([\d,]+(?:\.\d+)?)\s+([\d,]+(?:\.\d+)?)\s*-\s*$")
 _SINGLE_VALUE_PATTERN = re.compile(r"^\s*([\d,]+(?:\.\d+)?)\s*$")
+_COMPACT_ALIASES = {key.replace(" ", ""): value for key, value in HARTI_LIVE_VEGETABLE_ALIASES.items()}
+# Formats HARTI has used for a market's reporting date. Slash dates are day-first.
+_REPORTING_DATE_FORMATS = ("%Y.%m.%d", "%Y-%m-%d", "%d/%m/%Y", "%d.%m.%Y", "%d-%m-%Y")
+# A market that didn't report keeps showing its last reporting date, so its date may trail
+# the bulletin slightly. Anything further apart is a parsing error, not data.
+MAX_REPORTING_LAG_DAYS = 7
+MARKET_NAMES = (
+    "Peliyagoda", "Kandy", "Dambulla", "Meegoda", "Norochchole",
+    "Thambuththegama", "Keppetipola", "Nuwaraeliya", "Bandarawela", "Veyangoda", "Pettah",
+)
+# Spellings older bulletins use for the same market. Pettah (Colombo's former Manning Market) is
+# kept as its own market: HARTI lists Peliyagoda separately once the market moved there in 2021.
+_MARKET_SPELLINGS = {"kappetipola": "Keppetipola", "t'thegama": "Thambuththegama", "petha": "Pettah"}
+
+
+def parse_reporting_date(text: object) -> "pd.Timestamp | None":
+    """A market column's reporting date, in any format HARTI has used; None if unparseable."""
+    cleaned = str(text).strip() if text else ""
+    for date_format in _REPORTING_DATE_FORMATS:
+        parsed = pd.to_datetime(cleaned, format=date_format, errors="coerce")
+        if pd.notna(parsed):
+            return parsed
+    return None
+
+
+def parse_price_range(raw: object) -> tuple[float, float] | None:
+    """(low, high) from a "min - max" or single-value cell; None when there is no reading."""
+    if raw is None:
+        return None
+    text = str(raw).strip()
+    if not text or text == "-":
+        return None
+    match = _RANGE_PATTERN.match(text) or _DASHLESS_RANGE_PATTERN.match(text)
+    if match:
+        low, high = (float(group.replace(",", "")) for group in match.groups())
+        return low, high
+    # Older bulletins wrap a range over two lines, so text extraction can return "- 115.00 110.00":
+    # one dash and two numbers is still exactly one min-max range, whichever order they come out in.
+    scrambled = _SCRAMBLED_RANGE_PATTERN.match(text)
+    if scrambled:
+        first, second = (float(group.replace(",", "")) for group in scrambled.groups() if group is not None)
+        return min(first, second), max(first, second)
+    single = _SINGLE_VALUE_PATTERN.match(text)
+    if single:
+        value = float(single.group(1).replace(",", ""))
+        return value, value
+    logger.warning("HartiLiveClient: could not parse price cell %r; skipping", raw)
+    return None
+
+
+def resolve_vegetable(label: object) -> str | None:
+    """Map a bulletin row label to the project's vocabulary, ignoring spacing differences
+    (HARTI prints both "Beet Root (N'Eliya)" and "Beet Root(N'Eliya)")."""
+    return _COMPACT_ALIASES.get(HartiLiveClient._normalize_label(label).replace(" ", ""))
+
+
+def canonical_market_name(header: object) -> str | None:
+    """A bulletin's market header as its real name. Extraction can truncate a header
+    ("Peliyagod") or leave part of a neighbouring cell in it ("Kandy 2024.11.13")."""
+    text = str(header or "").lower()
+    if "hambuth" in text:  # the leading "T" can land in the neighbouring column
+        return "Thambuththegama"
+    for spelling, name in _MARKET_SPELLINGS.items():
+        if spelling in text.replace(" market", "").split():
+            return name
+    first_word = text.split(" ")[0] if text else ""
+    if len(first_word) < 4:
+        return None
+    for name in MARKET_NAMES:
+        if name.lower().startswith(first_word[:6]) or first_word.startswith(name.lower()[:6]):
+            return name
+    return None
+
+
+def parse_all_markets(table_data: list[list], bulletin_date: pd.Timestamp) -> pd.DataFrame:
+    """Every market's readings from one bulletin's table.
+
+    `published` is the bulletin's date: the day a reading actually became known. Some
+    markets are always reported a day late, so a reading's own `reported` date can't be used
+    to decide what a forecast made on a given day could have seen.
+    """
+    date_row, market_row = table_data[0], table_data[1]
+    records = []
+    for column, header in enumerate(market_row):
+        market = canonical_market_name(header)
+        reported = parse_reporting_date(date_row[column]) if market and column < len(date_row) else None
+        if reported is None or not 0 <= (bulletin_date - reported).days <= MAX_REPORTING_LAG_DAYS:
+            continue
+        for row in table_data[2:]:
+            vegetable = resolve_vegetable(row[0]) if row and row[0] else None
+            price_range = parse_price_range(row[column]) if vegetable and column < len(row) else None
+            if price_range:
+                records.append(
+                    {
+                        "published": bulletin_date,
+                        "reported": reported,
+                        "market": market,
+                        "vegetable": vegetable,
+                        "price": sum(price_range) / 2,
+                    }
+                )
+    return pd.DataFrame(records, columns=["published", "reported", "market", "vegetable", "price"])
+
+
+def cell_text(words: list, cell_box: tuple | None) -> str:
+    """A table cell's text in reading order, from only the words centred inside it.
+
+    Used instead of pymupdf's Table.extract(), which scrambles this PDF's date cells
+    ("20261106\\n. .") and price cells ("380 500\\n-") and strips spaces from row labels
+    ("BitterGourd"). `words` is page.get_text("words").
+    """
+    if cell_box is None:
+        return ""
+    x0, y0, x1, y1 = cell_box
+    inside = [
+        word
+        for word in words
+        if x0 <= (word[0] + word[2]) / 2 <= x1 and y0 <= (word[1] + word[3]) / 2 <= y1
+    ]
+    return " ".join(word[4] for word in sorted(inside, key=lambda word: (round(word[1] / 3), word[0])))
+
+
+def split_merged_label_rows(rows: list[list], words: list, table, first_row: int) -> list[list]:
+    """Give each row its own label where one label cell spans several rows.
+
+    2015-2020 bulletins print "Gingerly / Soya / Potato (Welimada) / Potato (Nuwaraeliya) /
+    B'Onion Imported / Big-onion Local" as one tall label cell beside six separately priced rows.
+    Each label line is matched to the price row at the same height on the page. Rows whose label
+    already reads as one known vegetable are left unchanged, so every other bulletin is unaffected.
+    """
+    for offset, row in enumerate(rows):
+        label = row[0] if row else None
+        if not label or resolve_vegetable(label) is not None:
+            continue
+        box = table.rows[first_row + offset].cells[0]
+        if box is None:
+            continue
+        x0, y0, x1, y1 = box
+        inside = [w for w in words if x0 <= (w[0] + w[2]) / 2 <= x1 and y0 <= (w[1] + w[3]) / 2 <= y1]
+        lines: list[list] = []
+        for word in sorted(inside, key=lambda w: ((w[1] + w[3]) / 2, w[0])):
+            middle = (word[1] + word[3]) / 2
+            if lines and abs(lines[-1][0] - middle) <= 2.5:
+                lines[-1][1].append(word)
+            else:
+                lines.append([middle, [word]])
+        if len(lines) < 2 or sum(resolve_vegetable(" ".join(w[4] for w in ws)) is not None for _, ws in lines) < 2:
+            continue
+        # The spanning row's own box covers every line, so a line goes to the unlabelled row at
+        # its height first, and to the spanning row only when no such row exists (its top line).
+        own_label = None
+        for middle, line_words in lines:
+            text = " ".join(w[4] for w in sorted(line_words, key=lambda w: w[0]))
+            target = next(
+                (
+                    other
+                    for other in range(offset + 1, len(rows))
+                    if not rows[other][0] and table.rows[first_row + other].bbox[1] <= middle <= table.rows[first_row + other].bbox[3]
+                ),
+                None,
+            )
+            if target is not None:
+                rows[target][0] = text
+            elif own_label is None:
+                own_label = text
+        rows[offset][0] = own_label
+    return rows
 
 
 class HartiLiveDataError(Exception):
@@ -139,6 +317,7 @@ class HartiLiveSnapshot:
     bulletin_date: pd.Timestamp
     retrieved_at: pd.Timestamp
     source_url: str
+    all_markets: pd.DataFrame | None = None  # parse_all_markets() output for this bulletin
 
 
 class HartiLiveClient:
@@ -170,6 +349,10 @@ class HartiLiveClient:
         self._market_column = market_column
         self._price_column = price_column
         self._validator = DataValidator()
+        # A long-lived client (the app caches one) avoids re-downloading the 2.8 MB archive
+        # page and any past bulletin it has already read. A past bulletin never changes.
+        self._archive_entries: list[_ArchiveEntry] | None = None
+        self._snapshots_by_date: dict[pd.Timestamp, HartiLiveSnapshot] = {}
 
     @classmethod
     def from_config(cls, config_path: str = "config/config.yaml") -> "HartiLiveClient":
@@ -212,7 +395,13 @@ class HartiLiveClient:
     # ------------------------------------------------------------------
 
     def _fetch(self, target_date: "pd.Timestamp | None") -> HartiLiveSnapshot:
-        entries = self._fetch_archive_entries()
+        if target_date is not None and target_date in self._snapshots_by_date:
+            return self._snapshots_by_date[target_date]
+
+        # "Latest" must always see a freshly published bulletin; a past date can reuse the index.
+        if target_date is None or self._archive_entries is None:
+            self._archive_entries = self._fetch_archive_entries()
+        entries = self._archive_entries
         english_entries = [e for e in entries if e.medium.strip().lower() == "english"]
         if not english_entries:
             raise HartiLiveDataError(
@@ -236,6 +425,13 @@ class HartiLiveClient:
         self._validate(df)
 
         bulletin_date = df[self._date_column].iloc[0]
+        if not 0 <= (entry.date - bulletin_date).days <= MAX_REPORTING_LAG_DAYS:
+            message = (
+                f"HARTI bulletin listed for {entry.date.date()} reports '{self._target_market}' "
+                f"as {bulletin_date.date()} -- too far apart to trust"
+            )
+            logger.error(message)
+            raise HartiLiveDataError(message)
         retrieved_at = pd.Timestamp.now()
         logger.info(
             "HartiLiveClient: fetched %d vegetable price(s) for '%s' dated %s from %s",
@@ -244,9 +440,16 @@ class HartiLiveClient:
             bulletin_date.date(),
             entry.pdf_url,
         )
-        return HartiLiveSnapshot(
-            data=df, bulletin_date=bulletin_date, retrieved_at=retrieved_at, source_url=entry.pdf_url
+        snapshot = HartiLiveSnapshot(
+            data=df,
+            bulletin_date=bulletin_date,
+            retrieved_at=retrieved_at,
+            source_url=entry.pdf_url,
+            all_markets=parse_all_markets(table_data, entry.date),
         )
+        if target_date is not None:
+            self._snapshots_by_date[target_date] = snapshot
+        return snapshot
 
     def _fetch_archive_entries(self) -> list[_ArchiveEntry]:
         try:
@@ -268,33 +471,34 @@ class HartiLiveClient:
             raise HartiLiveDataError(message)
 
         soup = BeautifulSoup(response.text, "html.parser")
-        table = soup.find("table")
-        if table is None:
+        tables = soup.find_all("table")  # one table per year, newest first
+        if not tables:
             message = "HARTI archive page structure has changed: no bulletin table found"
             logger.error(message)
             raise HartiLiveDataError(message)
 
         entries: list[_ArchiveEntry] = []
-        body = table.find("tbody") or table
-        for row in body.find_all("tr"):
-            cells = row.find_all("td")
-            if len(cells) < 3:
-                continue
-            date_text = cells[0].get_text(strip=True)
-            medium_text = cells[1].get_text(strip=True)
-            link = cells[2].find("a")
-            if link is None or not link.get("href"):
-                continue
-            parsed_date = pd.to_datetime(date_text, format="%Y-%m-%d", errors="coerce")
-            if pd.isna(parsed_date):
-                continue  # skip an unparseable row rather than failing the whole archive
-            entries.append(
-                _ArchiveEntry(
-                    date=parsed_date,
-                    medium=medium_text,
-                    pdf_url=urljoin(self._archive_url, link["href"]),
+        for table in tables:
+            body = table.find("tbody") or table
+            for row in body.find_all("tr"):
+                cells = row.find_all("td")
+                if len(cells) < 3:
+                    continue
+                date_text = cells[0].get_text(strip=True)
+                medium_text = cells[1].get_text(strip=True)
+                link = cells[2].find("a")
+                if link is None or not link.get("href"):
+                    continue
+                parsed_date = pd.to_datetime(date_text, format="%Y-%m-%d", errors="coerce")
+                if pd.isna(parsed_date):
+                    continue  # skip an unparseable row rather than failing the whole archive
+                entries.append(
+                    _ArchiveEntry(
+                        date=parsed_date,
+                        medium=medium_text,
+                        pdf_url=urljoin(self._archive_url, link["href"]),
+                    )
                 )
-            )
 
         if not entries:
             message = "HARTI archive page contained no usable bulletin entries"
@@ -333,7 +537,11 @@ class HartiLiveClient:
 
         Never assumes a fixed page index: HARTI's bulletin has changed its page count/
         section order before (rice/subsidiary crops vs. vegetables vs. fruits are
-        separate pages, in an order this client does not rely on).
+        separate pages, in an order this client does not rely on). Nor a fixed header
+        row: older bulletins have a title row above it.
+
+        Returns rows shaped [date row, market row, data rows...], with each cell read
+        by word position -- see cell_text() for why not Table.extract()'s own text.
         """
         try:
             document = pymupdf.open(stream=pdf_bytes, filetype="pdf")
@@ -351,14 +559,23 @@ class HartiLiveClient:
                 continue
             for table in found_tables.tables:
                 data = table.extract()
-                if len(data) < 3:
+                header_index = next(
+                    (
+                        index
+                        for index, row in enumerate(data[:4])
+                        if any(cell and self._normalize_market_header(cell) == target_normalized for cell in row)
+                    ),
+                    None,
+                )
+                # A header on row 0 has no date row above it, so it can't be this table.
+                if not header_index or len(data) < header_index + 2:
                     continue
-                market_row = data[1]
-                if any(
-                    cell and self._normalize_market_header(cell) == target_normalized
-                    for cell in market_row
-                ):
-                    return data
+                words = page.get_text("words")
+                rows = [
+                    [cell_text(words, box) or None for box in table.rows[row_index].cells]
+                    for row_index in range(header_index - 1, len(data))
+                ]
+                return split_merged_label_rows(rows, words, table, header_index - 1)
 
         message = (
             f"HARTI bulletin structure has changed: no table with a '{self._target_market}' "
@@ -386,12 +603,8 @@ class HartiLiveClient:
             raise HartiLiveDataError(message)
 
         column_date_text = date_row[column_index] if column_index < len(date_row) else None
-        column_date = (
-            pd.to_datetime(column_date_text, format="%Y.%m.%d", errors="coerce")
-            if column_date_text
-            else pd.NaT
-        )
-        if pd.isna(column_date):
+        column_date = parse_reporting_date(column_date_text)
+        if column_date is None:
             message = (
                 f"Could not parse a reporting date for the '{self._target_market}' column "
                 f"(raw value: {column_date_text!r})"
@@ -403,7 +616,7 @@ class HartiLiveClient:
         for row in table_data[2:]:
             if not row or row[0] is None:
                 continue
-            canonical = HARTI_LIVE_VEGETABLE_ALIASES.get(self._normalize_label(row[0]))
+            canonical = resolve_vegetable(row[0])
             if canonical is None:
                 continue  # not one of this project's tracked vegetables (fruit/rice/section header/etc.)
             cell_value = row[column_index] if column_index < len(row) else None
@@ -455,20 +668,5 @@ class HartiLiveClient:
 
     @staticmethod
     def _parse_price_cell(raw: object) -> float | None:
-        if raw is None:
-            return None
-        text = str(raw).strip()
-        if not text or text == "-":
-            return None
-
-        range_match = _RANGE_PATTERN.match(text)
-        if range_match:
-            low, high = (float(group.replace(",", "")) for group in range_match.groups())
-            return (low + high) / 2
-
-        single_match = _SINGLE_VALUE_PATTERN.match(text)
-        if single_match:
-            return float(single_match.group(1).replace(",", ""))
-
-        logger.warning("HartiLiveClient: could not parse price cell %r; skipping", raw)
-        return None
+        price_range = parse_price_range(raw)
+        return None if price_range is None else sum(price_range) / 2

@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-11-11T03:43:59",
+  "datasets": [
+    {
+      "file": "data/raw/harti_prices.csv",
+      "source": "HARTI daily food commodity bulletins",
+      "source_url": "https://www.harti.gov.lk/daily-price.php",
+      "price_type": "wholesale, Rs/kg (midpoint of the published range)",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 76719,
+      "sha256": "849242b1d20f2bae43f811a3e8f20fc0c4abd3b8777d2cefc11bf818a241b661",
+      "first_observation": "2015-06-22",
+      "latest_observation": "2026-11-09",
+      "markets": [
+        "Dambulla"
+      ]
+    },
+    {
+      "file": "data/raw/harti_all_markets.csv",
+      "source": "HARTI daily food commodity bulletins, every market",
+      "source_url": "https://www.harti.gov.lk/daily-price.php",
+      "price_type": "wholesale, Rs/kg (midpoint of the published range)",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 526905,
+      "sha256": "4882e42ab455ff8c7334e87ac97f26759d0ddc39b6cf9ca8f555e7a8d5c72964",
+      "first_observation": "2015-06-22",
+      "latest_observation": "2026-11-09",
+      "markets": [
+        "Bandarawela",
+        "Dambulla",
+        "Kandy",
+        "Keppetipola",
+        "Meegoda",
+        "Norochchole",
+        "Nuwaraeliya",
+        "Peliyagoda",
+        "Pettah",
+        "Thambuththegama",
+        "Veyangoda"
+      ]
+    },
+    {
+      "file": "data/raw/cbsl_daily_prices.csv",
+      "source": "Central Bank of Sri Lanka, Daily Price Report",
+      "source_url": "https://www.cbsl.gov.lk/en/statistics/economic-indicators/price-report",
+      "price_type": "wholesale and retail, Rs/kg (Today column), kept apart by the price_type column",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 9277,
+      "sha256": "08d49b14f3e4b36718743eaa7dc09605e03461e160d543690a5ba11b113853e2",
+      "first_observation": "2026-09-01",
+      "latest_observation": "2026-11-10",
+      "markets": [
+        "Dambulla",
+        "Narahenpita",
+        "Pettah"
+      ]
+    },
+    {
+      "file": "data/raw/dcs_weekly_retail_prices.csv",
+      "source": "Department of Census and Statistics, weekly retail prices",
+      "source_url": "https://www.statistics.gov.lk/InflationAndPrices/StaticalInformation/RetailPrices",
+      "price_type": "retail, weekly average",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 11439,
+      "sha256": "cdcc2ef93b3f0fef488b70e499e4e91121008644b30ebb5ff873fd77830f010b",
+      "markets": [
+        "Colombo District (DCS main markets)"
+      ],
+      "first_observation": "2019-12 week 4",
+      "latest_observation": "2026-11 week 1",
+      "period_type": "week of month, as published"
+    },
+    {
+      "file": "data/raw/fuel_prices.csv",
+      "source": "CEYPETCO price revisions",
+      "source_url": "https://ceypetco.gov.lk/marketing-sales/historical-prices",
+      "price_type": "retail fuel, Rs/litre",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 4161,
+      "sha256": "9e2ec34039d9ec02ea4147360c0be6da61e3afc3cdb208c22d10a56e25f834d7",
+      "first_observation": "2015-06-22",
+      "latest_observation": "2026-11-11"
+    },
+    {
+      "file": "data/raw/weather_data_by_region.csv",
+      "source": "Open-Meteo historical weather archive",
+      "source_url": "https://open-meteo.com/en/docs/historical-weather-api",
+      "price_type": "weather",
+      "retrieved_at": "2026-11-11T03:43:59",
+      "rows": 33264,
+      "sha256": "4ba0485686d09a5278c338e3d30a6ae32e054b9c43f90cbe84f095a68f4fed8f",
+      "first_observation": "2015-06-22",
+      "latest_observation": "2026-11-08",
+      "markets": [
+        "Anuradhapura",
+        "Badulla",
+        "Dambulla",
+        "Jaffna",
+        "Kandy",
+        "Monaragala",
+        "Nuwara Eliya",
+        "Welimada"
+      ]
+    }
+  ]
+}

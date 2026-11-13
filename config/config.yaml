@@ -48,6 +48,19 @@ paths:
     # retail prices). Left null, the pipeline works exactly as before --
     # DataLoader.load_fuel_price_data() returns None rather than raising.
     fuel_prices: "data/raw/fuel_prices.csv"
+    # Every market's readings from the same bulletins, built by scripts/build_market_prices.py.
+    # Inputs to the direct forecaster only, never treated as Dambulla prices.
+    harti_all_markets: "data/raw/harti_all_markets.csv"
+
+    # DCS weekly RETAIL prices, Colombo District (scripts/update_data.py). A different price type and
+    # place from HARTI's wholesale markets: shown separately, never merged into a HARTI series.
+    dcs_weekly_retail: "data/raw/dcs_weekly_retail_prices.csv"
+    # CBSL Daily Price Report (scripts/daily_update.py): wholesale AND retail, Pettah / Dambulla /
+    # Narahenpita, one row per date, item, market and price_type. CBSL collects its own prices, so
+    # this is a cross-check beside HARTI, never merged into a HARTI series or used for training.
+    cbsl_daily_prices: "data/raw/cbsl_daily_prices.csv"
+    # What each dataset holds and where it came from, read from the files themselves.
+    data_manifest: "data/raw/data_manifest.json"
 
   # Evidence-based vegetable -> production-region mapping (config/crop_production_regions.yaml).
   # A vegetable absent from it falls back to weather_api's market-location coordinates.
@@ -56,6 +69,14 @@ paths:
   processed_files:
     merged_dataset: "data/processed/processed_prices.csv"
     feature_dataset: "data/processed/feature_dataset.csv"
+
+# scripts/update_data.py: where downloaded bulletin PDFs and pre-update backups are kept. They are
+# kept outside the project because the PDFs total over 2 GB. Relative paths are from the project root.
+data_update:
+  harti_pdf_cache_dir: "../../Sri-lanka-Vegetable-Price-Backups/harti_pdf_archive_full"
+  dcs_pdf_cache_dir: "../../Sri-lanka-Vegetable-Price-Backups/dcs_weekly_retail_archive"
+  cbsl_pdf_cache_dir: "../../Sri-lanka-Vegetable-Price-Backups/cbsl_daily_price_reports"
+  backup_dir: "../../Sri-lanka-Vegetable-Price-Backups"
 
 # Column names expected in the raw CSVs. Centralizing these means a source
 # renaming a column only requires a one-line change here.
@@ -110,6 +131,8 @@ fuel_api:
   provider: "ceypetco"
   enabled: true # if false, prediction falls back to the last known historical fuel price
   url: "https://ceypetco.gov.lk/marketing-sales/"
+  # The public endpoint CEYPETCO's own page loads prices from; "url" above is the fallback.
+  api_url: "https://api.ceypetco.gov.lk/api/admin/fuel-prices/active"
   timeout_seconds: 15
   cache_minutes: 60 # CEYPETCO revises prices infrequently (weeks/months apart); no need to re-fetch more often
 
@@ -141,6 +164,12 @@ model:
     n_estimators: 200
     learning_rate: 0.05
     max_depth: 6
+
+# The direct forecaster (src/models/direct_forecaster.py, scripts/train_forecaster.py).
+forecasting:
+  # Fixed so results stay comparable as new data arrives. The configuration was chosen using
+  # only data before this date; everything from it on is the held-out test period.
+  test_start: "2026-05-14"
 
 evaluation:
   metrics: ["mae", "rmse", "r2"]

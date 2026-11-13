@@ -228,9 +228,9 @@ def test_fetch_recent_daily_weather_raises_on_negative_rainfall(mock_get):
 
 
 @patch("src.data_collection.live_weather_client.requests.get")
-def test_fetch_recent_daily_weather_raises_on_null_value_in_response(mock_get):
+def test_fetch_recent_daily_weather_raises_when_every_day_is_null(mock_get):
     payload = _daily_payload()
-    payload["daily"]["temperature_2m_mean"] = [27.8, None, 27.0]
+    payload["daily"]["temperature_2m_mean"] = [None, None, None]
     mock_get.return_value = _fake_response(json_data=payload)
     with pytest.raises(LiveWeatherError, match="missing \\(null\\)"):
         _client().fetch_recent_daily_weather(past_days=1)

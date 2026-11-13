@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-11-07T01:12:52",
+  "vegetables": [
+    "Beans",
+    "Carrot",
+    "Tomato",
+    "Leeks",
+    "Cabbage (Kandy)",
+    "Pumpkin",
+    "Green Chillies",
+    "Brinjals"
+  ],
+  "forecast_start_dates": [
+    "2026-05-20",
+    "2026-06-20",
+    "2026-07-20",
+    "2026-08-20",
+    "2026-09-20",
+    "2026-10-05"
+  ],
+  "bands": [
+    {
+      "days_ahead": "1",
+      "scored_days": 48,
+      "model_mae": 28.732328038929722,
+      "model_mape": 10.849209983091763,
+      "hold_last_mae": 25.208333333333332,
+      "hold_last_mape": 9.72577223330434
+    },
+    {
+      "days_ahead": "2-3",
+      "scored_days": 96,
+      "model_mae": 30.05531032642574,
+      "model_mape": 10.720769073075735,
+      "hold_last_mae": 27.864583333333332,
+      "hold_last_mape": 9.733995593276475
+    },
+    {
+      "days_ahead": "4-7",
+      "scored_days": 168,
+      "model_mae": 39.0493581142833,
+      "model_mape": 15.377474720136158,
+      "hold_last_mae": 42.455357142857146,
+      "hold_last_mape": 14.960385891257937
+    },
+    {
+      "days_ahead": "8-14",
+      "scored_days": 296,
+      "model_mae": 63.88330396154251,
+      "model_mape": 24.167462358549624,
+      "hold_last_mae": 59.49324324324324,
+      "hold_last_mape": 20.91320966333971
+    },
+    {
+      "days_ahead": "15-30",
+      "scored_days": 752,
+      "model_mae": 106.97621023516594,
+      "model_mape": 36.5480977256958,
+      "hold_last_mae": 96.56914893617021,
+      "hold_last_mape": 27.849497582602883
+    }
+  ]
+}

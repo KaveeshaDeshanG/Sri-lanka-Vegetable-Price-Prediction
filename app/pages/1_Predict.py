@@ -1,47 +1,65 @@
 """Streamlit page: train a demo model if needed, then request a price prediction."""
 
+import os
 import sys
 from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
+os.chdir(_PROJECT_ROOT)  # config and data paths are relative to the project root
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
+from app import ui
+from app.catalogue import data_version, display_name, past_date_notice, series_status
 from app.forecasting import (
     ForecastDataUnavailableError,
     ForecastInputError,
+    ForecastResult,
+    direct_forecast,
     forecast_future_price,
     max_supported_forecast_date,
 )
 from app.services import (
+    FUEL_COLUMNS,
     IMPUTED_HISTORICAL_SOURCE_LABEL,
+    HistoryInputError,
     backfill_harti_price_gap,
     backfill_internal_harti_gaps,
     build_live_prediction_input,
     build_prediction_input,
     fetch_harti_latest_snapshot,
     fetch_live_fuel_price,
+    forecaster_problems,
     impute_missing_historical_prices,
     load_real_market_history,
     load_sample_history,
     merge_harti_live_price,
+    missing_historical_datasets,
+    prepare_uploaded_history,
     resolve_demo_models_dir,
     resolve_weather_region,
     train_demo_model,
 )
 from config.config_loader import ConfigLoader
-from src.data_collection.harti_live_client import HartiLiveDataError, HartiLiveSnapshot
+from src.data_collection.data_validator import DataValidationError
+from src.data_collection.harti_live_client import HartiLiveClient, HartiLiveDataError, HartiLiveSnapshot
 from src.data_collection.live_fuel_price_client import LiveFuelPriceError, LiveFuelPriceSnapshot
 from src.data_collection.live_weather_client import LiveWeatherError
 from src.feature_engineering.feature_engineer import FeatureEngineeringError
+from src.feature_engineering.forecast_features import ForecastFeatureBuilder
 from src.feature_engineering.production_region_weather import (
     apply_production_region_weather,
 )
-from src.models.artifact_metadata import ArtifactConsistencyError
+from src.models.direct_forecaster import MAX_HORIZON_DAYS, DirectForecaster
+from src.models.artifact_metadata import (
+    ArtifactConsistencyError,
+    ArtifactMetadataNotFoundError,
+    load_artifact_metadata,
+)
 from src.prediction.pipeline import PredictionInputError, PredictionPipeline
 from src.prediction.predictor import (
     FeatureAlignmentError,
@@ -56,9 +74,27 @@ _HARTI_CACHE_TTL_SECONDS = ConfigLoader(CONFIG_PATH).get("harti.cache_minutes", 
 _HARTI_LATEST_DATA_ENABLED = ConfigLoader(CONFIG_PATH).get("harti.latest_data_enabled", True)
 _FUEL_CACHE_TTL_SECONDS = ConfigLoader(CONFIG_PATH).get("fuel_api.cache_minutes", 60) * 60
 _WEATHER_LAG_DAYS = ConfigLoader(CONFIG_PATH).get("feature_engineering.weather_lag_days", 14)
+_STALE_AFTER_DAYS = 30
+_MANY_IMPUTED_DAYS = 7
+SOURCE_HISTORICAL = "Historical dataset (real)"
+SOURCE_SAMPLE = "Bundled sample data (synthetic)"
+SOURCE_UPLOAD = "Upload my own CSV"
+SOURCE_LATEST = "Latest HARTI Data (real)"
+# What a damaged CSV can raise while loading: pandas' parser and decoding errors are ValueErrors.
+_DATA_READ_ERRORS = (DataValidationError, ValueError, KeyError, TypeError, OSError)
+# A sandbox model stays on disk, so it may have been trained before this data was loaded.
+_SANDBOX_IN_USE = (
+    "Using a **sandbox** model from the most recent sandbox training, not the project's saved models. "
+    "It may have been trained on different data; train again above to use this data."
+)
 
-st.set_page_config(page_title="Predict | Vegetable Price Prediction", page_icon="📈")
-st.title("📈 Predict a vegetable price")
+st.set_page_config(page_title="Predict | Vegetable Price Prediction", page_icon="📈", layout="wide", initial_sidebar_state="auto")
+ui.apply_theme()
+ui.page_header(
+    "Predict a vegetable price",
+    "Choose a data source and vegetable, then request a next-day price or a forecast up to 30 days ahead.",
+    "Price forecasting",
+)
 
 
 def _render_weather_data_card(
@@ -67,6 +103,7 @@ def _render_weather_data_card(
     resolved_location,
     weather_date_label: str,
     weather_values: dict[str, float] | None,
+    used_for: str = f"Price Prediction (as {_WEATHER_LAG_DAYS}-day-lagged features)",
 ) -> None:
     """Renders the 'Weather Data Used' transparency card: which location's weather fed
     this prediction, its coordinates, and (when available) the actual values used --
@@ -89,15 +126,13 @@ def _render_weather_data_card(
             f"- **Coordinates:** {resolved_location.latitude:.4f}, {resolved_location.longitude:.4f}\n"
             f"- **Weather Source:** Open-Meteo\n"
             f"- **Weather Date:** {weather_date_label}\n"
-            f"- **Data Used For:** Price Prediction (as {_WEATHER_LAG_DAYS}-day-lagged features)"
+            f"- **Data Used For:** {used_for}"
         )
         st.caption(location_note)
         if weather_values:
-            cols = st.columns(len(weather_values))
-            for col, (label, value) in zip(cols, weather_values.items()):
-                col.metric(label, value)
+            ui.stat_cards([{"label": label, "value": value} for label, value in weather_values.items()], compact=True)
         st.caption(
-            "Weather features used by this model: rainfall, temperature, humidity (14-day lag). "
+            "Weather used by this model: rainfall, temperature and humidity. "
             "Wind speed is not part of this project's weather schema/model -- not shown, not fabricated."
         )
 
@@ -122,8 +157,12 @@ def _load_sample_history_cached() -> pd.DataFrame:
 
 
 @st.cache_data
-def _load_real_market_history_cached() -> pd.DataFrame:
+def _load_real_market_history_cached(version: str) -> pd.DataFrame:
+    """Cached per data_version(), so a daily update is picked up without restarting the app."""
     return load_real_market_history(CONFIG_PATH)
+
+
+_DATA_VERSION = data_version()
 
 
 @st.cache_data(ttl=_HARTI_CACHE_TTL_SECONDS)
@@ -136,43 +175,231 @@ def _fetch_live_fuel_price_cached() -> LiveFuelPriceSnapshot:
     return fetch_live_fuel_price(CONFIG_PATH)
 
 
+@st.cache_resource(ttl=_HARTI_CACHE_TTL_SECONDS)
+def _harti_client() -> HartiLiveClient:
+    """One shared client, which remembers the archive index and bulletins it has read, so a
+    widget interaction doesn't re-download them."""
+    return HartiLiveClient.from_config(CONFIG_PATH)
+
+
+@st.cache_data(ttl=_HARTI_CACHE_TTL_SECONDS, show_spinner="Reading HARTI bulletins...")
+def _history_with_latest_bulletin(
+    vegetable: str,
+    market: str,
+    bulletin_date: str,
+    _history_df: pd.DataFrame,
+    _live_snapshot: HartiLiveSnapshot,
+    _live_fuel_snapshot: LiveFuelPriceSnapshot | None,
+) -> pd.DataFrame:
+    """The history plus real bulletins closing any gap up to the latest one. Cached by
+    (vegetable, market, bulletin_date); underscore arguments aren't part of the cache key."""
+    backfilled = backfill_harti_price_gap(
+        _history_df, _live_snapshot, vegetable, market, CONFIG_PATH,
+        live_fuel_snapshot=_live_fuel_snapshot, client=_harti_client(),
+    )
+    return merge_harti_live_price(backfilled, _live_snapshot, vegetable, market, live_fuel_snapshot=_live_fuel_snapshot)
+
+
+def _history_for_features(
+    history: pd.DataFrame, vegetable: str, market: str, live_fuel: LiveFuelPriceSnapshot | None, use_archive: bool
+) -> tuple[pd.DataFrame, list[pd.Timestamp]]:
+    """Close holes in the trailing lag/rolling window so exact-date features can be computed:
+    real archived bulletins first (when using live HARTI data), then labelled estimates."""
+    if use_archive:
+        history = backfill_internal_harti_gaps(
+            history, vegetable, market, CONFIG_PATH, live_fuel_snapshot=live_fuel, client=_harti_client()
+        )
+    return impute_missing_historical_prices(history, vegetable, market, CONFIG_PATH, live_fuel_snapshot=live_fuel)
+
+
+def _load_model_files(load, description: str, training_script: str = "scripts/train.py"):
+    """Load a model, reporting unusable model files on the page rather than crashing it."""
+    try:
+        return load()
+    except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError):
+        return None
+    except ArtifactConsistencyError as error:
+        st.error(f"{description} the model files are inconsistent and cannot be used: {error}")
+    except Exception as error:  # noqa: BLE001 -- a corrupt file can raise almost anything while unpickling
+        st.error(
+            f"{description} the model files could not be read, so they may be damaged "
+            f"({type(error).__name__}: {error}). Restore them from a backup, or run `{training_script}` to recreate them."
+        )
+    return None
+
+
+def _missing_required_columns(model: Predictor, history: pd.DataFrame) -> list[str]:
+    """Fuel columns this model's features need that the loaded data doesn't have, or has only blank."""
+    return [
+        column
+        for column in FUEL_COLUMNS
+        if any(feature.startswith(f"{column}_lag") for feature in model.feature_columns)
+        and (column not in history.columns or history[column].notna().sum() == 0)
+    ]
+
+
+@st.cache_resource
+def _load_forecaster_version(version: str) -> DirectForecaster:
+    try:
+        return DirectForecaster.load(CONFIG_PATH)
+    except FileNotFoundError as error:
+        raise ModelArtifactNotFoundError(str(error)) from error
+
+
+@st.cache_data(ttl=_HARTI_CACHE_TTL_SECONDS, show_spinner="Preparing forecast features...")
+def _forecast_origin_rows(cache_key: str, _history: pd.DataFrame, _latest_markets: pd.DataFrame | None) -> pd.DataFrame:
+    """Features for every vegetable and date. Cached by cache_key alone."""
+    return ForecastFeatureBuilder(CONFIG_PATH, extra_market_rows=_latest_markets).build_origin_features(_history)
+
+
+def _render_direct_result(
+    result: ForecastResult, origin_rows: pd.DataFrame, actual_history: pd.DataFrame, location, source_label: str, multi_day: bool
+) -> None:
+    """Show a direct forecast: the price, its path (for several days), weather and sources."""
+    if multi_day:
+        st.subheader("📈 Future Vegetable Price Forecast")
+        st.warning(
+            "⚠ **FORECAST** -- a model estimate from the latest actual market data, not a guaranteed "
+            "future price. Error grows with distance; see **Model Performance** for measured accuracy."
+        )
+        columns = st.columns(3)
+        columns[0].metric("Vegetable", result.vegetable)
+        columns[1].metric("Market", result.market)
+        columns[2].metric("Forecast Horizon", f"{result.forecast_horizon_days} day(s) ahead")
+    label = "Forecasted" if multi_day else "Predicted"
+    with st.container(key="vp_result_direct"):
+        st.metric(
+            label=f"{label} Price -- {result.vegetable} at {result.market} on {result.target_date.date()}",
+            value=f"Rs. {result.predicted_price:.2f} / kg",
+        )
+        st.caption(
+            f"Latest actual data: **{result.latest_actual_date.date()}**. Each day's forecast uses only what was "
+            f"known then, including other markets' published prices. **Data source:** {source_label}."
+        )
+        st.caption(f"**Model used:** {_model_used}")
+
+    chart_column, detail_column = st.columns([3, 2], gap="medium")
+    origin_row = origin_rows[
+        (origin_rows["vegetable"] == result.vegetable) & (origin_rows["origin"] == result.latest_actual_date)
+    ].iloc[0]
+    values = {
+        "Rainfall (last 7 days)": origin_row["rain_sum_7"],
+        "Temperature (7-day mean)": origin_row["temp_mean_7"],
+        "Humidity (7-day mean)": origin_row["humidity_mean_7"],
+    }
+    units = {"Rainfall (last 7 days)": "mm", "Temperature (7-day mean)": "°C", "Humidity (7-day mean)": "%"}
+    path = pd.DataFrame(
+        {"date": [p.date for p in result.daily_forecast], "forecasted_price": [p.predicted_price for p in result.daily_forecast]}
+    )
+    with detail_column:
+        _render_weather_data_card(
+            result.vegetable,
+            result.market,
+            location,
+            f"The 7 days up to {result.latest_actual_date.date()}",
+            {name: f"{value:.1f} {units[name]}" for name, value in values.items() if pd.notna(value)} or None,
+            used_for="Forecasting, from observed weather only (no future weather is needed)",
+        )
+        if multi_day:
+            with st.expander("Daily forecast path"):
+                st.dataframe(
+                    pd.DataFrame({"Date": path["date"].dt.date, "Forecast (Rs / kg)": path["forecasted_price"].round(2)}),
+                    hide_index=True,
+                )
+    recent = actual_history[actual_history["date"] >= result.latest_actual_date - pd.Timedelta(days=180)]
+    fig, ax = plt.subplots(figsize=(8, 4.4))
+    ax.plot(recent["date"], recent["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Actual price")
+    if multi_day:
+        ax.plot(path["date"], path["forecasted_price"], marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label="Forecast")
+    ax.scatter([result.target_date], [result.predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Requested date")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price (Rs / kg)")
+    ax.legend()
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    with chart_column:
+        st.pyplot(fig)
+    plt.close(fig)
+
+
+def _model_summary() -> str:
+    try:
+        metadata = load_artifact_metadata(config_path=CONFIG_PATH)
+    except (ArtifactMetadataNotFoundError, ValueError, TypeError):
+        return "Earlier comparison model loaded from `models/`."
+    data = metadata.training_data
+    return (
+        f"Earlier comparison model loaded: **{metadata.model_type}**, trained on {data.get('train_rows', '?')} rows "
+        f"of data from {data.get('start_date', '?')} to {data.get('end_date', '?')}."
+    )
+
+
 # ---------------------------------------------------------------------------
 # 1. Historical data source
 # ---------------------------------------------------------------------------
 
 st.header("1. Historical data")
-_data_source_options = ["Bundled sample data (synthetic)", "Upload my own CSV"]
-if _HARTI_LATEST_DATA_ENABLED:
-    _data_source_options.append("Latest HARTI Data (real)")
+_missing_datasets = missing_historical_datasets(CONFIG_PATH)
+_data_source_options = [SOURCE_SAMPLE, SOURCE_UPLOAD]
+if not _missing_datasets:
+    _data_source_options.insert(0, SOURCE_HISTORICAL)
+    if _HARTI_LATEST_DATA_ENABLED:
+        _data_source_options.append(SOURCE_LATEST)
+else:
+    st.warning(
+        f"The real-data options are unavailable because of missing file(s): "
+        f"{', '.join(f'`{path}`' for path in _missing_datasets)}. Only sample and uploaded data can be used. "
+        "`reports/DATA_SOURCES.md` explains how to rebuild them."
+    )
 data_source = st.radio("Data source", _data_source_options, horizontal=True)
 
 history_df = None
 live_snapshot: HartiLiveSnapshot | None = None
-if data_source == "Bundled sample data (synthetic)":
+if data_source == SOURCE_SAMPLE:
     history_df = _load_sample_history_cached()
     st.caption(
         f"Loaded `app/sample_data/sample_history.csv` -- {len(history_df)} synthetic row(s), "
         f"{history_df['date'].min().date()} to {history_df['date'].max().date()}. Not real market data."
     )
-elif data_source == "Upload my own CSV":
+elif data_source == SOURCE_UPLOAD:
     uploaded_file = st.file_uploader(
-        "CSV with columns: date, vegetable, market, price, rainfall_mm, temperature_c, humidity_pct "
-        "(also include diesel_price, petrol_price if the loaded model was trained with fuel-price "
-        "data -- otherwise a prediction needing those lag features will fail with a clear error)",
+        "CSV with columns: date (YYYY-MM-DD), vegetable, market, price. Optional: rainfall_mm, temperature_c, "
+        "humidity_pct, and diesel_price, petrol_price (needed if the loaded model uses fuel prices).",
         type="csv",
     )
     if uploaded_file is not None:
         try:
-            history_df = pd.read_csv(uploaded_file, parse_dates=["date"])
-        except Exception as error:  # noqa: BLE001 -- surfaced directly to the user, not swallowed
-            st.error(f"Could not read that CSV: {error}")
+            history_df, _upload_notes = prepare_uploaded_history(pd.read_csv(uploaded_file))
+        except HistoryInputError as error:
+            st.error(str(error))
             st.stop()
-else:  # "Latest HARTI Data (real)"
+        except pd.errors.EmptyDataError:
+            st.error("That file is empty. It needs a header row and at least one row of data.")
+            st.stop()
+        except Exception as error:  # noqa: BLE001 -- surfaced directly to the user, not swallowed
+            st.error(f"Could not read that file as a comma-separated CSV saved in UTF-8. Details: {error}")
+            st.stop()
+        for _note in _upload_notes:
+            st.warning(_note)
+elif data_source == SOURCE_HISTORICAL:
     try:
-        history_df = _load_real_market_history_cached()
+        history_df = _load_real_market_history_cached(_DATA_VERSION)
+    except _DATA_READ_ERRORS as error:
+        st.error(f"Couldn't load the real datasets: {error}")
+        st.stop()
+    st.caption(
+        f"Real HARTI/Dambulla prices with real weather and fuel data -- {len(history_df)} rows, "
+        f"{history_df['date'].min().date()} to {history_df['date'].max().date()}. Sources: `reports/DATA_SOURCES.md`."
+    )
+else:  # SOURCE_LATEST
+    try:
+        history_df = _load_real_market_history_cached(_DATA_VERSION)
         live_snapshot = _fetch_harti_snapshot_cached()
     except HartiLiveDataError as error:
         st.error(f"Couldn't fetch the latest HARTI bulletin: {error}")
+        st.stop()
+    except _DATA_READ_ERRORS as error:
+        st.error(f"Couldn't load the real datasets: {error}")
         st.stop()
 
     refresh_col, info_col = st.columns([1, 5])
@@ -204,7 +431,19 @@ if missing_columns:
 # region (config/crop_production_regions.yaml) where one is mapped -- e.g. Carrot
 # rows get Nuwara Eliya's weather instead of the market's. A vegetable with no
 # sufficiently evidenced region is left unchanged (market-location weather).
-history_df = apply_production_region_weather(history_df, config_path=CONFIG_PATH)
+_region_weather_path = ConfigLoader(CONFIG_PATH).get("paths.raw_files.weather_data_by_region")
+if not _region_weather_path or not Path(_region_weather_path).exists():
+    st.warning(
+        "The regional weather file is missing, so this data keeps its own weather rather than each "
+        "vegetable's production-region weather, even where the weather details below name a region."
+    )
+try:
+    history_df = apply_production_region_weather(history_df, config_path=CONFIG_PATH)
+except (ValueError, KeyError, TypeError, OSError) as error:
+    st.warning(
+        f"The regional weather file could not be read ({type(error).__name__}), so this data keeps its own weather "
+        "rather than each vegetable's production-region weather, even where the weather details below name a region."
+    )
 
 with st.expander("Preview loaded data"):
     st.dataframe(history_df.head(20))
@@ -217,21 +456,29 @@ st.header("2. Model")
 
 demo_models_dir = resolve_demo_models_dir(CONFIG_PATH)
 
-try:
-    production_predictor = _load_predictor(CONFIG_PATH)
-except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError):
-    production_predictor = None
-except ArtifactConsistencyError as error:
-    st.error(f"Production model artifacts under `models/` are inconsistent and cannot be used: {error}")
-    production_predictor = None
-
-try:
-    demo_predictor = _load_demo_predictor(CONFIG_PATH, demo_models_dir)
-except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError):
-    demo_predictor = None
-except ArtifactConsistencyError as error:
-    st.error(f"Sandbox model artifacts under `{demo_models_dir}` are inconsistent and cannot be used: {error}")
-    demo_predictor = None
+# Real data always uses the direct forecaster. If it can't run as it was evaluated, this stops and
+# says why, and the earlier model is used only if the user explicitly asks for it.
+forecaster = None
+if data_source in (SOURCE_HISTORICAL, SOURCE_LATEST):
+    _problems = forecaster_problems(CONFIG_PATH)
+    if _problems:
+        st.error(
+            "**The Ridge direct forecaster can't run:**\n"
+            + "\n".join(f"- {problem}" for problem in _problems)
+            + "\n\nRestore the file(s) from a backup. `reports/DATA_SOURCES.md` explains how to rebuild datasets, "
+            "and `scripts/train_forecaster.py` recreates the model."
+        )
+    else:
+        forecaster = _load_model_files(lambda: _load_forecaster_version(_DATA_VERSION), "Ridge direct forecaster:", "scripts/train_forecaster.py")
+    if forecaster is None and not st.checkbox(
+        "Use the earlier comparison model instead (a different model, with different accuracy)",
+        key="use_earlier_model_for_real_data",
+    ):
+        st.info("No prediction is available from this data source until the forecaster can run.")
+        st.stop()
+use_direct = forecaster is not None
+production_predictor = None if use_direct else _load_model_files(lambda: _load_predictor(CONFIG_PATH), "Earlier comparison model:")
+demo_predictor = _load_model_files(lambda: _load_demo_predictor(CONFIG_PATH, demo_models_dir), "Sandbox model:")
 
 
 def _train_sandbox_model(button_label: str) -> None:
@@ -247,31 +494,67 @@ def _train_sandbox_model(button_label: str) -> None:
                 st.error(f"Training failed: {error}")
                 st.stop()
         st.success(
-            f"Sandbox model trained and saved under `{demo_models_dir}` (production model, if any, "
-            f"is untouched). Best model: **{result.best_model_name}** "
+            f"Sandbox model trained and saved under `{demo_models_dir}` (the saved project models are "
+            f"untouched). Best model: **{result.best_model_name}** "
             f"({result.metrics[result.best_model_name]})"
         )
         _load_demo_predictor.clear()
         st.rerun()
 
 
-if production_predictor is not None:
-    st.success("Production model loaded from `models/` -- trained on the real HARTI dataset by `scripts/train.py`.")
+_missing_for_production = (
+    _missing_required_columns(production_predictor, history_df) if production_predictor is not None else []
+)
+if use_direct:
+    predictor = None
+    _model_used = f"Ridge direct forecaster, with a separate model for each day up to {MAX_HORIZON_DAYS} days ahead."
+    st.success(
+        f"Ridge direct forecaster loaded: one model for each day up to {MAX_HORIZON_DAYS} days ahead, trained on data "
+        f"through {forecaster.trained_through.date()}. See **Model Performance** for measured accuracy."
+    )
+elif production_predictor is not None and not _missing_for_production:
+    st.success(_model_summary())
     predictor = production_predictor
+    _model_used = "Earlier comparison model (51 features), not the Ridge direct forecaster."
+    if data_source in (SOURCE_HISTORICAL, SOURCE_LATEST):
+        st.warning(
+            "**You chose the earlier comparison model.** The direct forecaster's accuracy on **Model Performance** "
+            "doesn't apply to these results."
+        )
+    else:
+        st.info(
+            "**This data uses the earlier comparison model, not the Ridge direct forecaster.** The forecaster needs "
+            "other markets' published prices and regional weather on the same dates, which only the project's real "
+            "datasets have. The accuracy on **Model Performance** was measured on real Dambulla prices and doesn't "
+            "carry over to other data."
+        )
     with st.expander("Train a sandbox model on the data loaded above"):
-        st.caption(f"Saved separately under `{demo_models_dir}` -- never overwrites the production model above.")
+        st.caption(f"Saved separately under `{demo_models_dir}` -- never overwrites the project's saved models.")
         _train_sandbox_model("Train sandbox model")
-else:
+elif production_predictor is not None:
     st.warning(
-        "No production model found under `models/`. Run `scripts/train.py` to train one on the real "
-        "HARTI dataset. In the meantime, you can train a temporary sandbox model on the data loaded "
-        f"above (saved under `{demo_models_dir}`, never as the production model) to try the app."
+        f"The earlier comparison model needs {', '.join(_missing_for_production)}, which this data doesn't have. To "
+        f"try the app on this data, train a temporary sandbox model (saved under `{demo_models_dir}`, never over the "
+        "project's saved models). Its results describe only the data it was trained on."
     )
     _train_sandbox_model("Train sandbox model on loaded data")
-    if demo_predictor is None:
+    if demo_predictor is None or _missing_required_columns(demo_predictor, history_df):
         st.stop()
-    st.info("No production model is available -- using a **sandbox** model for this session instead.")
+    st.info(_SANDBOX_IN_USE)
     predictor = demo_predictor
+    _model_used = "Temporary sandbox model, from the most recent sandbox training."
+else:
+    st.warning(
+        "The earlier comparison model isn't available from `models/` (`scripts/train.py` creates it). You can train a "
+        f"temporary sandbox model on the data loaded above (saved under `{demo_models_dir}`, never over the project's "
+        "saved models) to try the app."
+    )
+    _train_sandbox_model("Train sandbox model on loaded data")
+    if demo_predictor is None or _missing_required_columns(demo_predictor, history_df):
+        st.stop()
+    st.info(_SANDBOX_IN_USE)
+    predictor = demo_predictor
+    _model_used = "Temporary sandbox model, from the most recent sandbox training."
 
 # ---------------------------------------------------------------------------
 # 3. Prediction request
@@ -279,12 +562,57 @@ else:
 
 st.header("3. Request a prediction")
 
-vegetable = st.selectbox("Vegetable", sorted(history_df["vegetable"].unique()))
-markets_for_vegetable = sorted(history_df.loc[history_df["vegetable"] == vegetable, "market"].unique())
-market = st.selectbox("Market", markets_for_vegetable)
+_priced_rows = history_df[history_df["price"].notna()]
+if _priced_rows.empty:
+    st.error("The loaded data has no usable prices.")
+    st.stop()
+if use_direct:
+    # Only series the forecaster was trained on and whose latest price is within its reach: a
+    # forecast from an older price would describe dates that have already passed.
+    _status = series_status(_priced_rows, forecaster.vegetables)
+    _supported = _status[_status["prediction_supported"]]
+    _unsupported = _status[~_status["prediction_supported"]]
+    if _supported.empty:
+        st.error("No price series is recent enough to forecast. Run `scripts/update_data.py` to import the latest bulletins.")
+        st.stop()
+    vegetable = st.selectbox("Vegetable", _supported["series"].tolist(), format_func=display_name, key="predict_vegetable")
+    if not _unsupported.empty:
+        with st.expander(f"{len(_unsupported)} recorded price series can't be forecast, and why"):
+            st.dataframe(
+                pd.DataFrame(
+                    {
+                        "Series": _unsupported["display_name"],
+                        "Recorded from": _unsupported["first"].dt.date,
+                        "Latest price": _unsupported["latest"].dt.date,
+                        "Reason": _unsupported["reason"],
+                    }
+                ),
+                hide_index=True,
+                width="stretch",
+            )
+            st.caption("Their recorded prices are still on the **Price History** page.")
+else:
+    vegetable = st.selectbox("Vegetable", sorted(_priced_rows["vegetable"].unique()), key="predict_vegetable")
+market = st.selectbox("Market", sorted(_priced_rows.loc[_priced_rows["vegetable"] == vegetable, "market"].unique()))
+if use_direct:
+    ui.data_source_panel(
+        "HARTI daily bulletins", market, "Wholesale (Rs/kg)",
+        _priced_rows.loc[_priced_rows["vegetable"] == vegetable, "date"].max(),
+        extra=f"Forecasts run from the latest recorded price, up to {MAX_HORIZON_DAYS} days ahead.",
+    )
 
+if use_direct and vegetable not in forecaster.vegetables:
+    st.error(f"**{vegetable}** has too little price history for the forecaster to have been trained on it.")
+    st.stop()
+_unseen = [] if use_direct else predictor.unseen_categories(vegetable=vegetable, market=market)
+if _unseen:
+    st.warning(
+        f"This model never saw **{', '.join(_unseen)}** during training. It can still return a number from the "
+        "recent prices, but nothing specific to this selection is behind it, so treat it with caution."
+    )
+
+live_fuel_snapshot: LiveFuelPriceSnapshot | None = None
 if live_snapshot is not None:
-    live_fuel_snapshot: LiveFuelPriceSnapshot | None = None
     try:
         live_fuel_snapshot = _fetch_live_fuel_price_cached()
     except LiveFuelPriceError as error:
@@ -303,16 +631,12 @@ if live_snapshot is not None:
         )
 
     try:
-        history_df = backfill_harti_price_gap(
-            history_df, live_snapshot, vegetable, market, CONFIG_PATH,
-            live_fuel_snapshot=live_fuel_snapshot,
-        )
-        history_df = merge_harti_live_price(
-            history_df, live_snapshot, vegetable, market, live_fuel_snapshot=live_fuel_snapshot
+        history_df = _history_with_latest_bulletin(
+            vegetable, market, f"{live_snapshot.bulletin_date.date()}|{_DATA_VERSION}", history_df, live_snapshot, live_fuel_snapshot
         )
     except HartiLiveDataError as error:
-        st.error(f"Can't use the latest HARTI bulletin for this selection: {error}")
-        st.stop()
+        st.warning(f"Using historical data only for this selection: {error}")
+        live_snapshot = None
 
 resolved_location = resolve_weather_region(vegetable, config_path=CONFIG_PATH)
 _coords_caption = f"({resolved_location.latitude:.4f}, {resolved_location.longitude:.4f})"
@@ -335,18 +659,27 @@ actual_group_history = group_history.loc[group_history["price"].notna()]
 latest_actual_date = actual_group_history["date"].max()
 default_target = (latest_actual_date + pd.Timedelta(days=1)).date()
 
+_days_since_reading = (pd.Timestamp.now().normalize() - latest_actual_date).days
+if _days_since_reading > _STALE_AFTER_DAYS:
+    st.warning(
+        f"The latest price for {vegetable} at {market} is from **{latest_actual_date.date()}**, "
+        f"{_days_since_reading} days ago. A prediction here continues from that date, not from today."
+    )
+
 prediction_type = st.radio(
     "Prediction type",
     ["Latest / Next Available Prediction", "Future Date Forecast (multi-step)"],
     horizontal=True,
     help=(
-        "'Latest / Next Available Prediction' scores one date directly, same as before. "
-        "'Future Date Forecast' reaches a distant date by recursively predicting every day in "
-        "between first and feeding each day's own prediction into the next -- see README.md "
-        "section 12."
+        f"Both options use a separate model for each number of days ahead, up to {MAX_HORIZON_DAYS}. "
+        "'Future Date Forecast' also shows the daily path to the chosen date."
+        if use_direct
+        else "'Latest / Next Available Prediction' scores one date directly. 'Future Date Forecast' reaches a "
+        "distant date by predicting every day in between and feeding each prediction into the next, so errors "
+        "can build up -- see README.md section 12."
     ),
 )
-use_live_weather = st.checkbox(
+use_live_weather = use_direct or st.checkbox(
     "Fetch latest weather from Open-Meteo automatically (recommended)",
     value=True,
     help=(
@@ -357,27 +690,71 @@ use_live_weather = st.checkbox(
     ),
 )
 
+_direct_rows = None
+if use_direct:
+    _latest_markets = live_snapshot.all_markets if live_snapshot is not None else None
+    _rows_key = (f"{vegetable}|{live_snapshot.bulletin_date.date()}" if live_snapshot is not None else "historical") + f"|{_DATA_VERSION}"
+    _direct_rows = _forecast_origin_rows(_rows_key, history_df, _latest_markets)
+    _direct_sources = "HARTI bulletins (Dambulla and other markets), Open-Meteo archive weather, CEYPETCO fuel prices"
+    if live_snapshot is not None:
+        _direct_sources += f", including the bulletin dated {live_snapshot.bulletin_date.date()} (not real-time)"
+
+
+def _show_direct_forecast(requested_date, multi_day: bool) -> None:
+    """Run and display a direct forecast, reporting a refusal on the page."""
+    try:
+        with st.spinner("Calculating the forecast..."):
+            result = direct_forecast(
+                forecaster, _direct_rows, vegetable, market, requested_date, latest_actual_date, [_direct_sources]
+            )
+    except (ForecastInputError, ForecastDataUnavailableError) as error:
+        st.error(f"Cannot forecast that date: {error}")
+        return
+    _render_direct_result(result, _direct_rows, actual_group_history, resolved_location, _direct_sources, multi_day)
+
+
 if prediction_type == "Latest / Next Available Prediction":
     target_date = st.date_input(
         "Date to predict",
         value=default_target,
         min_value=default_target,
     )
-    st.caption(
-        "Predicting further beyond the last historical date needs correspondingly more lag/rolling "
-        "history (up to 30 days per config.feature_engineering). If it's missing, you'll see a clear "
-        "error naming the exact feature(s) that couldn't be computed -- never a fabricated result. "
-        "For a date far enough ahead to need more than that, use **Future Date Forecast** instead."
-    )
+    _past = past_date_notice(target_date, latest_actual_date)
+    if _past:
+        st.warning(_past)
+    if not use_direct:
+        st.caption(
+            "Predicting further beyond the last historical date needs correspondingly more lag/rolling "
+            "history (up to 30 days per config.feature_engineering). If it's missing, you'll see a clear "
+            "error naming the exact feature(s) that couldn't be computed -- never a fabricated result. "
+            "For a date far enough ahead to need more than that, use **Future Date Forecast** instead."
+        )
 
     if st.button("Predict", type="primary"):
+        if use_direct:
+            _show_direct_forecast(target_date, multi_day=False)
+            st.stop()
+
         target_ts = pd.Timestamp(target_date)
+
+        # A day with no reading anywhere in the lag/rolling window would otherwise refuse
+        # the prediction outright. Same labelled handling as Future Date Forecast below.
+        prediction_history, imputed_dates = _history_for_features(
+            history_df, vegetable, market, live_fuel_snapshot, use_archive=live_snapshot is not None
+        )
+        if imputed_dates:
+            _severity = st.error if len(imputed_dates) > _MANY_IMPUTED_DAYS else st.warning
+            _severity(
+                f"{len(imputed_dates)} of the last 30 days have no real price for {vegetable} at {market}, so "
+                "estimates from surrounding real prices fill them for the model's features: "
+                f"{', '.join(day.date().isoformat() for day in imputed_dates)}. Original data is unchanged."
+            )
 
         try:
             if use_live_weather:
-                input_df = build_live_prediction_input(history_df, target_ts, vegetable, market, CONFIG_PATH)
+                input_df = build_live_prediction_input(prediction_history, target_ts, vegetable, market, CONFIG_PATH)
             else:
-                input_df = build_prediction_input(history_df, target_ts, vegetable, market)
+                input_df = build_prediction_input(prediction_history, target_ts, vegetable, market)
         except LiveWeatherError as error:
             st.error(f"Couldn't get live weather data: {error}")
             st.stop()
@@ -396,7 +773,11 @@ if prediction_type == "Latest / Next Available Prediction":
             st.error(f"Model not available: {error}")
         else:
             predicted_price = float(result.loc[0, "predicted_price"])
-            st.metric(label=f"Predicted price -- {vegetable} at {market} on {target_date}", value=f"{predicted_price:.2f}")
+            with st.container(key="vp_result_next"):
+                st.metric(
+                    label=f"Predicted price -- {vegetable} at {market} on {target_date}",
+                    value=f"Rs. {predicted_price:.2f} / kg",
+                )
 
             _weather_lookup_date = target_ts - pd.Timedelta(days=_WEATHER_LAG_DAYS)
             _weather_values = None
@@ -405,9 +786,9 @@ if prediction_type == "Latest / Next Available Prediction":
                     input_df, target_date=target_ts, vegetable=vegetable, market=market
                 )
                 _weather_values = {
-                    "Rainfall": f"{_engineered_row['rainfall_mm_lag14d']:.1f} mm",
-                    "Temperature": f"{_engineered_row['temperature_c_lag14d']:.1f} °C",
-                    "Humidity": f"{_engineered_row['humidity_pct_lag14d']:.0f} %",
+                    "Rainfall": f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
+                    "Temperature": f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
+                    "Humidity": f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
                 }
             except (PredictionInputError, KeyError):
                 pass  # display the card without values rather than fail the page
@@ -422,23 +803,32 @@ if prediction_type == "Latest / Next Available Prediction":
                 )
             else:
                 st.caption(f"Data source: {data_source}")
+            st.caption(f"**Model used:** {_model_used}")
 
-            fig, ax = plt.subplots()
-            ax.plot(group_history["date"], group_history["price"], marker="o", markersize=3, label="Historical price")
-            ax.scatter([pd.Timestamp(target_date)], [predicted_price], color="red", zorder=5, label="Prediction")
+            fig, ax = plt.subplots(figsize=(8, 4.4))
+            ax.plot(group_history["date"], group_history["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Historical price")
+            ax.scatter([pd.Timestamp(target_date)], [predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Prediction")
             ax.set_xlabel("Date")
             ax.set_ylabel("Price")
             ax.legend()
             fig.autofmt_xdate()
+            fig.tight_layout()
             st.pyplot(fig)
+            plt.close(fig)
 
 else:  # "Future Date Forecast (multi-step)"
-    estimated_max_date = max_supported_forecast_date(latest_actual_date, CONFIG_PATH)
-    st.caption(
-        f"Estimated furthest forecastable date given the live weather provider's own forward "
-        f"limit: **~{estimated_max_date.date()}**. The loaded history's own weather coverage can "
-        "extend this further; the real limit is only known once you generate the forecast."
-    )
+    if use_direct:
+        st.caption(
+            f"The furthest date available is **{(latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS)).date()}**, "
+            f"{MAX_HORIZON_DAYS} days after the latest actual price."
+        )
+    else:
+        estimated_max_date = max_supported_forecast_date(latest_actual_date, CONFIG_PATH)
+        st.caption(
+            f"Estimated furthest forecastable date given the live weather provider's own forward "
+            f"limit: **~{estimated_max_date.date()}**. The loaded history's own weather coverage can "
+            "extend this further; the real limit is only known once you generate the forecast."
+        )
     forecast_date = st.date_input(
         "Forecast date",
         value=default_target,
@@ -450,36 +840,37 @@ else:  # "Future Date Forecast (multi-step)"
         f"Latest actual data: **{latest_actual_date.date()}** &nbsp;|&nbsp; Forecast horizon: "
         f"**{forecast_horizon_preview} day(s) ahead**"
     )
+    _past = past_date_notice(forecast_date, latest_actual_date)
+    if _past:
+        st.warning(_past)
+    elif pd.Timestamp(default_target) < pd.Timestamp.now().normalize():
+        st.caption(
+            f"The forecast path starts on {default_target}, the day after the latest actual data; its days before "
+            "today have already passed and are forecasts, not recorded prices."
+        )
+
+    if forecast_horizon_preview > 7:
+        st.warning(
+            "Forecast error grows quickly with distance. See the **Model Performance** page for measured "
+            "accuracy at each range before relying on a date this far ahead."
+        )
 
     if st.button("Generate Forecast", type="primary"):
+        if use_direct:
+            _show_direct_forecast(forecast_date, multi_day=True)
+            st.stop()
+
         live_fuel_snapshot_for_forecast: LiveFuelPriceSnapshot | None = None
         try:
             live_fuel_snapshot_for_forecast = _fetch_live_fuel_price_cached()
         except LiveFuelPriceError as error:
             st.caption(f"Live fuel price unavailable ({error}) -- using historical fuel price fallback.")
 
-        forecast_input_history = history_df
-        if live_snapshot is not None:
-            # Recursive forecasting depends on the ENTIRE trailing lag/rolling window
-            # before latest_actual_date staying dense -- a single isolated day HARTI's
-            # bulletin never covered (anywhere in that window, not just the recent
-            # stale-CSV gap backfill_harti_price_gap() already closed above) would
-            # otherwise silently starve a later forecast day's price_lag_{7,14,30}d.
-            # Only real bulletins are ever added here; see that function's docstring.
-            forecast_input_history = backfill_internal_harti_gaps(
-                forecast_input_history, vegetable, market, CONFIG_PATH,
-                live_fuel_snapshot=live_fuel_snapshot_for_forecast,
-            )
-
-        # Priority 2, last resort: a date backfill_internal_harti_gaps() just confirmed
-        # HARTI genuinely has no bulletin for (a real archive fetch was attempted and
-        # found nothing) still needs SOME value for its exact-date lag/rolling lookup.
-        # This estimates it deterministically from real surrounding observations only
-        # -- never a forecast row -- and tags it source="IMPUTED_HISTORICAL" so it can
-        # never be mistaken for a real observation; see that function's docstring.
-        forecast_input_history, imputed_dates_for_forecast = impute_missing_historical_prices(
-            forecast_input_history, vegetable, market, CONFIG_PATH,
-            live_fuel_snapshot=live_fuel_snapshot_for_forecast,
+        # Recursive forecasting depends on the ENTIRE trailing lag/rolling window staying
+        # dense. Real archived bulletins fill holes first; a date HARTI genuinely has none
+        # for is then estimated from real surrounding prices and tagged IMPUTED_HISTORICAL.
+        forecast_input_history, imputed_dates_for_forecast = _history_for_features(
+            history_df, vegetable, market, live_fuel_snapshot_for_forecast, use_archive=live_snapshot is not None
         )
 
         pipeline = PredictionPipeline(config_path=CONFIG_PATH, predictor=predictor)
@@ -538,23 +929,25 @@ else:  # "Future Date Forecast (multi-step)"
                 _final_day_input, target_date=forecast_result.target_date, vegetable=vegetable, market=market
             )
             _forecast_weather_values = {
-                "Rainfall": f"{_engineered_row['rainfall_mm_lag14d']:.1f} mm",
-                "Temperature": f"{_engineered_row['temperature_c_lag14d']:.1f} °C",
-                "Humidity": f"{_engineered_row['humidity_pct_lag14d']:.0f} %",
+                "Rainfall": f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
+                "Temperature": f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
+                "Humidity": f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
             }
         except (LiveWeatherError, PredictionInputError, KeyError):
             pass  # display the card without values rather than fail the page
         _render_weather_data_card(
             vegetable, market, resolved_location, str(_forecast_weather_lookup_date.date()), _forecast_weather_values
         )
-        st.metric(
-            label=(
-                f"Forecasted Price -- {forecast_result.vegetable} at {forecast_result.market} on "
-                f"{forecast_result.target_date.date()}"
-            ),
-            value=f"Rs. {forecast_result.predicted_price:.2f} / kg",
-        )
-        st.caption("**Data source:** " + " + ".join(forecast_result.data_sources))
+        with st.container(key="vp_result_recursive"):
+            st.metric(
+                label=(
+                    f"Forecasted Price -- {forecast_result.vegetable} at {forecast_result.market} on "
+                    f"{forecast_result.target_date.date()}"
+                ),
+                value=f"Rs. {forecast_result.predicted_price:.2f} / kg",
+            )
+            st.caption("**Data source:** " + " + ".join(forecast_result.data_sources))
+            st.caption(f"**Model used:** {_model_used} Reached by predicting one day at a time.")
         for warning_message in forecast_result.warnings:
             st.caption(f"⚠ {warning_message}")
 
@@ -571,29 +964,31 @@ else:  # "Future Date Forecast (multi-step)"
                 imputed_points = forecast_input_history.loc[imputed_mask, ["date", "price"]].sort_values("date")
                 st.dataframe(imputed_points.rename(columns={"price": "imputed_estimated_price"}))
 
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(8, 4.4))
             ax.plot(
                 actual_group_history["date"], actual_group_history["price"],
-                marker="o", markersize=3, label="Historical price (actual)",
+                marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Historical price (actual)",
             )
             if forecast_result.imputed_historical_dates:
                 imputed_mask = forecast_input_history["source"] == IMPUTED_HISTORICAL_SOURCE_LABEL
                 imputed_points = forecast_input_history.loc[imputed_mask].sort_values("date")
                 ax.scatter(
                     imputed_points["date"], imputed_points["price"],
-                    marker="x", color="gray", zorder=4,
+                    marker="x", color=ui.SERIES["estimate"], zorder=4,
                     label="Imputed historical (estimated -- not real HARTI data)",
                 )
             ax.plot(
                 daily_forecast_df["date"], daily_forecast_df["forecasted_price"],
-                marker="o", markersize=3, linestyle="--", color="orange", label="Forecast (recursive)",
+                marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label="Forecast (recursive)",
             )
             ax.scatter(
                 [forecast_result.target_date], [forecast_result.predicted_price],
-                color="red", zorder=5, label="Requested forecast date",
+                s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Requested forecast date",
             )
             ax.set_xlabel("Date")
             ax.set_ylabel("Price")
             ax.legend()
             fig.autofmt_xdate()
+            fig.tight_layout()
             st.pyplot(fig)
+            plt.close(fig)

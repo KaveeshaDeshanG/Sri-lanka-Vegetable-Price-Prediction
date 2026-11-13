@@ -1,0 +1,78 @@
+crop,variety,price_labels,min_value,max_value,unit,start_stage,event,repeat_harvest,scope,source_url,source_text
+Beans,Bush types (crop guidance),Beans,45,45,days,planting,first harvest,Gannoruwa BIL can be harvested in every 4 days and the rest of varieties in every 7 days,crop guidance,https://doa.gov.lk/hordi-crop-bean/,Bush types can be harvested from 45 days after planting
+Beans,Vine types (crop guidance),Beans,60,60,days,planting,first harvest,Gannoruwa BIL can be harvested in every 4 days and the rest of varieties in every 7 days,crop guidance,https://doa.gov.lk/hordi-crop-bean/,Vine types can be harvested from 60 days after planting
+Beans,Sanjaya,Beans,45,45,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 45 days after planting
+Beans,Bandarawela Green,Beans,65,65,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 65 days after planting
+Beans,Gannoruwa BIL,Beans,55,55,days,planting,first harvest,Gannoruwa BIL can be harvested in every 4 days,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest : 55 days after planting
+Beans,Kekulu Bonchi,Beans,55,55,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest : 55 days after planting
+Beans,Kappetipola Nil,Beans,65,65,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest : 65 days after planting
+Beans,Kentucky Wonder Green (KWG),Beans,65,65,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest : 65 days after planting
+Beans,Lanka Butter,Beans,60,65,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest :60 – 65 days after planting
+Beans,Balangoda Nil,Beans,55,55,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 55 days after planting
+Beans,Gannoruwa Green,Beans,52,58,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 52 – 58 days after planting
+Beans,Wade,Beans,45,45,days,seeding,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 45 days after seeding
+Beans,Top Crop,Beans,45,45,days,seeding,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 45 days after seeding
+Beans,Cherokee Wax,Beans,45,45,days,seeding,first harvest,,released variety,https://doa.gov.lk/hordi-variety-bean/,Days to first harvest: 45 days after seeding
+Beetroot,Crop guidance,Beetroot;Beetroot (Nuwara Eliya),75,90,days,transplanting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-beet-root/,Crop cab be harvest 75- 90 days after transplanting.
+Beetroot,Crimson globe,Beetroot;Beetroot (Nuwara Eliya),70,90,days,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-beet/,It takes 70-90 days to harvest.
+Beetroot,Detroit Dark Red,Beetroot;Beetroot (Nuwara Eliya),70,90,days,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-beet/,Takes 70-90 days to harvest.
+Brinjal,Crop guidance,Brinjal;Brinjals,10,12,weeks,transplanting,first harvest,Fruit can be harvested 7 days intervals up to 10-12 picks.,crop guidance,https://doa.gov.lk/hordi-crop-brinjal/,Harvesting can be started 10-12 weeks after transplanting.
+Brinjal,Thinnaweli purple,Brinjal;Brinjals,75,80,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety2-brinjal/,Days to 1st harvest 75-80
+Brinjal,Padagoda,Brinjal;Brinjals,61,85,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety2-brinjal/,Days to 1st harvest 61-85
+Brinjal,SM 164,Brinjal;Brinjals,60,64,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety2-brinjal/,Days to 1st harvest 60-64
+Cabbage,Crop guidance,Cabbage (Kandy);Cabbage (Nuwara Eliya),90,110,days,planting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-cabbage/,Crop can be harvest 90-110 days after planting.
+Capsicum,Crop guidance,Capsicum,75,75,days,nursery sowing,first harvest,at 5-7 day intervals. Thereafter in 7-10 picks during the crop growth.,crop guidance,https://doa.gov.lk/hordi-crop-capsicum/,First harvesting can be done 75 days after nursery sowing and at 5-7 day intervals.
+Carrot,New Kuroda,Carrot,110,110,days,planting,harvest,,released variety,https://doa.gov.lk/hordi-variety-carrot/,"medium maturity variety, harvest 110 days after planting."
+Cauliflower,Crop guidance,,60,75,days,transplanting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-cauliflower/,"Heads are ready to harvest around 60 – 75 days after transplant. However, this may be vary with the variety and agro ecological zone."
+Ela Batu,Crop guidance,,10,12,weeks,transplanting,first harvest,Ten to twelve picks at weekly intervals are possible.,crop guidance,https://doa.gov.lk/hordi-crop-ela-batu/,Can begin harvesting about 10 – 12 weeks after transplanting.
+Ela Batu,GK Elabatu 1 (Manike),,75,80,days,field planting,harvest,,released variety,https://doa.gov.lk/hordi-variety-ela-batu/,It takes 75 to 80 days for harvesting after field planting.
+Ela Batu,GK Elabatu 2 (Tikira),,75,80,days,field planting,harvest,,released variety,https://doa.gov.lk/hordi-variety-ela-batu/,It takes 40 to 45 days for flowering and 75 to 80 days for harvesting after field planting
+Kiri Ala,Crop guidance,,8,10,months,not stated,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-kiri-ala/,Harvest at 8-10 month.
+Knol Khol,Crop guidance,Knol Khol,50,60,days,transplanting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-knol-khol/,Harvest can be taken around 50 – 60 days after transplant.
+Kohila,Crop guidance (leaves),,8,12,months,planting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-kohila/,Leaves can be harvested about 8-12 months after planting.
+Leeks,Crop guidance,Leeks,4.5,4.5,months,transplanting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-leeks/,Crop cab be harvest about 4 ½ months after transplanting.
+Luffa,Crop guidance,Luffa,60,70,days,planting,first harvest,10-15 harvesting can be done over a period of 1 ½ – 2 months with 4 days interval,crop guidance,https://doa.gov.lk/hordi-crop-luffa/,First harvesting can be taken around 60-70 days after planting.
+Luffa,LA33,Luffa,60,70,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-luffa/,First harvest can be get in 60-70 days.
+Luffa,Asiri,Luffa,60,70,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-luffa/,First harvest is given in 60-70 days.
+Luffa,Gannoruwa Ari,Luffa,45,45,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-luffa/,First harvest is in about 45 days.
+Okra,Crop guidance,Ladies Fingers,50,100,days,planting,harvesting period,Can be harvested every 2 days up to 25 times,crop guidance,https://doa.gov.lk/hordi-crop-okra/,Can be harvested every 2 days  up to 25 times over 50-100 days after planting
+Okra,OKH-1 (F1 hybrid),Ladies Fingers,50,60,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-okra/,First harvest in 50-60 days
+Okra,MI5,Ladies Fingers,55,60,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-okra/,First harvest in 55-60 days
+Okra,MI7,Ladies Fingers,55,60,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-okra/,First harvest in 55-60 days.
+Okra,Haritha,Ladies Fingers,50,50,days,not stated,first harvest,,released variety,https://doa.gov.lk/hordi-variety-okra/,first harvest in about 50 days
+Potato,Golden Star,Potato (Nuwara Eliya);Potato (Welimada),100,110,days,not stated,maturity,,released variety,https://doa.gov.lk/hordi-variety-potato/,Medium maturity : 100- 110 days
+Pumpkin,Pathma,Pumpkin,75,80,days,not stated,maturity for consumption,,released variety,https://doa.gov.lk/hordi-variety-pumpkin/,Maturity for consumption – 75-80 days
+Pumpkin,A.N.K.,Pumpkin,40,40,days,flowering,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-pumpkin/,a)A.N.K. – Harvest 40 days after flowering
+Pumpkin,Local variety,Pumpkin,60,60,days,flowering,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-pumpkin/,b) Local Variety – Harvest 60days after flowering
+Pumpkin,Butternut,Pumpkin,20,20,days,flowering,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-pumpkin/,2 Butternut – harvest 20 days after flowering
+Radish,Japanese Ball,Radish,45,55,days,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-raddish/,Can be harvested withing 45-55 days
+Radish,Beeralu Rabu,Radish,45,50,days,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-raddish/,Can be harvested withing 45-50 days
+Salad Leaves,Crop guidance,,50,60,days,transplanting,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-salad-leaves/,Can be harvested in 50-60 days after transplanting.
+Snake Gourd,Crop guidance,Snake Gourd,60,75,days,planting,harvest,with 4 days interval,crop guidance,https://doa.gov.lk/hordi-crop-snake-gourd/,Harvest the crop 60-75 days after planting with 4 days interval
+Sweet Potato,Crop guidance,Sweet Potato,3,4,months,not stated,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-sweet-potato/,Recommended varieties can be harvested at 3 to 4 months .
+Sweet Potato,Wariyapola Red,Sweet Potato,3,3.5,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest within 3- 3 ½ month.
+Sweet Potato,CARI -9,Sweet Potato,3.5,4,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest at 3 ½ month – 4month.
+Sweet Potato,CARI 273,Sweet Potato,3.5,4,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest within 3 ½- 4 month.
+Sweet Potato,CARI 426,Sweet Potato,3,3.5,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest within 3- 3 ½ month.
+Sweet Potato,Wariyapola white,Sweet Potato,3,3.5,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Age – 3-3 ½ month.
+Sweet Potato,Shanthi,Sweet Potato,3,3.5,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Harvest within 3-31/2 month.
+Sweet Potato,Ama,Sweet Potato,3.5,4,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Age is  3 ½ -4month .
+Sweet Potato,Dawala,Sweet Potato,3.5,4,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-sweet-potato/,Age is  3 ½ – 4month.
+Manioc,Crop guidance,Manioc,9,12,months,not stated,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-cassava/,Harvest at 9Month – 12Month. Only kirikawadi can be harvest from 6 month
+Manioc,Shani,Manioc,9,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age 9-12 month
+Manioc,Suranimala,Manioc,9,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age 9-12 month
+Manioc,Suwarne,Manioc,9,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age 9-12 month
+Manioc,HORDI Mu- 01,Manioc,9,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age months 9-12
+Manioc,Kirikawadi,Manioc,6,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age months 6-12
+Manioc,MU 51,Manioc,9,12,months,not stated,harvest,,released variety,https://doa.gov.lk/hordi-variety-cassava/,Age months 9-12
+Winged Bean,Recommended varieties (crop guidance),,70,75,days,not stated,first harvest,Harvest pods every 3-4 days. Harvesting can be done 6-7 weeks from first harvesting.,crop guidance,https://doa.gov.lk/hordi-crop-winged-bean/,First harvest of recommended varieties can be taken in 70-75 days.
+Winged Bean,Local varieties (crop guidance),,90,100,days,not stated,first harvest,Harvest pods every 3-4 days. Harvesting can be done 6-7 weeks from first harvesting.,crop guidance,https://doa.gov.lk/hordi-crop-winged-bean/,"But most cultivated local varieties, this can take up to 90-100 days."
+Winged Bean,Krishna,,70,70,days,planting,first harvest,,released variety,https://doa.gov.lk/hordi-variety3-winged-bean/,gives the first yield in about 70 days after planting
+Yams,Crop guidance,,8,9,months,not stated,harvest,,crop guidance,https://doa.gov.lk/hordi-crop-yams/,Takes 8-9 month period.
+Long Beans (Mae),Gannoruwa Hawari,Long Beans,45,48,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,First Harvest in  45-48 days
+Long Beans (Mae),Hawari Mae,Long Beans,60,70,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,First harvest in 60-70 days
+Long Beans (Mae),Sena,Long Beans,45,50,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 45-50 days
+Long Beans (Mae),Polon Mae,Long Beans,60,70,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 60-70 days
+Long Beans (Mae),Bushita (Local),Long Beans,45,50,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 45-50 days
+Long Beans (Mae),BS1,Long Beans,45,50,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 45-50 days
+Long Beans (Mae),Bush Polon Mae,Long Beans,45,50,days,not stated,first harvest,Harvest both bush & vine types every 2 days.,released variety,https://doa.gov.lk/hordi-variety-mae/,Harvesting can begin in 45-50 days

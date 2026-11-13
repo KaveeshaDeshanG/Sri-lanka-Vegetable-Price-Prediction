@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="40" viewBox="0 0 220 40" role="img" aria-label="VegPrice LK">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#86EFAC"/>
+      <stop offset="1" stop-color="#16A34A"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="4" width="32" height="32" rx="9" fill="#17221D" stroke="#24352C"/>
+  <path d="M10 27c0-9 6-15 16-15-1 9-6 15-15 15h-1z" fill="url(#g)"/>
+  <path d="M11 27c4-4 7-7 11-10" stroke="#0B0F0E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <text x="44" y="21" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#F8FAFC">VegPrice<tspan fill="#22C55E"> LK</tspan></text>
+  <text x="44" y="34" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="9.5" fill="#94A3B8" letter-spacing="0.6">PRICE ANALYTICS</text>
+</svg>

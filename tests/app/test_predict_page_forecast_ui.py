@@ -23,7 +23,7 @@ def test_predict_page_future_forecast_option_renders_without_error():
     assert not at.exception
     captions = [c.value for c in at.caption]
     assert any("Forecast horizon" in c for c in captions)
-    assert any("Estimated furthest forecastable date" in c for c in captions)
+    assert any("furthest" in c and "date" in c for c in captions)
     assert any(b.label == "Generate Forecast" for b in at.button)
 
 

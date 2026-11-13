@@ -31,12 +31,14 @@ import pandas as pd
 
 from config.config_loader import ConfigLoader
 from src.data_collection.live_fuel_price_client import LiveFuelPriceSnapshot
-from src.data_collection.live_weather_client import MAX_FORECAST_DAYS, LiveWeatherError
+from src.data_collection.live_weather_client import MAX_SEASONAL_FORECAST_DAYS, LiveWeatherError
+from src.models.direct_forecaster import MAX_HORIZON_DAYS, DirectForecaster
 from src.prediction.pipeline import PredictionPipeline
 from src.prediction.predictor import FeatureAlignmentError
 
 from .services import (
     IMPUTED_HISTORICAL_SOURCE_LABEL,
+    LOCAL_WEATHER_SOURCE_LABEL,
     build_live_prediction_input,
     build_prediction_input,
     finalize_live_row,
@@ -111,6 +113,60 @@ class ForecastResult:
     imputed_historical_dates: list[pd.Timestamp] = field(default_factory=list)
 
 
+def direct_forecast(
+    forecaster: DirectForecaster,
+    origin_rows: pd.DataFrame,
+    vegetable: str,
+    market: str,
+    target_date: "pd.Timestamp | str",
+    latest_actual_date: pd.Timestamp,
+    data_sources: list[str],
+) -> ForecastResult:
+    """Forecast target_date, and each day up to it, using the direct forecaster.
+
+    Every day's model uses only what was known on latest_actual_date, so no day's forecast
+    depends on an earlier forecast or on future weather.
+
+    Raises:
+        ForecastInputError: target_date is unparseable or not after latest_actual_date.
+        ForecastDataUnavailableError: target_date is too far ahead, or there's no usable
+            current price to forecast from.
+    """
+    try:
+        target_date = pd.Timestamp(target_date)
+    except (ValueError, TypeError) as error:
+        raise ForecastInputError(f"Could not read the date {target_date!r}.") from error
+    latest_actual_date = pd.Timestamp(latest_actual_date)
+    horizon = (target_date - latest_actual_date).days
+    if horizon < 1:
+        raise ForecastInputError(
+            f"{target_date.date()} is not after the latest known price ({latest_actual_date.date()})."
+        )
+    if horizon > MAX_HORIZON_DAYS:
+        raise ForecastDataUnavailableError(
+            f"{target_date.date()} is {horizon} days after the latest known price ({latest_actual_date.date()}). "
+            f"The forecaster reaches at most {MAX_HORIZON_DAYS} days ahead."
+        )
+    try:
+        path = forecaster.forecast(origin_rows, vegetable, latest_actual_date, list(range(1, horizon + 1)))
+    except ValueError as error:
+        raise ForecastDataUnavailableError(str(error)) from error
+
+    return ForecastResult(
+        vegetable=vegetable,
+        market=market,
+        latest_actual_date=latest_actual_date,
+        target_date=target_date,
+        forecast_horizon_days=horizon,
+        predicted_price=float(path["predicted_price"].iloc[-1]),
+        daily_forecast=[
+            DailyForecastPoint(date=row.target_date, predicted_price=row.predicted_price)
+            for row in path.itertuples(index=False)
+        ],
+        data_sources=data_sources,
+    )
+
+
 def max_supported_forecast_date(
     latest_actual_date: "pd.Timestamp | str",
     config_path: str = "config/config.yaml",
@@ -125,17 +181,15 @@ def max_supported_forecast_date(
     provider is temporarily degraded, it can fail before reaching it. The loop's own
     per-day check is always the authority, never this estimate.
 
-    Computed from MAX_FORECAST_DAYS (live_weather_client.py's own real Open-Meteo
-    forecast-endpoint limit, not a number invented here) and the configured
-    feature_engineering.weather_lag_days: a forecast day D needs weather at
-    D - weather_lag_days, and Open-Meteo's forecast endpoint reaches at most
-    MAX_FORECAST_DAYS - 1 days past today, so the furthest D reachable purely from a
-    live weather fetch is today + (MAX_FORECAST_DAYS - 1) + weather_lag_days.
+    Computed from MAX_SEASONAL_FORECAST_DAYS (the furthest Open-Meteo endpoint this project
+    uses) and the configured feature_engineering.weather_lag_days: a forecast day D needs
+    weather at D - weather_lag_days, so the furthest D reachable from a live weather fetch
+    is today + (MAX_SEASONAL_FORECAST_DAYS - 1) + weather_lag_days.
     """
     config = ConfigLoader(config_path)
     weather_lag_days = config.get("feature_engineering.weather_lag_days", 14)
     today = pd.Timestamp.now().normalize()
-    return today + pd.Timedelta(days=MAX_FORECAST_DAYS - 1 + weather_lag_days)
+    return today + pd.Timedelta(days=MAX_SEASONAL_FORECAST_DAYS - 1 + weather_lag_days)
 
 
 def forecast_future_price(
@@ -234,13 +288,15 @@ def forecast_future_price(
     warnings: list[str] = []
     any_live_weather_used = False
     any_seasonal_weather_used = False
+    any_archive_weather_used = False
+    weather_cache: dict = {}  # shared across this one vegetable's days, avoiding one request per day
 
     current_date = latest_actual_date + pd.Timedelta(days=1)
     while current_date <= target_date:
         try:
             if use_live_weather:
                 input_df = build_live_prediction_input(
-                    forecast_history, current_date, vegetable, market, config_path
+                    forecast_history, current_date, vegetable, market, config_path, weather_cache=weather_cache
                 )
             else:
                 input_df = build_prediction_input(forecast_history, current_date, vegetable, market)
@@ -257,12 +313,16 @@ def forecast_future_price(
             ) from error
 
         if len(input_df) > len(forecast_history) + 1:
-            any_live_weather_used = True
             # build_live_prediction_input() always appends [context_row, target_row]
             # in that order when a live fetch was needed -- the second-to-last row is
             # the context row, tagged by which Open-Meteo endpoint actually supplied
             # it (see that function's docstring).
-            if str(input_df.iloc[-2]["source"]) == "LIVE_WEATHER_SEASONAL":
+            context_source = str(input_df.iloc[-2]["source"])
+            if context_source == "ARCHIVE_WEATHER":
+                any_archive_weather_used = True
+            elif context_source != LOCAL_WEATHER_SOURCE_LABEL:
+                any_live_weather_used = True
+            if context_source == "LIVE_WEATHER_SEASONAL":
                 any_seasonal_weather_used = True
 
         try:
@@ -295,11 +355,19 @@ def forecast_future_price(
 
         current_date += pd.Timedelta(days=1)
 
-    data_sources = ["Historical HARTI price data", "Historical weather data"]
+    history_sources = set(group_history["source"].dropna()) if "source" in group_history.columns else set()
+    if "SAMPLE" in history_sources:
+        data_sources = ["Bundled synthetic sample prices (not real market data)", "Sample weather data"]
+    elif history_sources & {"HARTI", "HARTI_LIVE"}:
+        data_sources = ["Historical HARTI price data", "Historical weather data"]
+    else:
+        data_sources = ["Uploaded price data", "Weather from the uploaded data"]
     if "source" in group_history.columns and str(
         group_history.loc[group_history["date"] == latest_actual_date, "source"].iloc[0]
     ) in ("HARTI_LIVE",):
         data_sources.insert(1, "Latest live HARTI bulletin")
+    if any_archive_weather_used:
+        data_sources.append("Open-Meteo historical weather archive")
     if any_live_weather_used:
         data_sources.append("Open-Meteo weather forecast")
     if any_seasonal_weather_used:

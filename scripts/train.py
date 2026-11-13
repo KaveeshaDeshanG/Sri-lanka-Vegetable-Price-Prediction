@@ -20,8 +20,8 @@ computed, *how* a category is encoded, or *how* a model is fit; it only
 decides the order to call those things in and what to report.
 
 Usage:
-    .venv/Scripts/python.exe scripts/train.py --config config/config.yaml
-    .venv/Scripts/python.exe scripts/train.py --config config/config.yaml --dry-run
+    .venv312/Scripts/python.exe scripts/train.py --config config/config.yaml
+    .venv312/Scripts/python.exe scripts/train.py --config config/config.yaml --dry-run
 
 --dry-run runs everything up to, but not including, model fitting: it loads
 real data, preprocesses it, builds features, performs the chronological
@@ -51,6 +51,7 @@ from src.models.artifact_metadata import (  # noqa: E402
     new_training_run_id,
     save_artifact_metadata,
 )
+from src.models.evaluator import ModelEvaluator  # noqa: E402
 from src.models.metrics_report import save_metrics_report  # noqa: E402
 from src.models.pipeline import ModelTrainingPipeline  # noqa: E402
 from src.prediction.predictor import InferenceArtifact, save_inference_artifact  # noqa: E402
@@ -142,6 +143,15 @@ def run_training(config_path: str, dry_run: bool = False) -> dict:
     )
 
     best_model_metric = config.get("evaluation.best_model_metric", "rmse")
+
+    # "Yesterday's price" on the same test rows: the comparison any claim of skill must beat.
+    baseline_column = f"{config.get('data_schema.price_column', 'price')}_lag_1d"
+    naive_baseline, per_vegetable = None, None
+    if baseline_column in X_test.columns:
+        evaluator = ModelEvaluator(config_path)
+        naive_baseline = evaluator.evaluate_predictions(y_test, X_test[baseline_column])
+        per_vegetable = evaluator.per_vegetable(result.best_model, X_test, y_test, baseline_column)
+
     metrics_report_path = save_metrics_report(
         result.metrics,
         result.best_model_name,
@@ -157,6 +167,8 @@ def run_training(config_path: str, dry_run: bool = False) -> dict:
             "feature_count": summary["feature_count"],
         },
         config_path=config_path,
+        naive_baseline=naive_baseline,
+        per_vegetable=per_vegetable,
     )
 
     artifact_metadata_path = save_artifact_metadata(

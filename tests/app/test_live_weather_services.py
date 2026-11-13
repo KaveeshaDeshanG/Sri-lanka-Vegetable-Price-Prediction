@@ -93,13 +93,13 @@ def test_missing_weather_reading_is_filled_with_one_live_weather_context_row(moc
     target_date = pd.Timestamp("2024-02-20")  # required_date = 2024-02-06, not in history at all
     required_date = pd.Timestamp("2024-02-06")
 
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.return_value = _live_weather_covering(
         pd.date_range("2024-02-01", "2024-02-25", freq="D")
     )
 
     result = build_live_prediction_input(history, target_date, "Carrot", "Dambulla", _config(tmp_path))
 
-    context_rows = result[result["source"] == "LIVE_WEATHER"]
+    context_rows = result[result["source"] == "ARCHIVE_WEATHER"]
     assert len(context_rows) == 1
     row = context_rows.iloc[0]
     assert row["date"] == required_date
@@ -127,7 +127,7 @@ def test_missing_weather_within_existing_history_is_backfilled_not_replaced(mock
     target_date = pd.Timestamp("2024-02-20")  # required_date = 2024-02-06 -- price exists, weather NaN
     required_date = pd.Timestamp("2024-02-06")
 
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.return_value = _live_weather_covering(
         pd.date_range("2024-02-01", "2024-02-25", freq="D")
     )
 
@@ -139,18 +139,20 @@ def test_missing_weather_within_existing_history_is_backfilled_not_replaced(mock
     assert not pd.isna(original_row["price"])  # untouched
     assert pd.isna(original_row["rainfall_mm"])  # untouched -- still NaN, not silently patched
 
-    context_row = rows_at_required_date[rows_at_required_date["source"] == "LIVE_WEATHER"].iloc[0]
+    context_row = rows_at_required_date[rows_at_required_date["source"] == "ARCHIVE_WEATHER"].iloc[0]
     assert pd.isna(context_row["price"])
     assert context_row["rainfall_mm"] == 9.0
 
 
 @patch("app.services.OpenMeteoWeatherClient.for_coordinates")
 def test_fetch_uses_past_days_and_forecast_days_sized_to_required_date(mock_for_coordinates, tmp_path):
-    history = _history(last_date="2024-01-31", n_days=31)
-    target_date = pd.Timestamp("2024-02-20")
+    today = pd.Timestamp.now().normalize()
+    required_date = today - pd.Timedelta(days=2)  # recent enough for the forecast endpoint
+    target_date = required_date + pd.Timedelta(days=14)
+    history = _history(last_date=(required_date - pd.Timedelta(days=1)).strftime("%Y-%m-%d"), n_days=31)
 
     mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
-        pd.date_range("2024-02-01", "2024-02-25", freq="D")
+        pd.date_range(required_date - pd.Timedelta(days=1), required_date + pd.Timedelta(days=1), freq="D")
     )
 
     build_live_prediction_input(history, target_date, "Carrot", "Dambulla", _config(tmp_path))
@@ -182,7 +184,7 @@ def test_disabled_weather_api_raises_when_required_date_is_missing(mock_for_coor
 def test_live_weather_client_error_propagates_unchanged(mock_for_coordinates, tmp_path):
     history = _history(last_date="2024-01-31", n_days=31)
     target_date = pd.Timestamp("2024-02-20")
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.side_effect = LiveWeatherError(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.side_effect = LiveWeatherError(
         "Open-Meteo request timed out after 10s"
     )
 
@@ -196,7 +198,7 @@ def test_response_not_covering_required_date_raises_instead_of_predicting_incorr
     target_date = pd.Timestamp("2024-02-20")  # required_date = 2024-02-06
 
     # API returned data, but not for the one date that's actually required.
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.return_value = _live_weather_covering(
         pd.date_range("2024-03-01", "2024-03-05", freq="D")
     )
 
@@ -252,7 +254,7 @@ def test_seasonal_fallback_not_attempted_for_a_required_date_in_the_past(mock_fo
     history = _history(last_date="2024-01-31", n_days=31)
     target_date = pd.Timestamp("2024-02-20")  # required_date = 2024-02-06, in the past
 
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.return_value = _live_weather_covering(
         pd.date_range("2024-03-01", "2024-03-05", freq="D")
     )
 
@@ -288,7 +290,7 @@ def test_build_live_prediction_input_does_not_mutate_history(mock_for_coordinate
     original = history.copy()
     target_date = pd.Timestamp("2024-02-20")
 
-    mock_for_coordinates.return_value.fetch_recent_daily_weather.return_value = _live_weather_covering(
+    mock_for_coordinates.return_value.fetch_historical_daily_weather.return_value = _live_weather_covering(
         pd.date_range("2024-02-01", "2024-02-25", freq="D")
     )
 
