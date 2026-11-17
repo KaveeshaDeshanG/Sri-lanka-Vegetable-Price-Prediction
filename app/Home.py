@@ -16,7 +16,7 @@ os.chdir(_PROJECT_ROOT)  # config and data paths are relative to the project roo
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_version, freshness, latest_update, load_manifest
+from app.catalogue import data_freshness, data_version, freshness, last_run_problem, latest_update, load_manifest
 from app.data_refresh import run_data_update
 from app.services import forecaster_problems, historical_dataset_problems
 from config.config_loader import ConfigLoader
@@ -85,6 +85,17 @@ else:
     )
 
 st.header("Data in use")
+st.subheader("Data freshness")
+_problem = last_run_problem(ConfigLoader(CONFIG_PATH).get("paths.raw_data_dir", "data/raw"))
+if _problem:
+    st.warning(_problem + " The data shown is what was stored before it; the next scheduled update retries automatically.")
+ui.data_freshness_panel(data_freshness(ConfigLoader(CONFIG_PATH).get("paths.raw_data_dir", "data/raw")))
+st.caption(
+    "**Latest Available Data**: nothing newer has been published. **Recently Updated**: new data added in the last 24 hours. "
+    "**Update Pending**: newer data exists or the source hasn't been checked for over 24 hours. **Source Unavailable**: the last "
+    "check failed, so the stored data is shown unchanged. No source is real-time: each publishes on its own schedule."
+)
+st.subheader("Datasets")
 _manifest = load_manifest(ConfigLoader(CONFIG_PATH).get("paths.raw_files.data_manifest", "data/raw/data_manifest.json"))
 if _manifest is None:
     st.caption("`data/raw/data_manifest.json` is missing; run `scripts/update_data.py` to record where each dataset comes from.")

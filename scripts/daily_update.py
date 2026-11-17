@@ -33,7 +33,14 @@ recorded as failed in the log's "sources" entry, and the others are still checke
 
 Exit codes: 0 done; 1 the run itself failed; 2 a newly published HARTI bulletin couldn't be read
 (its layout may have changed, so the parser needs checking); 3 another update is already running;
-4 at least one source couldn't be checked (see "sources" in update_log.jsonl).
+4 at least one source couldn't be checked (see "sources" in update_log.jsonl); 130 interrupted.
+
+A run that is stopped part-way (its window closed, Ctrl+C, the PC shut down, or the app's time
+limit) can't always clean up. Its lock names its process, so the next run sees that the process is
+gone, records the earlier run as "interrupted" in update_log.jsonl and carries on, instead of
+refusing to start for hours. Whatever it had already saved is complete (files are replaced
+atomically); the manifest is rewritten whenever a dataset is newer than it. A source that can't be
+reached is retried twice within the run (RETRY_WAITS_SECONDS) before it is recorded as failed.
 
 The model isn't retrained here; scripts/retrain_if_better.py does that, with an acceptance check.
 
@@ -94,7 +101,8 @@ CBSL_DELAY_SECONDS = 10  # CBSL's robots.txt: Crawl-delay: 10
 CBSL_COLUMNS = ["date", "item", "item_as_printed", "vegetable", "unit", "market", "price_type", "price", "source_url", "retrieved_at"]
 HARTI_LOG_COLUMNS = ["bulletin_date", "url", "sha256", "retrieved_at", "status", "dambulla_rows", "all_market_rows", "detail"]
 DETAIL_COLUMNS = ["date", "vegetable", "market", "price", "low", "high", "raw_cell", "bulletin_date", "source_pdf"]
-LOCK_STALE_HOURS = 6
+LOCK_STALE_HOURS = 6  # a lock this old is ignored even if its process id has been reused
+RETRY_WAITS_SECONDS = (30, 90)  # waits before the 2nd and 3rd attempt at a source that couldn't be reached
 WEATHER_ARCHIVE_LAG_DAYS = 3  # Open-Meteo's archive usually lags a few days behind today
 
 
@@ -107,16 +115,92 @@ def _resolve(path: str) -> Path:
     return candidate if candidate.is_absolute() else (_PROJECT_ROOT / candidate).resolve()
 
 
+def process_running(pid: int) -> bool:
+    """Whether a process with this id is running now. Only asks the OS; never signals the process."""
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not handle:
+            return kernel32.GetLastError() == 5  # access denied: it exists but belongs to someone else
+        try:
+            code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                return True
+            return code.value == 259  # STILL_ACTIVE
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def read_lock(lock_path: Path) -> tuple[int | None, str | None]:
+    """The process id and start time a lock file records ("<pid> <iso time>"), or (None, None)."""
+    try:
+        pid, started = lock_path.read_text(encoding="utf-8").split(maxsplit=1)
+        return int(pid), started.strip()
+    except (OSError, ValueError):
+        return None, None
+
+
 @contextmanager
 def single_run(lock_path: Path):
-    """Refuse to start while another update holds the lock (a lock older than 6 hours is stale)."""
-    if lock_path.exists() and time.time() - lock_path.stat().st_mtime < LOCK_STALE_HOURS * 3600:
-        raise UpdateError(f"another update is running ({lock_path} exists)")
+    """Refuse to start while another update is running; take over a lock its run left behind.
+
+    A lock is a live run only if its process is still running and the lock is under
+    LOCK_STALE_HOURS old. Otherwise that run was interrupted: it is recorded as such in
+    update_log.jsonl (next to the lock) and this run goes ahead.
+    """
+    if lock_path.exists():
+        pid, started = read_lock(lock_path)
+        young = time.time() - lock_path.stat().st_mtime < LOCK_STALE_HOURS * 3600
+        if young and (pid is None or process_running(pid)):
+            raise UpdateError(f"another update is running ({lock_path} exists)")
+        record_interrupted_run(lock_path.parent, started, pid)
+        logger.warning("An earlier update (process %s, started %s) was interrupted; its lock was cleared", pid, started)
     lock_path.write_text(f"{os.getpid()} {pd.Timestamp.now().isoformat()}", encoding="utf-8")
     try:
         yield
     finally:
         lock_path.unlink(missing_ok=True)
+
+
+def record_interrupted_run(raw_dir: Path, started: str | None, pid: int | None) -> None:
+    """Log a run that stopped without finishing, so the app doesn't present it as a completed check."""
+    entry = {
+        "started_at": started or "unknown",
+        "status": "interrupted",
+        "error": f"the update (process {pid}) stopped before finishing, for example because its window was closed "
+        "or the PC shut down; anything it had already saved is complete",
+        "finished_at": pd.Timestamp.now().isoformat(timespec="seconds"),
+    }
+    try:
+        with (raw_dir / "update_log.jsonl").open("a", encoding="utf-8") as log:
+            log.write(json.dumps(entry) + "\n")
+    except OSError:
+        logger.exception("Couldn't record the interrupted run")
+
+
+def manifest_out_of_date(raw_dir: Path) -> bool:
+    """True when the manifest is missing or a dataset in data/raw was written after it (e.g. by an interrupted run)."""
+    manifest = raw_dir / "data_manifest.json"
+    if not manifest.exists():
+        return True
+    written = manifest.stat().st_mtime
+    return any(path.stat().st_mtime > written for path in raw_dir.glob("*.csv"))
+
+
+def _unreachable(error: BaseException) -> bool:
+    """A network problem worth retrying (the site didn't answer), as opposed to a bad page or a bug."""
+    return isinstance(error, (requests.ConnectionError, requests.Timeout, ConnectionError, TimeoutError))
 
 
 def write_atomically(frame: pd.DataFrame, path: Path) -> None:
@@ -452,16 +536,31 @@ def run(args) -> int:
     sources: dict = {}
 
     def check(name, job):
-        """Run one source's import; a failure is recorded for that source and the others go on."""
+        """Run one source's import; a failure is recorded for that source and the others go on.
+
+        A source that can't be reached is tried again after each of RETRY_WAITS_SECONDS; any other
+        error (a page that can't be read, for example) isn't retried, as retrying wouldn't change it.
+        """
         checked_at = pd.Timestamp.now().isoformat(timespec="seconds")
-        try:
-            result = job()
-        except Exception as error:  # noqa: BLE001 -- e.g. the site unreachable; recorded, never hidden
-            logger.exception("%s couldn't be checked; its stored data was kept", name.upper())
-            message = f"{type(error).__name__}: {error}"[:300]
-            sources[name] = {"status": "failed", "checked_at": checked_at, "error": message}
-            return {"error": message}
+        attempts = 0
+        while True:
+            attempts += 1
+            try:
+                result = job()
+                break
+            except Exception as error:  # noqa: BLE001 -- e.g. the site unreachable; recorded, never hidden
+                if _unreachable(error) and attempts <= len(RETRY_WAITS_SECONDS):
+                    wait = RETRY_WAITS_SECONDS[attempts - 1]
+                    logger.warning("%s couldn't be reached (%s); trying again in %d s", name.upper(), type(error).__name__, wait)
+                    time.sleep(wait)
+                    continue
+                logger.exception("%s couldn't be checked; its stored data was kept", name.upper())
+                message = f"{type(error).__name__}: {error}"[:300]
+                sources[name] = {"status": "failed", "checked_at": checked_at, "error": message, "attempts": attempts}
+                return {"error": message}
         sources[name] = {"status": "ok", "checked_at": checked_at}
+        if attempts > 1:
+            sources[name]["attempts"] = attempts
         return result
 
     harti = summary["harti"] = check("harti", lambda: import_harti(config, raw_dir, harti_cache, backup, args.lookback_days, today))
@@ -510,7 +609,7 @@ def run(args) -> int:
             )
     summary["sources"] = sources
 
-    if backup.changed or not (raw_dir / "data_manifest.json").exists():
+    if backup.changed or manifest_out_of_date(raw_dir):
         manifest_path = raw_dir / "data_manifest.json"
         backup.before_change(manifest_path)
         manifest = write_manifest(raw_dir, pd.Timestamp.now().isoformat(timespec="seconds"))
@@ -557,13 +656,17 @@ def main(argv: list[str] | None = None) -> int:
     except UpdateError as error:
         logger.error("%s", error)
         return 3
+    except KeyboardInterrupt:  # Ctrl+C: the lock is released on the way out; record why the run stopped
+        logger.error("Update interrupted; anything already saved is complete, the rest is left for the next run")
+        record_failed_run(raw_dir, started, KeyboardInterrupt("interrupted (Ctrl+C)"), status="interrupted")
+        return 130
     except Exception as error:  # noqa: BLE001 -- e.g. a source site unreachable; recorded, never hidden
         logger.exception("Update failed; the existing data was kept")
         record_failed_run(raw_dir, started, error)
         return 1
 
 
-def record_failed_run(raw_dir: Path, started: str, error: BaseException) -> None:
+def record_failed_run(raw_dir: Path, started: str, error: BaseException, status: str = "failed") -> None:
     """Add a failed attempt to update_log.jsonl, so the app can say the last check failed.
 
     Files are only ever replaced atomically after a successful download and parse, so a failed
@@ -571,7 +674,7 @@ def record_failed_run(raw_dir: Path, started: str, error: BaseException) -> None
     """
     entry = {
         "started_at": started,
-        "status": "failed",
+        "status": status,
         "error": f"{type(error).__name__}: {error}"[:300],
         "finished_at": pd.Timestamp.now().isoformat(timespec="seconds"),
     }

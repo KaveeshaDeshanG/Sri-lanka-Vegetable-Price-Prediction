@@ -14,7 +14,7 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_version, display_name
+from app.catalogue import data_freshness, data_version, display_name
 from app.source_records import load_dcs_weekly
 from app.services import break_long_gaps, load_real_market_history, missing_historical_datasets, resolve_weather_region
 from config.config_loader import ConfigLoader
@@ -35,6 +35,15 @@ ui.page_header(
     "Explore recorded prices from the official bulletins. Wholesale and retail, and each market, are kept separate.",
     "Market data",
 )
+
+# How current each source's data is (app/catalogue.py data_freshness): read from the files and the update log.
+_freshness = data_freshness()
+with st.expander(ui.freshness_summary(_freshness)):
+    ui.data_freshness_panel(_freshness)
+    st.caption(
+        "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
+        "source every 3 hours and adds anything newly published."
+    )
 
 
 @st.cache_data

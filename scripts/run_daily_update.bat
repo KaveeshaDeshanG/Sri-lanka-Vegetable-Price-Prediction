@@ -7,8 +7,11 @@ rem
 rem Registered on 2026-11-15 as the task "VegetablePriceUpdate": every 3 hours from 07:00, and as soon
 rem as possible after a start missed while the PC was off. HARTI uploads its bulletins at irregular
 rem times, 1-3 days late, so checking several times a day picks them up promptly; a run that finds
-rem nothing new takes seconds and changes nothing. To register it again, from a Command Prompt in this folder:
-rem   schtasks /Create /TN "VegetablePriceUpdate" /TR "\"%CD%\scripts\run_daily_update.bat\"" /SC HOURLY /MO 3 /ST 07:00 /F
+rem nothing new takes seconds and changes nothing.
+rem Since 2026-11-17 the task starts this file through "conhost.exe --headless", so no console window
+rem opens: closing such a window had stopped four runs part-way. To register it again, from a Command
+rem Prompt in the project folder:
+rem   schtasks /Create /TN "VegetablePriceUpdate" /TR "conhost.exe --headless \"%CD%\scripts\run_daily_update.bat\"" /SC HOURLY /MO 3 /ST 07:00 /F
 rem Check it with:   schtasks /Query /TN "VegetablePriceUpdate" /V /FO LIST
 rem Remove it with:  schtasks /Delete /TN "VegetablePriceUpdate" /F
 

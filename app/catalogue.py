@@ -290,3 +290,165 @@ def load_manifest(path: str | Path = "data/raw/data_manifest.json") -> dict | No
         return json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
+
+
+# --- Data freshness of every source (all pages) ----------------------------------------------------
+# One label per source, from two facts: the newest date actually stored in its file (read from the
+# file, not from a log or manifest that an interrupted run may have left behind) and the update log's
+# record of the last check of that source. No source is real-time: each publishes on its own schedule.
+FRESHNESS_LABELS = ("Latest Available Data", "Recently Updated", "Update Pending", "Source Unavailable", "Historical Data")
+RECENT_HOURS = 24  # new records added within this many hours count as "Recently Updated"
+WEATHER_ARCHIVE_LAG_DAYS = 3  # scripts/daily_update.py stores observed weather up to today minus this
+
+
+@dataclass(frozen=True)
+class DataSource:
+    key: str  # its name in update_log.jsonl's "sources"
+    name: str
+    category: str
+    location: str
+    schedule: str  # how often the source itself publishes
+    url: str
+
+
+DATA_SOURCES = (
+    DataSource("harti", "HARTI daily bulletin", "Wholesale", "Dambulla (used by the model) and 10 other markets",
+               "Daily bulletins, uploaded 1-3 days after the market day", "https://www.harti.gov.lk/daily-price.php"),
+    DataSource("cbsl", "CBSL Daily Price Report", "Wholesale and retail (kept separate)", "Pettah, Dambulla, Narahenpita, Marandagahamula",
+               "Each working day", "https://www.cbsl.gov.lk/en/statistics/economic-indicators/price-report"),
+    DataSource("dcs", "DCS weekly retail prices", "Retail", "Colombo District",
+               "Weekly, 1-3 weeks after the week", "https://www.statistics.gov.lk/"),
+    DataSource("weather", "Open-Meteo weather (observed)", "Observed weather, not a forecast", "8 production regions",
+               f"Daily archive; stored up to {WEATHER_ARCHIVE_LAG_DAYS} days before today, as the newest days are still forecast-based",
+               "https://archive-api.open-meteo.com/v1/archive"),
+    DataSource("fuel", "CEYPETCO fuel prices", "Retail fuel price (diesel, petrol 92)", "Sri Lanka",
+               "When prices are revised (about monthly)", "https://ceypetco.gov.lk/marketing-sales/historical-prices"),
+)
+
+
+@dataclass
+class SourceFreshness:
+    source: DataSource
+    label: str
+    latest_stored: str | None  # the newest data in the local file, as the source labels it
+    latest_stored_date: pd.Timestamp | None
+    newest_published: str | None  # the newest publication the last check found
+    last_checked: pd.Timestamp | None
+    last_success: pd.Timestamp | None  # the last successful synchronisation with this source
+    note: str = ""
+
+
+def _latest_stored(key: str, raw_dir: Path) -> tuple[str | None, pd.Timestamp | None, str]:
+    """(label, date, extra note) of the newest data stored for a source, read from its file."""
+    try:
+        if key == "harti":
+            dates = pd.to_datetime(pd.read_csv(raw_dir / "harti_prices.csv", usecols=["date"])["date"])
+        elif key == "cbsl":
+            dates = pd.to_datetime(pd.read_csv(raw_dir / "cbsl_daily_prices.csv", usecols=["date"])["date"])
+        elif key == "dcs":
+            table = pd.read_csv(raw_dir / "dcs_weekly_retail_prices.csv", usecols=["year", "month", "week_of_month"]).dropna()
+            year, month, week = (int(v) for v in table.sort_values(["year", "month", "week_of_month"]).iloc[-1])
+            start = pd.Timestamp(year=year, month=month, day=1) + pd.Timedelta(days=7 * (week - 1))
+            return f"{year}-{month:02d} week {week}", start, ""
+        elif key == "weather":
+            table = pd.read_csv(raw_dir / "weather_data_by_region.csv", usecols=["date", "region"], parse_dates=["date"])
+            dates = table.groupby("region")["date"].max()  # the region furthest behind
+            return f"{dates.min():%Y-%m-%d}", dates.min(), ""
+        elif key == "fuel":
+            table = pd.read_csv(raw_dir / "fuel_prices.csv", parse_dates=["date"])
+            changed = table[(table["diesel_price"].diff() != 0) | (table["petrol_price"].diff() != 0)]
+            revision = changed["date"].max()
+            last = table.iloc[-1]
+            return (
+                f"{revision:%Y-%m-%d}",
+                revision,
+                (
+                    f"latest revision: diesel Rs {last['diesel_price']:,.0f}, petrol 92 Rs {last['petrol_price']:,.0f} per litre, "
+                    f"in force through {table['date'].max():%Y-%m-%d}"
+                ),
+            )
+        else:
+            return None, None, ""
+    except (OSError, ValueError, KeyError, IndexError):
+        return None, None, "its data file couldn't be read"
+    latest = dates.max()
+    return (f"{latest:%Y-%m-%d}", latest, "") if pd.notna(latest) else (None, None, "")
+
+
+def _recent_new_data(key: str, run: dict) -> bool:
+    if key in ("harti", "cbsl", "dcs"):
+        return bool(run.get("sources", {}).get(key, {}).get("new_records"))
+    if key == "weather":
+        added = run.get("weather_rows_added")
+        return isinstance(added, dict) and any(isinstance(v, int) and v > 0 for v in added.values())
+    return False
+
+
+def data_freshness(raw_dir: str | Path = "data/raw", now=None) -> list[SourceFreshness]:
+    """Every source's freshness label, newest stored data, newest publication found and last checks."""
+    raw_dir = Path(raw_dir)
+    now = pd.Timestamp(now or pd.Timestamp.now())
+    today = now.normalize()
+    runs = _update_runs(raw_dir / "update_log.jsonl")
+    result = []
+    for source in DATA_SOURCES:
+        stored, stored_date, extra = _latest_stored(source.key, raw_dir)
+        checks = [(run, run["sources"][source.key]) for run in runs if isinstance(run.get("sources"), dict) and source.key in run["sources"]]
+        last = checks[-1][1] if checks else None
+        successes = [(run, info) for run, info in checks if info.get("status") == "ok"]
+        last_success = pd.Timestamp(successes[-1][1]["checked_at"]) if successes else None
+        last_checked = pd.Timestamp(last["checked_at"]) if last else None
+        newest = (successes[-1][1].get("newest_published") if successes else None) or None
+        newest_date = _publication_date_of(newest)
+        recent = any(
+            _recent_new_data(source.key, run)
+            for run, info in successes
+            if now - pd.Timestamp(info["checked_at"]) <= pd.Timedelta(hours=RECENT_HOURS)
+        )
+        if source.key == "fuel" and stored_date is not None and (today - stored_date).days <= 3:
+            recent = True  # a price revision in the last few days
+        if last is None:
+            label, note = "Update Pending", "Not checked by the automatic update yet."
+        elif last.get("status") == "failed":
+            label = "Source Unavailable"
+            note = f"The last check ({last_checked:%Y-%m-%d %H:%M}) failed: {last.get('error', 'no details')}. The stored data is kept unchanged."
+        elif now - last_success > pd.Timedelta(hours=UPDATE_OVERDUE_HOURS):
+            label = "Update Pending"
+            note = f"Not checked for {int((now - last_success).total_seconds() // 3600)} hours; newer data may have been published."
+        elif newest_date is not None and stored_date is not None and newest_date > stored_date:
+            label, note = "Update Pending", f"The source lists {newest}, which isn't stored yet; the next update will add it."
+        elif source.key == "weather" and stored_date is not None and stored_date < today - pd.Timedelta(days=WEATHER_ARCHIVE_LAG_DAYS + 1):
+            label, note = "Update Pending", "Observed weather for the last few days hasn't been stored yet."
+        elif recent:
+            label, note = "Recently Updated", f"New data was added in the last {RECENT_HOURS} hours."
+        else:
+            label, note = "Latest Available Data", "Nothing newer has been published since the last check."
+        if extra:
+            note = f"{note} {extra[0].upper()}{extra[1:]}."
+        result.append(SourceFreshness(source, label, stored, stored_date, newest, last_checked, last_success, note))
+    return result
+
+
+def _publication_date_of(value) -> pd.Timestamp | None:
+    """'2026-11-12' or DCS's '2026-11 week 1' (that week's first day) as a date."""
+    import re
+
+    if not value:
+        return None
+    week = re.fullmatch(r"(\d{4})-(\d{2}) week (\d)", str(value))
+    if week:
+        year, month, number = map(int, week.groups())
+        return pd.Timestamp(year=year, month=month, day=1) + pd.Timedelta(days=7 * (number - 1))
+    parsed = pd.to_datetime(value, errors="coerce")
+    return None if pd.isna(parsed) else parsed.normalize()
+
+
+def last_run_problem(raw_dir: str | Path = "data/raw") -> str | None:
+    """A sentence about the most recent update run if it didn't complete (failed or interrupted), else None."""
+    runs = _update_runs(Path(raw_dir) / "update_log.jsonl")
+    if not runs or _succeeded(runs[-1]):
+        return None
+    run = runs[-1]
+    when = str(run.get("finished_at") or run.get("started_at", ""))[:16].replace("T", " ")
+    kind = "was interrupted" if run.get("status") == "interrupted" else "failed"
+    return f"The most recent update ({when}) {kind}: {run.get('error', 'no details')}."

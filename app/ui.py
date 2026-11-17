@@ -167,6 +167,16 @@ _CSS = """
 .vp-cmp-delta-text { font-size: .92rem; color: var(--vp-text); }
 .vp-cmp-delta-note { flex-basis: 100%; font-size: .82rem; color: var(--vp-muted); }
 
+/* Data freshness: one card per source, with a coloured status chip */
+.vp-fresh { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .7rem; margin: .3rem 0 .8rem; }
+.vp-fresh-card { background: var(--vp-card); border: 1px solid var(--vp-border); border-left: 4px solid var(--vp-fresh, var(--vp-border));
+  border-radius: 12px; padding: .75rem .9rem; font-size: .84rem; line-height: 1.5; color: var(--vp-muted); }
+.vp-fresh-name { font-weight: 650; color: var(--vp-text); font-size: .92rem; }
+.vp-fresh-chip { display: inline-block; margin: .3rem 0 .35rem; padding: .12rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 700;
+  color: var(--vp-bg); background: var(--vp-fresh, var(--vp-muted)); }
+.vp-fresh-card b { color: var(--vp-text); font-weight: 600; }
+.vp-fresh-note { margin-top: .3rem; font-size: .78rem; }
+
 /* Responsive */
 @media (max-width: 1100px) {
   .vp-stats, .vp-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -357,6 +367,58 @@ def price_comparison(cards: list[dict], delta: dict | None) -> None:
             f'<span class="vp-cmp-delta-text">{escape(delta["text"])}</span>{note}</div>'
         )
     st.markdown(html, unsafe_allow_html=True)
+
+
+FRESHNESS_COLORS = {
+    "Latest Available Data": COLORS["primary"],
+    "Recently Updated": COLORS["info"],
+    "Update Pending": COLORS["forecast"],
+    "Source Unavailable": "#F87171",
+    "Historical Data": COLORS["muted"],
+}
+
+
+def data_freshness_panel(sources: list, compact: bool = False) -> None:
+    """One card per data source: status label, category, location, newest stored data and last checks.
+
+    sources: app.catalogue.data_freshness() rows. compact leaves out the publishing schedule and notes.
+    """
+    def when(value) -> str:
+        return f"{value:%Y-%m-%d %H:%M}" if value is not None else "never"
+
+    cards = []
+    for row in sources:
+        source = row.source
+        lines = [
+            f"<div><b>Type:</b> {escape(source.category)}</div>",
+            f"<div><b>Location:</b> {escape(source.location)}</div>",
+            f"<div><b>Latest data:</b> {escape(row.latest_stored or 'none stored')}</div>",
+        ]
+        if row.newest_published and row.newest_published != row.latest_stored:
+            lines.append(f"<div><b>Newest found at last check:</b> {escape(str(row.newest_published))}</div>")
+        lines.append(f"<div><b>Last successful sync:</b> {escape(when(row.last_success))}</div>")
+        if not compact:
+            lines.append(f"<div><b>Publishes:</b> {escape(source.schedule)}</div>")
+            lines.append(f'<div class="vp-fresh-note">{escape(row.note)}</div>')
+        cards.append(
+            f'<div class="vp-fresh-card" style="--vp-fresh: {FRESHNESS_COLORS.get(row.label, COLORS["muted"])}">'
+            f'<div class="vp-fresh-name">{escape(source.name)}</div>'
+            f'<span class="vp-fresh-chip">{escape(row.label)}</span>{"".join(lines)}</div>'
+        )
+    st.markdown(f'<div class="vp-fresh">{"".join(cards)}</div>', unsafe_allow_html=True)
+
+
+def freshness_summary(sources: list) -> str:
+    """One line for an expander title, e.g. 'Data freshness: 4 up to date, 1 update pending'."""
+    counts: dict[str, int] = {}
+    for row in sources:
+        counts[row.label] = counts.get(row.label, 0) + 1
+    up_to_date = counts.get("Latest Available Data", 0) + counts.get("Recently Updated", 0)
+    parts = [f"{up_to_date} of {len(sources)} sources up to date"]
+    for label in ("Update Pending", "Source Unavailable"):
+        if counts.get(label):
+            parts.append(f"{counts[label]} {label.lower()}")
+    return "Data freshness: " + ", ".join(parts)
 
 
 def step_cards(steps: list[tuple[str, str]]) -> None:

@@ -15,7 +15,7 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import display_name
+from app.catalogue import data_freshness, display_name
 from config.config_loader import ConfigLoader
 
 METRICS_DIR = Path(ConfigLoader("config/config.yaml").get("paths.metrics_dir", "reports/metrics"))
@@ -28,6 +28,15 @@ ui.page_header(
     "Measured accuracy on a held-out test period, compared with simply holding the last price.",
     "Evaluation",
 )
+
+# How current each source's data is (app/catalogue.py data_freshness): read from the files and the update log.
+_freshness = data_freshness()
+with st.expander(ui.freshness_summary(_freshness)):
+    ui.data_freshness_panel(_freshness)
+    st.caption(
+        "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
+        "source every 3 hours and adds anything newly published."
+    )
 
 
 def _error_by_range_chart(bands: pd.DataFrame) -> alt.Chart:

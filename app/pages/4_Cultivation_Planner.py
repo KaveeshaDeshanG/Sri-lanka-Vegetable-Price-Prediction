@@ -14,7 +14,7 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import NO_DURATION_REASONS, data_version, display_name
+from app.catalogue import NO_DURATION_REASONS, data_freshness, data_version, display_name
 from app.cultivation import (
     MIN_SEASONAL_OBSERVATIONS,
     MIN_SEASONAL_YEARS,
@@ -58,6 +58,15 @@ ui.page_header(
     "From your cultivation start date to the expected harvest window, the price around it and a suggested selling period.",
     "Plan a crop",
 )
+
+# How current each source's data is (app/catalogue.py data_freshness): read from the files and the update log.
+_freshness = data_freshness()
+with st.expander(ui.freshness_summary(_freshness)):
+    ui.data_freshness_panel(_freshness)
+    st.caption(
+        "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
+        "source every 3 hours and adds anything newly published."
+    )
 
 
 # Every loader is cached per data_version(), so a daily update or a retrained model is picked up

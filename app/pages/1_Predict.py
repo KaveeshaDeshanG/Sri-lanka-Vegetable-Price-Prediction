@@ -16,7 +16,7 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_version, display_name, past_date_notice, series_status, update_notice, update_status
+from app.catalogue import data_freshness, data_version, display_name, last_run_problem, past_date_notice, series_status, update_notice, update_status
 from app.data_refresh import run_data_update
 from app.source_records import (
     cbsl_records,
@@ -433,6 +433,12 @@ def _render_source_status() -> None:
         + "Checks run automatically every 3 hours (Windows task `VegetablePriceUpdate`), and on request below. "
         + ("; ".join(others) + "." if others else "")
     )
+    problem = last_run_problem()
+    if problem:
+        st.warning(problem + " The next scheduled update retries automatically.")
+    freshness_rows = data_freshness()
+    with st.expander(ui.freshness_summary(freshness_rows) + " (all sources, including weather and fuel)"):
+        ui.data_freshness_panel(freshness_rows)
     if st.button("Check official sources now", help="Downloads any newly published HARTI, CBSL and DCS reports (about a minute). Nothing already stored is changed."):
         with st.spinner("Checking HARTI, CBSL and DCS for newly published reports..."):
             st.session_state["real_data_refresh_result"] = run_data_update()

@@ -252,6 +252,7 @@ def _isolated_run(tmp_path, monkeypatch, harti, cbsl, dcs):
     raw.mkdir()
     (raw / "data_manifest.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(daily_update, "_resolve", lambda path: raw)
+    monkeypatch.setattr(daily_update, "RETRY_WAITS_SECONDS", (0, 0))
     monkeypatch.setattr(daily_update, "import_harti", harti)
     monkeypatch.setattr(daily_update, "import_cbsl", cbsl)
     monkeypatch.setattr(daily_update, "import_dcs", dcs)
@@ -292,3 +293,128 @@ def test_every_source_reported_when_all_are_checked(tmp_path, monkeypatch):
     assert entry["sources"]["harti"]["newest_published"] == "2026-11-12" and entry["sources"]["harti"]["new_records"] == 253
     assert {name: s["status"] for name, s in entry["sources"].items()} == {"harti": "ok", "cbsl": "ok", "weather": "ok", "fuel": "ok", "dcs": "ok"}
     assert all("checked_at" in s for s in entry["sources"].values())
+
+
+# --- interrupted runs, retries and the manifest (2026-11-17 audit) ---------------------------------
+# Found in the audit: four scheduled runs were stopped part-way (window closed, Ctrl+C, PC shut down).
+# Each left its lock behind, so the next runs refused to start for hours, and none was logged.
+
+
+def _dead_pid() -> int:
+    """The id of a process that has already exited."""
+    import subprocess
+    import sys
+
+    process = subprocess.Popen([sys.executable, "-c", "pass"])
+    process.wait()
+    return process.pid
+
+
+def test_process_running_tells_a_live_process_from_a_finished_one():
+    import os
+
+    assert daily_update.process_running(os.getpid())
+    assert not daily_update.process_running(_dead_pid())
+    assert not daily_update.process_running(0)
+
+
+def test_a_lock_left_by_an_interrupted_run_is_taken_over_and_logged(tmp_path):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    lock = raw / ".update.lock"
+    pid = _dead_pid()
+    lock.write_text(f"{pid} 2026-11-17T19:00:12.339993", encoding="utf-8")  # minutes old, but its process is gone
+    with single_run(lock):
+        assert lock.read_text(encoding="utf-8").split()[0] != str(pid)  # this run holds it now
+    assert not lock.exists()
+    entry = json.loads((raw / "update_log.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+    assert entry["status"] == "interrupted" and entry["started_at"] == "2026-11-17T19:00:12.339993"
+    assert str(pid) in entry["error"]
+
+
+def test_a_lock_held_by_a_running_update_still_blocks(tmp_path):
+    import os
+
+    lock = tmp_path / ".update.lock"
+    lock.write_text(f"{os.getpid()} 2026-11-17T19:00:12", encoding="utf-8")
+    with pytest.raises(UpdateError), single_run(lock):
+        pass
+    assert lock.exists() and not (tmp_path / "update_log.jsonl").exists()
+
+
+def test_an_unreadable_young_lock_is_treated_as_running(tmp_path):
+    lock = tmp_path / ".update.lock"
+    lock.write_text("not a pid", encoding="utf-8")
+    with pytest.raises(UpdateError), single_run(lock):
+        pass
+
+
+def test_ctrl_c_is_logged_as_interrupted_and_the_lock_released(tmp_path, monkeypatch):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+
+    def stopped(args):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(daily_update, "run", stopped)
+    monkeypatch.setattr(daily_update, "_resolve", lambda path: raw)
+    assert daily_update.main([]) == 130
+    assert not (raw / ".update.lock").exists()
+    entry = json.loads((raw / "update_log.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+    assert entry["status"] == "interrupted"
+
+
+def test_the_manifest_is_rewritten_when_a_dataset_is_newer(tmp_path):
+    import os
+    import time
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    assert daily_update.manifest_out_of_date(raw)  # missing
+    (raw / "cbsl_daily_prices.csv").write_text("date\n2026-11-17\n", encoding="utf-8")
+    manifest = raw / "data_manifest.json"
+    manifest.write_text("{}", encoding="utf-8")
+    assert not daily_update.manifest_out_of_date(raw)
+    later = time.time() + 60
+    os.utime(raw / "cbsl_daily_prices.csv", (later, later))  # written by a run that stopped before the manifest
+    assert daily_update.manifest_out_of_date(raw)
+
+
+def test_an_unreachable_source_is_retried_before_it_is_called_failed(tmp_path, monkeypatch):
+    import requests
+
+    calls = []
+
+    def harti_flaky(*args):
+        calls.append(1)
+        if len(calls) < 3:
+            raise requests.ConnectionError("www.harti.gov.lk didn't answer")
+        return {"bulletins_listed": 3154, "newest_listed": "2026-11-17", "bulletins_read": 0, "dambulla_rows_added": 0,
+                "all_market_rows_added": 0, "unreadable": [], "download_failed": []}
+
+    code, entry = _isolated_run(tmp_path, monkeypatch, harti_flaky, _cbsl_ok, _dcs_ok)
+    assert len(calls) == 3 and code == 0
+    assert entry["sources"]["harti"]["status"] == "ok" and entry["sources"]["harti"]["attempts"] == 3
+
+
+def test_a_source_that_stays_unreachable_is_recorded_after_its_retries(tmp_path, monkeypatch):
+    calls = []
+
+    def harti_down(*args):
+        calls.append(1)
+        raise ConnectionError("www.harti.gov.lk unreachable")
+
+    code, entry = _isolated_run(tmp_path, monkeypatch, harti_down, _cbsl_ok, _dcs_ok)
+    assert len(calls) == 1 + len(daily_update.RETRY_WAITS_SECONDS) and code == 4
+    assert entry["sources"]["harti"]["status"] == "failed" and entry["sources"]["harti"]["attempts"] == 3
+
+
+def test_a_page_that_cant_be_read_is_not_retried(tmp_path, monkeypatch):
+    calls = []
+
+    def harti_broken(*args):
+        calls.append(1)
+        raise ValueError("the archive page layout changed")
+
+    code, entry = _isolated_run(tmp_path, monkeypatch, harti_broken, _cbsl_ok, _dcs_ok)
+    assert len(calls) == 1 and entry["sources"]["harti"]["status"] == "failed"

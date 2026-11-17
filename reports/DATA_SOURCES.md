@@ -95,7 +95,43 @@ still 2026-11-12. So the newest price is usually 1 to 3 days old.
 from 07:00. It also runs as soon as possible after a start missed while the PC was off. It was
 registered on 2026-11-15, and the batch file has the command to register it again. Output goes to
 `logs/daily_update.log`. The Home page's **Check for new official data** button runs the same update
-on request.
+on request. The task only runs while the PC is on and you are signed in.
+
+**Interrupted runs (fixed 2026-11-17).** The data freshness audit found four scheduled runs between
+15 and 17 November that stopped part-way. The log shows `^C` and Windows reported 0xC000013A: the
+task's console window was closed, or the PC shut down. Each left its lock file behind, so the next
+runs refused to start for up to 6 hours (13:00 and 16:00 on 16 November), and none was written to
+`update_log.jsonl`. One had saved CBSL's 17 November report without updating `data_manifest.json`.
+Now:
+- the task starts the batch file through `conhost.exe --headless`, so there is no window to close;
+- the lock records its process id, and a run whose process has gone is recorded in
+  `update_log.jsonl` as `"interrupted"`, and the new run carries on straight away;
+- Ctrl+C is recorded as an interrupted run (exit code 130), and the lock is released;
+- the manifest is rewritten whenever a dataset is newer than it;
+- a source that can't be reached is tried twice more in the same run (after 30 and 90 seconds) before
+  it is recorded as failed; the next run, 3 hours later, tries again.
+
+Saved data is never half-written: each file is replaced in one step, so whatever an interrupted run
+saved is complete, and the rest is picked up by the next run.
+
+**Data freshness on every page** (`app/catalogue.py: data_freshness`). Home shows a card per source; the
+Predict, Price History, Cultivation Planner and Model Performance pages show the same cards in a
+"Data freshness" expander. Each card gives the type (wholesale, retail, observed weather, fuel), the
+location, the newest data stored (read from the file itself), the newest publication found and the last
+successful synchronisation, with one label:
+
+| Label | Meaning |
+|---|---|
+| Latest Available Data | Checked in the last 24 hours; nothing newer has been published |
+| Recently Updated | New data was added in the last 24 hours (for fuel: a price revision in the last 3 days) |
+| Update Pending | The source lists something not stored yet, it hasn't been checked for 24 hours, or observed weather is more than 4 days behind |
+| Source Unavailable | The last check failed; the stored data is shown unchanged |
+| Historical Data | Reserved for data no longer updated automatically |
+
+No source is real-time. HARTI uploads daily bulletins 1-3 days late; CBSL publishes each working day;
+DCS publishes weekly bulletins 1-3 weeks after the week; CEYPETCO revises fuel prices about monthly;
+and Open-Meteo's archive is stored up to 3 days before today, as its newest days are still
+forecast-based rather than observed.
 
 **What the Predict page shows** (Latest Real Data Prediction; `app/catalogue.py: update_status,
 update_notice`, `app/source_records.py`):
