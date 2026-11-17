@@ -20,9 +20,14 @@ from app.cultivation import (
     MIN_SEASONAL_YEARS,
     SEASONAL_PAD_DAYS,
     SEASONAL_REFERENCE_YEARS,
+    NEUTRAL_CHANGE_PCT,
     CultivationReferenceError,
+    CurrentPrice,
+    PriceComparison,
     PriceResult,
     build_plan,
+    compare_prices,
+    current_price,
     latest_start_in_reach,
     load_crop_timings,
     load_error_bands,
@@ -191,6 +196,96 @@ def _render_price(result: PriceResult, plan, timing, series: str | None, window_
         st.markdown(f"**What this is:** {result.explanation}")
         if result.limitation:
             st.caption(f"**Limitation:** {result.limitation}")
+
+
+def _render_comparison(
+    current: CurrentPrice, harvest: PriceResult, comparison: PriceComparison, plan, crop: str, today: pd.Timestamp
+) -> None:
+    """Today's actual price and the harvest-time price side by side, and the change between them."""
+    now_meta = [("Vegetable", crop)]
+    if current.price is not None:
+        now_meta.append(("Price date", f"{_fmt_date(current.date)} ({current.age_days} day(s) ago), latest recorded"))
+        if current.low is not None and current.high is not None:
+            now_meta.append(("Day's range", f"Rs. {current.low:,.2f} to {current.high:,.2f} (this price is the midpoint)"))
+        if current.planting_price is not None:
+            now_meta.append(
+                ("On your planting date", f"Rs. {current.planting_price:,.2f} (recorded {_fmt_date(current.planting_price_date)})")
+            )
+    else:
+        now_meta.append(("Why", current.reason))
+    now_meta.append(("Market", f"{current.market} wholesale, {current.source} (the same for every growing location)"))
+    now_card = {
+        "tag": "Actual price · now" if current.is_current else ("Last recorded price" if current.price is not None else "No recorded price"),
+        "title": "Current market price (planning time)",
+        "value": current.price,
+        "value_text": "No current price",
+        "accent": ui.COLORS["primary"] if current.is_current else ui.COLORS["muted"],
+        "meta": now_meta,
+    }
+
+    harvest_meta = [("Vegetable", crop)]
+    harvest_date = harvest.date if harvest.kind == "model_forecast" and harvest.date is not None else plan.harvest_start
+    harvest_meta.append(("Expected harvest", _fmt_date(harvest_date)))
+    if plan.latest_price_date is not None and harvest.kind in ("model_forecast", "seasonal_reference"):
+        after_latest = (harvest_date - plan.latest_price_date).days
+        from_today = (harvest_date - today).days
+        horizon = f"{after_latest} days after the latest recorded price ({from_today} days from today)"
+        if plan.stale:
+            horizon = f"{from_today} days from today; no forecast, as the latest recorded price is too old"
+        elif harvest.kind == "seasonal_reference":
+            horizon += f": beyond the model's {MAX_HORIZON_DAYS}-day forecast"
+        harvest_meta.append(("Horizon", horizon))
+    if harvest.kind == "model_forecast":
+        if harvest.low is not None and harvest.high is not None:
+            harvest_meta.append(("Likely range", f"Rs. {harvest.low:,.2f} to {harvest.high:,.2f}"))
+        harvest_meta.append(("Note", "A model forecast, not a guaranteed price"))
+        tag, title, accent = "Model forecast", "Expected price at harvest", ui.COLORS["info"]
+    elif harvest.kind == "seasonal_reference":
+        harvest_meta.append(
+            ("Based on", f"{harvest.observations} prices in the same weeks of {harvest.years[0]}–{harvest.years[-1]}")
+        )
+        harvest_meta.append(("Range", f"Rs. {harvest.low:,.2f} to {harvest.high:,.2f}"))
+        tag, title, accent = "Seasonal reference · not a forecast", "Typical price at harvest time", ui.COLORS["forecast"]
+    elif harvest.kind == "recorded_actual":
+        harvest_meta.append(("Based on", f"{harvest.observations} price(s) recorded in the harvest window"))
+        tag, title, accent = "Actual · harvest passed", "Price recorded at harvest", ui.COLORS["secondary"]
+    else:
+        harvest_meta.append(
+            ("Why", "No forecast or seasonal reference covers the harvest dates."
+             if harvest.kind == "latest_actual" else "No verified price exists for this crop.")
+        )
+        tag, title, accent = "No harvest-time estimate", "Expected price at harvest", ui.COLORS["muted"]
+    harvest_card = {
+        "tag": tag,
+        "title": title,
+        "value": harvest.price if harvest.kind in ("model_forecast", "seasonal_reference", "recorded_actual") else None,
+        "value_text": "No estimate",
+        "accent": accent,
+        "meta": harvest_meta,
+    }
+
+    if comparison.comparable:
+        sign = "+" if comparison.difference >= 0 else "−"
+        headline = f"{sign}Rs. {abs(comparison.difference):,.2f} / kg ({sign}{abs(comparison.percent):.1f}%)"
+        subject = "The forecast price at harvest" if harvest.kind == "model_forecast" else "The typical price at harvest time"
+        text = {
+            "higher": f"{subject} is HIGHER than today's price.",
+            "lower": f"{subject} is LOWER than today's price.",
+            "similar": f"{subject} is about the same as today's price (within ±{NEUTRAL_CHANGE_PCT:.0f}%).",
+        }[comparison.direction]
+        if harvest.kind == "model_forecast":
+            note = "A forecast, not a guaranteed price."
+            if comparison.within_forecast_range:
+                note += " Today's price lies inside the forecast's likely range, so the change is within its normal error."
+        else:
+            note = (
+                "Compared with what the price has been in these weeks in earlier years (history, not a forecast); "
+                "earlier years' prices are not adjusted for inflation."
+            )
+        delta = {"direction": comparison.direction, "headline": headline, "text": text, "note": note}
+    else:
+        delta = {"direction": None, "headline": "No comparison", "text": comparison.reason}
+    ui.price_comparison([now_card, harvest_card], delta)
 
 
 PRICE_SOURCE_NOTE = (
@@ -410,6 +505,10 @@ ui.stat_cards(
 )
 
 st.header("3. Price at harvest")
+_current = current_price(actual, _today, _latest_record, plan.start_date, crop=timing.crop)
+_render_comparison(
+    _current, price_result, compare_prices(_current, price_result), plan, display_name(price_label) if price_label else timing.crop, _today
+)
 _render_price(price_result, plan, timing, price_label, _window, _today)
 
 if plan.latest_price_date is not None:

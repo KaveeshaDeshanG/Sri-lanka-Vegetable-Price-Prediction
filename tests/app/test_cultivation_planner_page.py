@@ -204,3 +204,61 @@ def test_a_long_harvest_shows_its_records_and_years():
     text = _markdown(_run("Manioc", "2026-11-15"))
     assert "**Historical period:**" in text and "**Records used:**" in text and "**Median / average:**" in text
     assert "Source:** HARTI daily bulletin" in text and "**Unit:** Rs/kg" in text
+
+
+
+# --- current price vs harvest-time price (2026-11-17) -------------------------------------------
+
+
+def _comparison(at) -> str:
+    """The comparison cards' visible text."""
+    import re
+
+    html = next(m.value for m in at.markdown if m.value.startswith('<div class="vp-cmp"'))
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html)).replace("&#x27;", "'")
+
+
+def test_both_prices_and_their_difference_come_from_the_real_data_and_model():
+    from app.services import load_real_market_history
+    from src.feature_engineering.forecast_features import ForecastFeatureBuilder
+    from src.models.direct_forecaster import DirectForecaster
+
+    history = load_real_market_history("config/config.yaml")
+    carrot = history[(history["vegetable"] == "Carrot") & history["price"].notna()].sort_values("date")
+    latest, today_price = carrot["date"].iloc[-1], carrot["price"].iloc[-1]
+    rows = ForecastFeatureBuilder("config/config.yaml").build_origin_features(history)
+    forecast = DirectForecaster.load("config/config.yaml").forecast(rows, "Carrot", latest, [7])["predicted_price"].iloc[0]
+    difference = forecast - today_price
+    percent = difference / today_price * 100
+
+    text = _comparison(_run("Carrot", _carrot_start(7)))
+    assert "Current market price (planning time)" in text and f"Rs. {today_price:,.2f}" in text
+    assert "Expected price at harvest" in text and f"Rs. {forecast:,.2f}" in text and "Model forecast" in text
+    assert f"{_day(latest + pd.Timedelta(days=7))}" in text and "7 days after the latest recorded price" in text
+    sign = "+" if difference >= 0 else "−"
+    assert f"{sign}Rs. {abs(difference):,.2f} / kg ({sign}{abs(percent):.1f}%)" in text
+    word = "about the same" if abs(percent) < 5 else ("HIGHER" if difference > 0 else "LOWER")
+    assert word in text and "not a guaranteed price" in text
+
+
+def test_a_long_harvest_compares_with_a_labelled_seasonal_reference():
+    text = _comparison(_run("Carrot", str(pd.Timestamp.now().date())))  # 110 days: beyond the forecast
+    assert "Seasonal reference · not a forecast" in text and "Typical price at harvest time" in text
+    assert "beyond the model's 30-day forecast" in text and "history, not a forecast" in text
+    assert "Model forecast" not in text
+
+
+def test_a_crop_without_prices_shows_both_cards_with_reasons():
+    text = _comparison(_run("Cauliflower", "2026-11-15"))
+    assert "No current price" in text and "No estimate" in text and "No comparison" in text
+    assert "Rs. 0" not in text
+
+
+def test_a_stale_price_is_not_compared_as_todays_price():
+    text = _comparison(_run("Cabbage", "2026-08-20", series="Cabbage (Nuwara Eliya)"))
+    assert "Last recorded price" in text and "too old to count as today's price" in text and "No comparison" in text
+
+
+def test_a_passed_harvest_is_shown_but_not_compared():
+    text = _comparison(_run("Beans", "2026-09-01", "Sanjaya"))
+    assert "Actual · harvest passed" in text and "On your planting date" in text and "No comparison" in text

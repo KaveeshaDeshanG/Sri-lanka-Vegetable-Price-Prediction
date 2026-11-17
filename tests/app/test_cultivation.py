@@ -14,10 +14,14 @@ from app.cultivation import (
     EVENTS,
     START_STAGES,
     UNITS,
+    NEUTRAL_CHANGE_PCT,
     CropTiming,
     CultivationReferenceError,
+    PriceResult,
     add_duration,
     build_plan,
+    compare_prices,
+    current_price,
     harvest_window,
     latest_start_in_reach,
     load_crop_timings,
@@ -543,3 +547,88 @@ def test_a_passed_window_leads_with_the_prices_recorded_in_it():
     result = select_price(plan, actual, "2026-11-09")
     recorded = actual[actual["date"].between("2026-08-30", "2026-09-09")]["price"]
     assert result.kind == "recorded_actual" and result.price == recorded.median() and result.observations == len(recorded)
+
+
+# --- current price vs harvest-time price (2026-11-17) -------------------------------------------
+
+
+def _forecast_result(price, low=None, high=None) -> PriceResult:
+    return PriceResult("model_forecast", price=price, low=low, high=high, date=pd.Timestamp("2026-11-29"), horizon=12)
+
+
+def _current(price=120.0, age=0):
+    actual = pd.DataFrame({"date": [pd.Timestamp("2026-11-17") - pd.Timedelta(days=age)], "price": [price]})
+    return current_price(actual, "2026-11-17")
+
+
+@pytest.mark.parametrize(
+    ("current", "harvest", "difference", "percent", "direction"),
+    [
+        (120.0, 160.0, 40.0, 100 * 40 / 120, "higher"),  # the example in the request: +Rs 40, +33.33%
+        (200.0, 150.0, -50.0, -25.0, "lower"),
+        (400.0, 410.0, 10.0, 2.5, "similar"),  # under NEUTRAL_CHANGE_PCT either way
+        (400.0, 390.0, -10.0, -2.5, "similar"),
+        (100.0, 105.0, 5.0, 5.0, "higher"),  # exactly the threshold counts as a change
+    ],
+)
+def test_difference_and_percentage_are_harvest_minus_current(current, harvest, difference, percent, direction):
+    comparison = compare_prices(_current(current), _forecast_result(harvest))
+    assert comparison.comparable
+    assert comparison.difference == pytest.approx(difference)
+    assert comparison.percent == pytest.approx(percent)
+    assert comparison.direction == direction
+    assert NEUTRAL_CHANGE_PCT == 5.0
+
+
+def test_a_seasonal_reference_is_compared_too():
+    seasonal = PriceResult("seasonal_reference", price=90.0, low=60.0, high=130.0, median=90.0, observations=40, years=[2022, 2026])
+    comparison = compare_prices(_current(120.0), seasonal)
+    assert comparison.comparable and comparison.direction == "lower" and comparison.difference == -30.0
+    assert comparison.within_forecast_range is None  # only a forecast has a forecast range
+
+
+def test_the_forecast_range_note_reflects_where_todays_price_sits():
+    assert compare_prices(_current(120.0), _forecast_result(160.0, 110.0, 200.0)).within_forecast_range is True
+    assert compare_prices(_current(100.0), _forecast_result(160.0, 110.0, 200.0)).within_forecast_range is False
+
+
+@pytest.mark.parametrize(
+    ("harvest", "reason"),
+    [
+        (PriceResult("recorded_actual", price=100.0), "already passed"),
+        (PriceResult("latest_actual", price=120.0), "only today's price"),
+        (PriceResult("unavailable"), "no harvest-time price"),
+    ],
+)
+def test_no_comparison_without_a_harvest_time_estimate(harvest, reason):
+    comparison = compare_prices(_current(120.0), harvest)
+    assert not comparison.comparable and comparison.difference is None and reason in comparison.reason
+
+
+def test_no_comparison_without_a_current_price():
+    missing = current_price(None, "2026-11-17", crop="Cauliflower")
+    assert missing.price is None and "no price series for Cauliflower" in missing.reason
+    comparison = compare_prices(missing, _forecast_result(160.0))
+    assert not comparison.comparable and comparison.reason == missing.reason
+
+
+def test_an_old_price_is_not_called_current():
+    old = _current(245.0, age=493)
+    assert old.price == 245.0 and not old.is_current and "493 days ago" in old.reason
+    assert not compare_prices(old, _forecast_result(300.0)).comparable
+
+
+def test_zero_coded_prices_are_never_the_current_price():
+    actual = pd.DataFrame({"date": pd.to_datetime(["2026-11-15", "2026-11-16", "2026-11-17"]), "price": [100.0, 110.0, 0.0]})
+    current = current_price(actual, "2026-11-17")
+    assert current.price == 110.0 and current.date == pd.Timestamp("2026-11-16")
+
+
+def test_the_current_price_uses_the_bulletin_record_and_the_planting_day_price():
+    actual = _actual(start="2026-09-01", end="2026-11-17")
+    record = {"date": pd.Timestamp("2026-11-17"), "price": 450.0, "low": 400.0, "high": 500.0}
+    current = current_price(actual, "2026-11-17", record, start_date="2026-10-15")
+    assert (current.price, current.low, current.high, current.age_days) == (450.0, 400.0, 500.0, 0)
+    on_planting = actual.loc[actual["date"] == pd.Timestamp("2026-10-15"), "price"].iloc[0]
+    assert current.planting_price == on_planting and current.planting_price_date == pd.Timestamp("2026-10-15")
+    assert current_price(actual, "2026-11-17", record, start_date="2026-11-20").planting_price is None  # not planted yet

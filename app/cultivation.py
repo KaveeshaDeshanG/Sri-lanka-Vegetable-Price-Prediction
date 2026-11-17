@@ -618,3 +618,111 @@ def _add_timing_warnings(plan: CultivationPlan) -> None:
         plan.warnings.append("This duration counts from flowering, so enter the date the crop flowered, not the planting date.")
     if timing.event == "first harvest" and timing.repeat_harvest:
         plan.warnings.append(f"The dates are for the first harvest. Later harvests, as published: {timing.repeat_harvest}")
+
+
+# --- current price vs harvest-time price -----------------------------------------------------------
+# A change smaller than this, either way, is shown as "about the same": daily wholesale prices move by
+# more than that routinely, so a smaller difference says nothing either way.
+NEUTRAL_CHANGE_PCT = 5.0
+
+
+@dataclass
+class CurrentPrice:
+    """The newest recorded market price: what the market pays now, at planning time."""
+
+    price: float | None
+    date: pd.Timestamp | None
+    age_days: int | None
+    low: float | None = None
+    high: float | None = None
+    planting_price: float | None = None  # the recorded price on or just before a past planting date
+    planting_price_date: pd.Timestamp | None = None
+    reason: str | None = None  # why there is no current price
+    source: str = PRICE_SOURCE
+    market: str = PRICE_MARKET
+    price_type: str = PRICE_TYPE
+    unit: str = PRICE_UNIT
+
+    @property
+    def is_current(self) -> bool:
+        return self.price is not None and self.age_days is not None and self.age_days <= MAX_HORIZON_DAYS
+
+
+def current_price(
+    actual: pd.DataFrame | None, today=None, latest_record: dict | None = None, start_date=None, crop: str = "this crop"
+) -> CurrentPrice:
+    """The series' newest recorded price, its age, and (for a crop already planted) the price on its planting day.
+
+    Never a made-up or zero price: with no recorded price, `price` is None and `reason` says why.
+    """
+    today = pd.Timestamp(today or pd.Timestamp.now()).normalize()
+    valid = None if actual is None else _valid(actual)
+    if valid is None or valid.empty:
+        return CurrentPrice(
+            None, None, None,
+            reason=f"HARTI's daily bulletin has no price series for {crop}, so there is no recorded market price.",
+        )
+    valid = valid.sort_values("date")
+    last = valid.iloc[-1]
+    record = latest_record or {}
+    observed = pd.Timestamp(record.get("date", last["date"]))
+    low, high = record.get("low"), record.get("high")
+    result = CurrentPrice(
+        price=float(record.get("price", last["price"])),
+        date=observed,
+        age_days=int((today - observed).days),
+        low=None if low is None or pd.isna(low) else float(low),
+        high=None if high is None or pd.isna(high) else float(high),
+    )
+    if not result.is_current:
+        result.reason = (
+            f"The latest recorded price is from {observed:%Y-%m-%d}, {result.age_days} days ago, "
+            f"too old to count as today's price."
+        )
+    if start_date is not None:
+        start = pd.Timestamp(start_date).normalize()
+        if start < observed:  # a crop already planted: the price recorded on (or up to a week before) that day
+            near = valid[valid["date"].between(start - pd.Timedelta(days=7), start)]
+            if not near.empty:
+                result.planting_price = float(near["price"].iloc[-1])
+                result.planting_price_date = pd.Timestamp(near["date"].iloc[-1])
+    return result
+
+
+@dataclass
+class PriceComparison:
+    """Harvest-time price minus the current price, when comparing them means something."""
+
+    comparable: bool
+    difference: float | None = None  # Rs/kg, harvest-time minus current
+    percent: float | None = None
+    direction: str | None = None  # "higher", "lower" or "similar"
+    within_forecast_range: bool | None = None  # the current price lies inside the forecast's likely range
+    reason: str | None = None  # why there is no comparison
+
+
+def compare_prices(current: CurrentPrice, harvest: PriceResult) -> PriceComparison:
+    """Price difference = harvest-time price - current price; change % = difference / current price x 100.
+
+    Compared only when there is a current price and a harvest-time estimate distinct from it: a model
+    forecast or a historical seasonal reference. Within ±NEUTRAL_CHANGE_PCT the direction is "similar".
+    """
+    if current.price is None:
+        return PriceComparison(False, reason=current.reason)
+    if not current.is_current:
+        return PriceComparison(False, reason=current.reason)
+    if harvest.kind == "unavailable" or harvest.price is None:
+        return PriceComparison(False, reason="There is no harvest-time price to compare with.")
+    if harvest.kind == "recorded_actual":
+        return PriceComparison(False, reason="The harvest window has already passed, so there is no expected price to compare.")
+    if harvest.kind == "latest_actual":
+        return PriceComparison(
+            False, reason="There is no forecast or seasonal reference for the harvest dates, only today's price itself."
+        )
+    difference = harvest.price - current.price
+    percent = difference / current.price * 100
+    direction = "similar" if abs(percent) < NEUTRAL_CHANGE_PCT else ("higher" if difference > 0 else "lower")
+    within = None
+    if harvest.kind == "model_forecast" and harvest.low is not None and harvest.high is not None:
+        within = harvest.low <= current.price <= harvest.high
+    return PriceComparison(True, difference=difference, percent=percent, direction=direction, within_forecast_range=within)

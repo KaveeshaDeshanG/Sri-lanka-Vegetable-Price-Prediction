@@ -147,6 +147,26 @@ _CSS = """
 .vp-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--vp-primary); box-shadow: 0 0 0 3px rgba(34,197,94,.18); flex: none; }
 .vp-side-foot { margin: .9rem .3rem 0; font-size: .74rem; color: var(--vp-muted); line-height: 1.5; }
 
+/* Price comparison (Cultivation Planner): today's actual price next to the harvest-time price */
+.vp-cmp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; margin: .3rem 0 .8rem; }
+.vp-cmp-card { background: var(--vp-card); border: 1px solid var(--vp-border); border-top: 4px solid var(--vp-cmp-accent, var(--vp-border));
+  border-radius: var(--vp-radius); padding: 1.1rem 1.25rem; box-shadow: var(--vp-shadow); }
+.vp-cmp-tag { display: inline-block; padding: .18rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 650; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--vp-bg); background: var(--vp-cmp-accent, var(--vp-muted)); }
+.vp-cmp-title { margin: .65rem 0 .1rem; font-size: .95rem; font-weight: 650; color: var(--vp-text); }
+.vp-cmp-value { font-size: 2.3rem; font-weight: 750; letter-spacing: -.02em; color: var(--vp-text); line-height: 1.15; }
+.vp-cmp-value small { font-size: 1rem; font-weight: 600; color: var(--vp-muted); }
+.vp-cmp-value.vp-cmp-none { font-size: 1.35rem; color: var(--vp-muted); }
+.vp-cmp-meta { margin: .45rem 0 0; padding: 0; list-style: none; font-size: .86rem; line-height: 1.6; color: var(--vp-muted); }
+.vp-cmp-meta b { color: var(--vp-text); font-weight: 600; }
+.vp-cmp .vp-cmp-meta { padding-left: 0 !important; }
+.vp-cmp .vp-cmp-meta li { margin: 0 0 .1rem !important; padding: 0 !important; list-style: none; }
+.vp-cmp-delta { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.1rem; margin: 0 0 1rem; padding: .9rem 1.25rem;
+  border-radius: var(--vp-radius); border: 1px solid var(--vp-delta, var(--vp-border)); background: var(--vp-card-raised); }
+.vp-cmp-delta-main { font-size: 1.35rem; font-weight: 750; color: var(--vp-delta, var(--vp-text)); }
+.vp-cmp-delta-text { font-size: .92rem; color: var(--vp-text); }
+.vp-cmp-delta-note { flex-basis: 100%; font-size: .82rem; color: var(--vp-muted); }
+
 /* Responsive */
 @media (max-width: 1100px) {
   .vp-stats, .vp-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -163,6 +183,8 @@ _CSS = """
   .vp-steps { grid-template-columns: 1fr; }
   .vp-stat { padding: .8rem .85rem; }
   .vp-stat-value { font-size: 1.3rem; }
+  .vp-cmp { grid-template-columns: 1fr; }
+  .vp-cmp-value { font-size: 1.9rem; }
   [class*="st-key-vp_result"] [data-testid="stMetricValue"] { font-size: 1.9rem; }
   [data-testid="stMain"] h2 { font-size: 1.25rem; }
 }
@@ -296,6 +318,45 @@ def data_source_panel(source: str, market: str, price_type: str, latest, today=N
         st.info(fresh.message + (f" {extra}" if extra else ""))
     elif extra:
         st.caption(extra)
+
+
+# Direction of a price change: colour, arrow and words, so the meaning never rests on colour alone.
+PRICE_CHANGE_STYLE = {
+    "higher": (COLORS["primary"], "▲"),
+    "lower": ("#F87171", "▼"),
+    "similar": (COLORS["muted"], "◆"),
+}
+
+
+def price_comparison(cards: list[dict], delta: dict | None) -> None:
+    """Two price cards side by side (one column on a phone), then the change between them.
+
+    Each card: tag, title, value (None for no price), value_text (shown instead when value is None),
+    accent (a colour), meta (list of (label, text)). delta: direction, headline, text, note.
+    """
+    items = []
+    for card in cards:
+        meta = "".join(f"<li><b>{escape(label)}:</b> {escape(text)}</li>" for label, text in card.get("meta", []))
+        value = (
+            f'<div class="vp-cmp-value">Rs. {card["value"]:,.2f} <small>/ kg</small></div>'
+            if card.get("value") is not None
+            else f'<div class="vp-cmp-value vp-cmp-none">{escape(card.get("value_text", "No price"))}</div>'
+        )
+        items.append(
+            f'<div class="vp-cmp-card" style="--vp-cmp-accent: {card["accent"]}">'
+            f'<span class="vp-cmp-tag">{escape(card["tag"])}</span>'
+            f'<div class="vp-cmp-title">{escape(card["title"])}</div>{value}<ul class="vp-cmp-meta">{meta}</ul></div>'
+        )
+    html = f'<div class="vp-cmp">{"".join(items)}</div>'
+    if delta:
+        colour, arrow = PRICE_CHANGE_STYLE.get(delta.get("direction"), (COLORS["muted"], "–"))
+        note = f'<div class="vp-cmp-delta-note">{escape(delta["note"])}</div>' if delta.get("note") else ""
+        html += (
+            f'<div class="vp-cmp-delta" style="--vp-delta: {colour}">'
+            f'<span class="vp-cmp-delta-main">{arrow} {escape(delta["headline"])}</span>'
+            f'<span class="vp-cmp-delta-text">{escape(delta["text"])}</span>{note}</div>'
+        )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def step_cards(steps: list[tuple[str, str]]) -> None:
