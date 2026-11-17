@@ -10,7 +10,7 @@ There are **two generations** of models. Know both and which one the app uses.
 | Target | Price in rupees | **log(future price ÷ today's price)** — the % change |
 | Features | 51 (date, lags 1/7/14/30, rolling 7/14/30 mean/std, 14-day weather lag, fuel, one-hot vegetable, market) | Groups chosen per horizon (below) |
 | Split | Chronological 80/20 (train 13,749, test 3,915 rows) | Fixed date: test from **2026-05-14** (`config.yaml` `forecasting.test_start`) |
-| Used in app | Only for sample data / uploaded CSV | For "Historical dataset (real)" and "Latest HARTI Data" |
+| Used in app | Only for "Upload CSV" | For "Latest Real Data Prediction" |
 
 > සිංහල: පළමුව Linear Regression, Random Forest, XGBoost ආකෘති තුනක් "හෙට මිල" අනාවැකි කීමට පුහුණු කළා. ඒවා
 > කිසිවක් "ඊයේ මිලම හෙටත්" (naive baseline) යන සරල ක්‍රමයට වඩා හොඳ වුණේ නැහැ. එම නිසා දෙවනුව **Ridge direct

@@ -81,7 +81,7 @@ values were confirmed today by TC01/TC17.
 | Real users / usability study | No participants |
 | Browsers other than Microsoft Edge (Chromium) | Not available in test setup |
 | Load / many simultaneous users | Single-user local app |
-| Windows Task Scheduler registration of the daily update | Must be done by the user; not registered |
+| Windows Task Scheduler | Registered 15 Nov 2026; manual trigger 12:14 and first timed run 13:00 both exit 0 (`logs/daily_update.log`) — now TESTED |
 | `scripts/retrain_if_better.py` | Never run (would replace the model) |
 | `scripts/daily_update.py` today | Not run for this guide to avoid changing data before the viva (it was run successfully on 11 Nov 2026, see `data/raw/update_log.jsonl`) |
 | Database | Not applicable — no database |

@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-11-11T03:43:59",
+  "generated_at": "2026-11-17T16:00:55",
   "datasets": [
     {
       "file": "data/raw/harti_prices.csv",
       "source": "HARTI daily food commodity bulletins",
       "source_url": "https://www.harti.gov.lk/daily-price.php",
       "price_type": "wholesale, Rs/kg (midpoint of the published range)",
-      "retrieved_at": "2026-11-11T03:43:59",
-      "rows": 76719,
-      "sha256": "849242b1d20f2bae43f811a3e8f20fc0c4abd3b8777d2cefc11bf818a241b661",
+      "retrieved_at": "2026-11-17T16:00:55",
+      "rows": 76954,
+      "sha256": "3ef2f6d060171c077c7c706a8bb8393d72c21550bd5ec1325343368f2493606d",
       "first_observation": "2015-06-22",
-      "latest_observation": "2026-11-09",
+      "latest_observation": "2026-11-17",
       "markets": [
         "Dambulla"
       ]
@@ -20,11 +20,11 @@
       "source": "HARTI daily food commodity bulletins, every market",
       "source_url": "https://www.harti.gov.lk/daily-price.php",
       "price_type": "wholesale, Rs/kg (midpoint of the published range)",
-      "retrieved_at": "2026-11-11T03:43:59",
-      "rows": 526905,
-      "sha256": "4882e42ab455ff8c7334e87ac97f26759d0ddc39b6cf9ca8f555e7a8d5c72964",
+      "retrieved_at": "2026-11-17T16:00:55",
+      "rows": 528587,
+      "sha256": "237f51ca292c78805e21ba0f30af98907826c509c1a7435df9d2076465d5e289",
       "first_observation": "2015-06-22",
-      "latest_observation": "2026-11-09",
+      "latest_observation": "2026-11-17",
       "markets": [
         "Bandarawela",
         "Dambulla",
@@ -44,11 +44,11 @@
       "source": "Central Bank of Sri Lanka, Daily Price Report",
       "source_url": "https://www.cbsl.gov.lk/en/statistics/economic-indicators/price-report",
       "price_type": "wholesale and retail, Rs/kg (Today column), kept apart by the price_type column",
-      "retrieved_at": "2026-11-11T03:43:59",
-      "rows": 9277,
-      "sha256": "08d49b14f3e4b36718743eaa7dc09605e03461e160d543690a5ba11b113853e2",
+      "retrieved_at": "2026-11-17T16:00:55",
+      "rows": 10005,
+      "sha256": "ea9a2b6cac221aa53e69030b30cc964882ef99686f6d20e25f8aa757142fd792",
       "first_observation": "2026-09-01",
-      "latest_observation": "2026-11-10",
+      "latest_observation": "2026-11-16",
       "markets": [
         "Dambulla",
         "Narahenpita",
@@ -60,7 +60,7 @@
       "source": "Department of Census and Statistics, weekly retail prices",
       "source_url": "https://www.statistics.gov.lk/InflationAndPrices/StaticalInformation/RetailPrices",
       "price_type": "retail, weekly average",
-      "retrieved_at": "2026-11-11T03:43:59",
+      "retrieved_at": "2026-11-17T16:00:55",
       "rows": 11439,
       "sha256": "cdcc2ef93b3f0fef488b70e499e4e91121008644b30ebb5ff873fd77830f010b",
       "markets": [
@@ -75,22 +75,22 @@
       "source": "CEYPETCO price revisions",
       "source_url": "https://ceypetco.gov.lk/marketing-sales/historical-prices",
       "price_type": "retail fuel, Rs/litre",
-      "retrieved_at": "2026-11-11T03:43:59",
-      "rows": 4161,
-      "sha256": "9e2ec34039d9ec02ea4147360c0be6da61e3afc3cdb208c22d10a56e25f834d7",
+      "retrieved_at": "2026-11-17T16:00:55",
+      "rows": 4167,
+      "sha256": "298aeb66cb1778c020f40f5c029e9653bfcdf61ea360f188d332ca3dc42e856d",
       "first_observation": "2015-06-22",
-      "latest_observation": "2026-11-11"
+      "latest_observation": "2026-11-17"
     },
     {
       "file": "data/raw/weather_data_by_region.csv",
       "source": "Open-Meteo historical weather archive",
       "source_url": "https://open-meteo.com/en/docs/historical-weather-api",
       "price_type": "weather",
-      "retrieved_at": "2026-11-11T03:43:59",
-      "rows": 33264,
-      "sha256": "4ba0485686d09a5278c338e3d30a6ae32e054b9c43f90cbe84f095a68f4fed8f",
+      "retrieved_at": "2026-11-17T16:00:55",
+      "rows": 33312,
+      "sha256": "1229be5fb4eb1432361c4d855a5c730e0c33870090300fd964ed40a0d16d21f5",
       "first_observation": "2015-06-22",
-      "latest_observation": "2026-11-08",
+      "latest_observation": "2026-11-14",
       "markets": [
         "Anuradhapura",
         "Badulla",

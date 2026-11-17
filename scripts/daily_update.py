@@ -28,8 +28,12 @@ newest --keep-backups of those folders are kept. Files are written to a temporar
 renamed, so an interrupted run never leaves a half-written dataset. Nothing is estimated: a
 bulletin that can't be downloaded or read stays missing and is reported.
 
-Exit codes: 0 done; 2 a newly published HARTI bulletin couldn't be read (its layout may have
-changed, so the parser needs checking); 3 another update is already running.
+Each source (HARTI, CBSL, DCS, weather, fuel) is checked separately: one that can't be reached is
+recorded as failed in the log's "sources" entry, and the others are still checked.
+
+Exit codes: 0 done; 1 the run itself failed; 2 a newly published HARTI bulletin couldn't be read
+(its layout may have changed, so the parser needs checking); 3 another update is already running;
+4 at least one source couldn't be checked (see "sources" in update_log.jsonl).
 
 The model isn't retrained here; scripts/retrain_if_better.py does that, with an acceptance check.
 
@@ -43,6 +47,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import time
@@ -65,6 +70,7 @@ from scripts.build_harti_prices import (  # noqa: E402
     finalize,
     hash_url,
 )
+from scripts import build_market_price_ranges  # noqa: E402
 from scripts.build_market_prices import read_bulletin  # noqa: E402
 from scripts.update_data import (  # noqa: E402
     _dcs_file_name,
@@ -282,13 +288,15 @@ def import_cbsl(raw_dir: Path, cache_dir: Path, backup: Backup, since: pd.Timest
     days = [d for d in pd.bdate_range(since, today) if d.date().isoformat() not in stored | settled]
     logger.info("CBSL: %d working days to check from %s", len(days), since.date())
     cache_dir.mkdir(parents=True, exist_ok=True)
-    session, rows, added_days, missing = requests.Session(), [], [], []
+    session, rows, added_days, missing, errors = requests.Session(), [], [], [], {}
     for day in days:
         key = day.date().isoformat()
         try:
             found = fetch_cbsl_report(day, session)
         except requests.exceptions.RequestException as error:
+            # Not "not published": the site couldn't be asked. Reported, and retried next run.
             logger.warning("CBSL %s: %s", key, error)
+            errors[key] = f"{type(error).__name__}: {error}"[:200]
             continue
         if found is None:
             missing.append(key)
@@ -312,7 +320,14 @@ def import_cbsl(raw_dir: Path, cache_dir: Path, backup: Backup, since: pd.Timest
         write_atomically(merged, path)
     state["not_published"] = sorted(set(state["not_published"]))
     state_path.write_text(json.dumps(state, indent=1), encoding="utf-8")
-    return {"days_added": added_days, "not_published_yet": missing, "unreadable": state["unreadable"]}
+    stored_dates = pd.read_csv(path, usecols=["date"])["date"] if path.exists() else pd.Series(dtype=str)
+    return {
+        "days_added": added_days,
+        "not_published_yet": missing,
+        "unreadable": state["unreadable"],
+        "request_errors": errors,
+        "newest_report": str(stored_dates.max()) if not stored_dates.empty else None,
+    }
 
 
 # ---------------------------------------------------------------------------------------------
@@ -348,7 +363,16 @@ def import_dcs(config: ConfigLoader, raw_dir: Path, backup: Backup) -> dict:
     if downloaded or not output.exists():
         backup.before_change(output)
         rebuild_dcs(cache, raw_dir, listing)
-    return {"listed": len(listing), "new_bulletins": downloaded, "unavailable": len(failures)}
+    return {"listed": len(listing), "new_bulletins": downloaded, "unavailable": len(failures), "newest_listed": newest_dcs_week(listing)}
+
+
+def newest_dcs_week(listing: list[dict]) -> str | None:
+    """The newest week DCS lists, from its own file names (DCSB-WRP-<year>-<month>-W<week>)."""
+    weeks = [tuple(map(int, m.groups())) for item in listing if (m := re.search(r"DCSB-WRP-(\d{4})-(\d{1,2})-W(\d)", item["link"]))]
+    if not weeks:
+        return None
+    year, month, week = max(weeks)
+    return f"{year}-{month:02d} week {week}"
 
 
 # ---------------------------------------------------------------------------------------------
@@ -425,18 +449,66 @@ def run(args) -> int:
     today = pd.Timestamp(args.today) if args.today else pd.Timestamp.now().normalize()
     started = pd.Timestamp.now().isoformat(timespec="seconds")
     summary: dict = {"started_at": started, "today": str(today.date())}
+    sources: dict = {}
 
-    summary["harti"] = import_harti(config, raw_dir, harti_cache, backup, args.lookback_days, today)
+    def check(name, job):
+        """Run one source's import; a failure is recorded for that source and the others go on."""
+        checked_at = pd.Timestamp.now().isoformat(timespec="seconds")
+        try:
+            result = job()
+        except Exception as error:  # noqa: BLE001 -- e.g. the site unreachable; recorded, never hidden
+            logger.exception("%s couldn't be checked; its stored data was kept", name.upper())
+            message = f"{type(error).__name__}: {error}"[:300]
+            sources[name] = {"status": "failed", "checked_at": checked_at, "error": message}
+            return {"error": message}
+        sources[name] = {"status": "ok", "checked_at": checked_at}
+        return result
+
+    harti = summary["harti"] = check("harti", lambda: import_harti(config, raw_dir, harti_cache, backup, args.lookback_days, today))
+    if "error" not in harti:
+        sources["harti"].update(
+            newest_published=harti["newest_listed"],
+            new_records=harti["dambulla_rows_added"] + harti["all_market_rows_added"],
+            problems=[f"bulletin {d} couldn't be read" for d in harti["unreadable"]] + [f"bulletin {d} couldn't be downloaded" for d in harti["download_failed"]],
+        )
+    # Display-only min-max ranges for the other markets' new readings (scripts/build_market_price_ranges.py).
+    # Only once the full build has created the file: the first build reads every saved bulletin, which is
+    # far too long for a scheduled run. A failure here is logged; it doesn't affect any dataset.
+    if "error" not in harti and (raw_dir / build_market_price_ranges.RANGES_FILE).exists():
+        try:
+            summary["harti_ranges"] = build_market_price_ranges.update_ranges(raw_dir, harti_cache)
+        except Exception as error:  # noqa: BLE001 -- reported, never fatal
+            logger.exception("Other markets' price ranges not updated")
+            summary["harti_ranges"] = {"error": f"{type(error).__name__}: {error}"[:300]}
     if not args.skip_cbsl:
         since = pd.Timestamp(args.cbsl_since) if args.cbsl_since else today - pd.Timedelta(days=args.lookback_days)
-        summary["cbsl"] = import_cbsl(raw_dir, cbsl_cache, backup, since, today)
+        cbsl = summary["cbsl"] = check("cbsl", lambda: import_cbsl(raw_dir, cbsl_cache, backup, since, today))
+        if "error" not in cbsl:
+            sources["cbsl"].update(
+                newest_published=cbsl["newest_report"],
+                new_records=len(cbsl["days_added"]),
+                problems=[f"report {d} couldn't be read: {e}" for d, e in cbsl["unreadable"].items()],
+            )
+            if cbsl["request_errors"]:
+                sources["cbsl"].update(status="failed", error="; ".join(f"{d}: {e}" for d, e in cbsl["request_errors"].items())[:300])
     if not args.skip_weather:
-        summary["weather_rows_added"] = topup_weather(config, args.config, backup, today)
+        summary["weather_rows_added"] = check("weather", lambda: topup_weather(config, args.config, backup, today))
     if not args.skip_fuel:
-        summary["fuel"] = topup_fuel(config, args.config, backup, today)
+        summary["fuel"] = check("fuel", lambda: topup_fuel(config, args.config, backup, today))
+        if str(summary["fuel"]).startswith("not updated"):
+            sources["fuel"].update(status="failed", error=str(summary["fuel"])[:300])
 
     if not args.skip_dcs:
-        summary["dcs"] = import_dcs(config, raw_dir, backup)
+        dcs = summary["dcs"] = check("dcs", lambda: import_dcs(config, raw_dir, backup))
+        if "error" in dcs:
+            sources["dcs"].update(status="failed", error=dcs["error"])
+        else:
+            sources["dcs"].update(
+                newest_published=dcs["newest_listed"],
+                new_records=dcs["new_bulletins"],
+                problems=[f"{dcs['unavailable']} listed bulletin(s) had no PDF"] if dcs["unavailable"] else [],
+            )
+    summary["sources"] = sources
 
     if backup.changed or not (raw_dir / "data_manifest.json").exists():
         manifest_path = raw_dir / "data_manifest.json"
@@ -444,16 +516,22 @@ def run(args) -> int:
         manifest = write_manifest(raw_dir, pd.Timestamp.now().isoformat(timespec="seconds"))
         summary["latest"] = {d["file"]: d.get("latest_observation") for d in manifest["datasets"]}
     summary["backup"] = str(backup.folder) if backup.saved else None
+    failed = sorted(name for name, source in sources.items() if source["status"] == "failed")
+    # "partial": the run completed, but some source couldn't be checked (its data was kept as it was).
+    summary["status"] = "partial" if failed else "ok"
     summary["finished_at"] = pd.Timestamp.now().isoformat(timespec="seconds")
     backup.prune()
     with (raw_dir / "update_log.jsonl").open("a", encoding="utf-8") as log:
         log.write(json.dumps(summary, default=str) + "\n")
 
-    harti = summary["harti"]
-    logger.info("HARTI: newest listed %s; %d Dambulla and %d all-market rows added", harti["newest_listed"], harti["dambulla_rows_added"], harti["all_market_rows_added"])
-    if harti["unreadable"]:
-        logger.error("HARTI bulletins that couldn't be read (check the parser): %s", harti["unreadable"])
-        return 2
+    if "error" not in harti:
+        logger.info("HARTI: newest listed %s; %d Dambulla and %d all-market rows added", harti["newest_listed"], harti["dambulla_rows_added"], harti["all_market_rows_added"])
+        if harti["unreadable"]:
+            logger.error("HARTI bulletins that couldn't be read (check the parser): %s", harti["unreadable"])
+            return 2
+    if failed:
+        logger.error("Source(s) that couldn't be checked: %s", ", ".join(failed))
+        return 4
     return 0
 
 
@@ -472,12 +550,36 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level="INFO", format="%(asctime)s - %(levelname)s - %(message)s")
     os.chdir(_PROJECT_ROOT)
     raw_dir = _resolve(ConfigLoader(args.config).get("paths.raw_data_dir", "data/raw"))
+    started = pd.Timestamp.now().isoformat(timespec="seconds")
     try:
         with single_run(raw_dir / ".update.lock"):
             return run(args)
     except UpdateError as error:
         logger.error("%s", error)
         return 3
+    except Exception as error:  # noqa: BLE001 -- e.g. a source site unreachable; recorded, never hidden
+        logger.exception("Update failed; the existing data was kept")
+        record_failed_run(raw_dir, started, error)
+        return 1
+
+
+def record_failed_run(raw_dir: Path, started: str, error: BaseException) -> None:
+    """Add a failed attempt to update_log.jsonl, so the app can say the last check failed.
+
+    Files are only ever replaced atomically after a successful download and parse, so a failed
+    run leaves the datasets as they were.
+    """
+    entry = {
+        "started_at": started,
+        "status": "failed",
+        "error": f"{type(error).__name__}: {error}"[:300],
+        "finished_at": pd.Timestamp.now().isoformat(timespec="seconds"),
+    }
+    try:
+        with (raw_dir / "update_log.jsonl").open("a", encoding="utf-8") as log:
+            log.write(json.dumps(entry) + "\n")
+    except OSError:
+        logger.exception("Couldn't record the failed run")
 
 
 if __name__ == "__main__":

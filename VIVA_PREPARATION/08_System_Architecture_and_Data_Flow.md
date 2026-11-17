@@ -144,19 +144,21 @@ flowchart TD
     NAV --> HIST[Price History]
     NAV --> PLAN[Cultivation Planner]
     PRED --> SRC{Data source}
-    SRC -- Historical real --> DIRECT[Ridge direct forecaster]
-    SRC -- Latest HARTI --> LIVE[Download bulletin, fill gap] --> DIRECT
-    SRC -- Sample / Upload --> EARLY[Earlier 51-feature model<br/>optional sandbox training]
-    DIRECT --> TYPE{Prediction type}
-    TYPE -- Next available --> ONE[Predict -> one price]
-    TYPE -- Future date --> MULTI[Generate Forecast -> path up to 30 days]
+    SRC -- Latest Real Data Prediction --> STATUS[1. Source status: HARTI, CBSL, DCS]
+    STATUS --> RECORDS[2. Collected records per source<br/>forecast starting point named]
+    RECORDS --> DIRECT[3-4. Ridge direct forecaster]
+    SRC -- Upload CSV --> EARLY[Earlier 51-feature model<br/>optional sandbox training]
+    DIRECT --> TYPE{Forecast period}
+    TYPE -- 1 / 7 / 14 / 30 days --> ONE[Predict -> price + 1/7/14/30 table]
+    TYPE -- another date --> MULTI[Predict -> path up to 30 days]
+    ONE & MULTI --> FRESH[5. Freshness and warnings]
     PERF --> READ[Reads reports/metrics JSON]
     HIST --> HSRC{HARTI / CBSL / DCS} --> CHART[Charts + tables, kept separate]
     PLAN --> CROP[Crop + variety + date] --> HARV[Harvest window add_duration]
     HARV --> REACH{Harvest within 30 days of latest price?}
     REACH -- yes --> FPRICE[Forecast + likely range + selling suggestion]
     REACH -- no --> HISTP[Not available + same-season history]
-    ONE & MULTI & READ & CHART & FPRICE & HISTP --> STOP([Ctrl+C in console to stop])
+    FRESH & READ & CHART & FPRICE & HISTP --> STOP([Ctrl+C in console to stop])
 ```
 
 ## 6. Key design decisions (be ready to justify)

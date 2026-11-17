@@ -3,7 +3,7 @@
 All numbers below come from `data/raw/data_manifest.json` (generated 2026-11-11 03:43) — read from the files themselves.
 
 > සිංහල: මෙම ව්‍යාපෘතියේ සියලු දත්ත **සැබෑ, රජයේ/පොදු මූලාශ්‍රවලින්** ලබාගත් ඒවාය. කිසිදු දත්තයක් නිර්මාණය කර
-> (fabricate) නැත. එකම ව්‍යාජ දත්ත ගොනුව "Bundled sample data (synthetic)" ලෙස පැහැදිලිව ලේබල් කර ඇත.
+> (fabricate) නැත. එකම ව්‍යාජ දත්ත ගොනුව (`app/sample_data/sample_history.csv`) Predict පිටුවේ තවදුරටත් පෙන්වන්නේ නැත.
 
 ## 1. Datasets
 
@@ -15,7 +15,7 @@ All numbers below come from `data/raw/data_manifest.json` (generated 2026-11-11 
 | `dcs_weekly_retail_prices.csv` | Department of Census and Statistics weekly retail prices | Retail, weekly, Colombo District | 11,439 | 2019-12 wk 4 → 2026-11 wk 1 | Price History only |
 | `fuel_prices.csv` | CEYPETCO price revisions | Diesel/petrol Rs/litre | 4,161 | 2015-06-22 → 2026-11-11 | `fuel` features |
 | `weather_data_by_region.csv` | Open-Meteo historical archive | Rain, temperature, humidity; 8 locations | 33,264 | 2015-06-22 → 2026-11-08 | `rain_windows`, `weather_lag_14` features |
-| `app/sample_data/sample_history.csv` | **Synthetic** (made up for demo) | — | 360 | 2026-05-15 → 2026-08-12 | "Bundled sample data" option only |
+| `app/sample_data/sample_history.csv` | **Synthetic** (made up for demo) | — | 360 | 2026-05-15 → 2026-08-12 | Tests only; no longer offered on the Predict page (since 15 Nov 2026) |
 
 **Why "midpoint"?** HARTI prints a range like "400-450". `parse_price_range` (`harti_live_client.py` line 138) turns
 it into 425.
@@ -39,10 +39,9 @@ A missing day is carried forward at most 7 days in features; the Price History c
 
 | Data | Live in the app? | How | Evidence |
 |---|---|---|---|
-| HARTI latest bulletin | **Yes, on demand** ("Latest HARTI Data" option) | `fetch_harti_latest_snapshot` (`app/services.py` 552) → `fetch_latest_prices` (`harti_live_client.py` 379); cached 60 min (`config.yaml` `harti.cache_minutes`); missing days between stored data and the bulletin filled from archived bulletins (`backfill_harti_price_gap`, `services.py` 705). **Not saved to disk.** | Tested 13 Nov 2026: bulletin dated 2026-11-12, 30 prices |
-| Weather | Yes for prediction | `OpenMeteoWeatherClient` (`live_weather_client.py` 78): `fetch_recent` (180) → api.open-meteo.com/v1/forecast; `fetch_historical` (215) → archive-api.open-meteo.com. **No API key.** | `config.yaml` `weather_api` |
-| Fuel | Yes, with fallback | `CeypetcoLiveFuelPriceClient` (`live_fuel_price_client.py` 95/131) → api.ceypetco.gov.lk; if it fails, last known price | `config.yaml` `fuel_api` |
-| CBSL / DCS | No — updated by the daily script | `scripts/daily_update.py` | — |
+| HARTI, CBSL, DCS | **Checked automatically every 3 hours** (Windows task `VegetablePriceUpdate` → `scripts/daily_update.py`), or with **Check official sources now** on the Predict page. New reports are saved, de-duplicated and logged per source | `data/raw/update_log.jsonl` (`"sources"`); Predict page section 1 | Scheduled task run verified 15 Nov 2026 |
+| Weather, fuel | Topped up by the same update; the forecaster reads the stored files | `topup_weather`, `topup_fuel` | — |
+| Live single-bulletin download | Code kept (`fetch_harti_latest_snapshot`, `backfill_harti_price_gap`), **no longer offered on the page** since 15 Nov 2026 | `app/services.py` | Tested 13 Nov 2026 |
 
 **Important honest statement:** there is **no real-time price API** for Sri Lankan vegetables. HARTI publishes one
 PDF per day, usually 1–2 days late. "Real-time" in this project means "as current as the newest published bulletin".
@@ -59,7 +58,7 @@ PDF per day, usually 1–2 days late. "Real-time" in this project means "as curr
 4. Rewrites the manifest; logs to `data/raw/update_log.jsonl`. Exit code 2 if a bulletin was unreadable.
 5. The running app notices changed files automatically (`data_version`, `app/catalogue.py` 162).
 
-**Not scheduled automatically** — registering a Windows Task Scheduler job must be done by the user.
+**Scheduled since 15 Nov 2026:** Windows task `VegetablePriceUpdate`, every 3 hours from 07:00 (first timed run 13:00, exit code 0). It runs only while the PC is on.
 `scripts/update_data.py` is the full rebuild (slower; `--workers` default 1; weather fetched in pieces to avoid
 Open-Meteo HTTP 429 "too many requests").
 

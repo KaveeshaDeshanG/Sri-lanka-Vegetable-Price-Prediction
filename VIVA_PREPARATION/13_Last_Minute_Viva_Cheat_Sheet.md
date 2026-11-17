@@ -38,7 +38,7 @@ Tests: `.\.venv312\Scripts\python.exe -m pytest -q` → **1,060 passed**
 Pipeline: **SimpleImputer(median) → StandardScaler → Ridge(α)** (line 118)
 
 ## Key files
-`app/Home.py` · `app/pages/1_Predict.py` · `app/forecasting.py` (`direct_forecast` 116) · `app/cultivation.py` (`build_plan` 276) ·
+`app/Home.py` · `app/pages/1_Predict.py` · `app/forecasting.py` (`direct_forecast` 116) · `app/cultivation.py` (`build_plan` 305) ·
 `src/models/direct_forecaster.py` · `src/feature_engineering/forecast_features.py` · `src/data_collection/harti_live_client.py` ·
 `scripts/daily_update.py` · `config/config.yaml` · `models/direct_forecaster.joblib` · `reports/metrics/direct_forecaster_metrics.json`
 
@@ -54,11 +54,18 @@ Open-Meteo (weather, no key) · CEYPETCO (fuel). **No real-time API exists** —
 
 ## Honest limitations (say them before they ask)
 Modest gain (4–8 %) · RMSE slightly worse than hold at 8–14 and 22–30 days · Dambulla only · no supply data ·
-not retrained on full history · daily update not scheduled · no database/login/deployment · no user study · no LSTM/ARIMA/SHAP.
+not retrained on full history (tested 13 Nov: rejected) · no database/login/deployment · no user study · no LSTM/ARIMA/SHAP.
+Updates: Windows task `VegetablePriceUpdate` checks HARTI, CBSL, DCS **every 3 hours** (verified 15 Nov 13:00, exit 0).
 
-## Demo values (13 Nov 2026 data)
-Beans: last Rs 425 → **10 Nov Rs 453.74** · **25 Nov Rs 507.96** (16 d) · **25 Dec refused** (46 d) ·
-Planner Beans bush planted 20 Oct → harvest 4 Dec → **Rs 450/kg** · Latest HARTI bulletin 12 Nov (30 prices)
+## Predict page (since 15 Nov 2026)
+Two options: **Upload CSV** · **Latest Real Data Prediction** → 1. Source status · 2. Collected data (per source, starting
+record named) · 3. Vegetable & market · 4. Prediction (1/7/14/30 days + accuracy table) · 5. Freshness & warnings.
+CBSL and DCS: shown, **never** model inputs.
+
+## Demo values (15 Nov 2026 data)
+Beans: last **Rs 430** (12 Nov, range 380–480) → 1 d **Rs 413.04** · 7 d **Rs 431.62** · 14 d **Rs 459.86** · 30 d **Rs 447.14** ·
+CBSL 13 Nov: Dambulla wholesale Rs 375 · DCS Nov wk 1: Beans (Green) retail Rs 731.03 ·
+Planner Beans bush planted 20 Oct → harvest 4 Dec → **Rs 450/kg** (13 Nov data)
 
 ## සිංහල — මතක තබා ගන්න
 - App එක: `start_app.bat` → localhost:8501 → නැවැත්වීමට Ctrl + C.

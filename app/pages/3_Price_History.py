@@ -15,6 +15,7 @@ import streamlit as st
 
 from app import ui
 from app.catalogue import data_version, display_name
+from app.source_records import load_dcs_weekly
 from app.services import break_long_gaps, load_real_market_history, missing_historical_datasets, resolve_weather_region
 from config.config_loader import ConfigLoader
 from src.data_collection.data_validator import DataValidationError
@@ -54,10 +55,10 @@ def _load_markets(version: str) -> pd.DataFrame | None:
 
 @st.cache_data
 def _load_dcs(version: str) -> pd.DataFrame | None:
-    path = _config.get("paths.raw_files.dcs_weekly_retail")
-    if not path or not Path(path).exists():
+    # DCS's printed 0.00 ("not available that week") is read as missing, never as Rs 0; the CSV is unchanged.
+    table = load_dcs_weekly(CONFIG_PATH)
+    if table is None:
         return None
-    table = pd.read_csv(path)
     # A plotting position only: DCS publishes "week n of a month", not dates.
     table["plot_position"] = pd.to_datetime(dict(year=table["year"], month=table["month"], day=1)) + pd.to_timedelta((table["week_of_month"] - 1) * 7, unit="D")
     return table
@@ -142,8 +143,16 @@ if source == SOURCE_DCS:
     years = sorted(group["year"].unique())
     with _filters[1]:
         year_range = st.select_slider("Years", options=years, value=(years[0], years[-1]), key="history_dcs_years") if len(years) > 1 else (years[0], years[0])
-    selected = group[group["year"].between(year_range[0], year_range[1])]
-    latest = selected.iloc[-1]
+    selected = group[group["year"].between(year_range[0], year_range[1])].copy()
+    # Weeks DCS printed 0.00 ("not available") are missing: not plotted, not in the statistics, and the
+    # line breaks there instead of joining across them.
+    selected["segment"] = selected["price_unavailable"].cumsum()
+    unavailable = selected[selected["price_unavailable"]]
+    selected_priced = selected[~selected["price_unavailable"]]
+    if selected_priced.empty:
+        st.warning(f"DCS published no price for {vegetable} in the selected years (every week was printed as unavailable).")
+        st.stop()
+    latest = selected_priced.iloc[-1]
     ui.stat_cards(
         [
             {"label": "Data source", "value": "DCS weekly retail prices"},
@@ -155,13 +164,14 @@ if source == SOURCE_DCS:
     )
     columns = st.columns(4)
     columns[0].metric("Latest weekly average", f"Rs. {latest['price']:,.2f}", help=latest["period"])
-    columns[1].metric("Average", f"Rs. {selected['price'].mean():,.0f}")
-    columns[2].metric("Lowest", f"Rs. {selected['price'].min():,.0f}")
-    columns[3].metric("Highest", f"Rs. {selected['price'].max():,.0f}")
+    columns[1].metric("Average", f"Rs. {selected_priced['price'].mean():,.0f}")
+    columns[2].metric("Lowest", f"Rs. {selected_priced['price'].min():,.0f}")
+    columns[3].metric("Highest", f"Rs. {selected_priced['price'].max():,.0f}")
     st.subheader(f"{vegetable}: retail price, Colombo District")
-    chart = alt.Chart(selected).mark_line(point=alt.OverlayMarkDef(size=14), strokeWidth=2).encode(
+    chart = alt.Chart(selected_priced).mark_line(point=alt.OverlayMarkDef(size=14), strokeWidth=2).encode(
         x=alt.X("plot_position:T", title="Month (weekly points placed by week number)"),
         y=alt.Y("price:Q", title=f"Rs per {latest['unit']}"),
+        detail="segment:N",
         color=alt.value(ui.SERIES["actual"]),
         tooltip=[alt.Tooltip("period:N", title="Published week"), alt.Tooltip("price:Q", title="Average Rs", format=",.2f"), alt.Tooltip("item:N", title="DCS item")],
     )
@@ -171,8 +181,16 @@ if source == SOURCE_DCS:
         "DCS publishes the week only as 'week n of a month', so points are placed by week number, not by a calendar date. "
         "Retail prices: not comparable with HARTI's wholesale prices and never combined with them."
     )
+    if not unavailable.empty:
+        st.info(
+            f"DCS printed no price (0.00) for {vegetable} in {len(unavailable)} week(s): {', '.join(unavailable['period'])}. "
+            "Those weeks are shown as unavailable, not as Rs 0: they aren't plotted or counted, and the line breaks there."
+        )
     with st.expander("View as a table"):
-        st.dataframe(selected[["period", "item", "unit", "price", "range_low", "range_high", "source_file"]], hide_index=True, width="stretch")
+        table = selected[["period", "item", "unit", "price", "range_low", "range_high", "source_file"]].copy()
+        for column in ("price", "range_low", "range_high"):
+            table[column] = table[column].map(lambda value: f"{value:,.2f}" if pd.notna(value) else "unavailable (DCS printed 0.00)")
+        st.dataframe(table, hide_index=True, width="stretch")
     st.stop()
 
 _market_list = ["Dambulla"] + (sorted(set(markets["market"]) - {"Dambulla"}) if markets is not None else [])

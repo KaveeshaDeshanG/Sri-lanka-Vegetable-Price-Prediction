@@ -60,13 +60,15 @@ Project root: `D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegeta
 | File | Key functions (line) | Responsibility |
 |---|---|---|
 | `Home.py` | `_load_forecaster` (31), `_saved_accuracy` (36) | Model summary cards, "Data in use" table from the manifest, last update, page links (190–196) |
-| `pages/1_Predict.py` | data source radio (354), upload (365), `_history_with_latest_bulletin` (186), `_forecast_origin_rows` (250), `_render_direct_result` (255), `_show_direct_forecast` (703), Predict button (733), Generate Forecast (858) | The prediction page |
+| `pages/1_Predict.py` | `_forecast_origin_rows` (271), `_render_direct_result` (276), `_render_source_status` (386), `_load_source_records` (438), `_render_vegetable_records` (468), `_render_real_prediction` (542), `_render_freshness` (604), data source radio (637: Upload CSV / Latest Real Data Prediction), `_show_direct_forecast` (963) | The prediction page (two options since 15 Nov 2026) |
+| `source_records.py` | `harti_dambulla_records`, `harti_other_market_records`, `cbsl_records`, `dcs_records`, `records_for_series`, `latest_dambulla_overview` | Each official source's records with traceability fields, kept apart |
+| `data_refresh.py` | `run_data_update`, `interpret_exit_code` | Runs `scripts/daily_update.py` from the page buttons |
 | `pages/2_Model_Performance.py` | `_show_direct` (81), `_show_earlier_models` (172), `_show_backtest` (238) | Reads `reports/metrics/*.json` and shows accuracy vs baseline |
 | `pages/3_Price_History.py` | `_load_history` (40), `_load_markets` (45), `_load_dcs` (56), `_load_cbsl` (67); source radio (97) | Charts of recorded prices |
-| `pages/4_Cultivation_Planner.py` | selectboxes (112, 115, 125), date (153), form button (165) | The planner page |
+| `pages/4_Cultivation_Planner.py` | selectboxes (133, 136, 146), forecast-reach box (191), date (200), weather to display (209), form button (220) | The planner page |
 | `services.py` | `load_real_market_history` (264), `prepare_uploaded_history` (148), `fetch_harti_latest_snapshot` (552), `fetch_live_fuel_price` (617), `backfill_harti_price_gap` (705), `train_demo_model` (1042) | Glue between pages and `src/` |
 | `forecasting.py` | `direct_forecast` (116), `forecast_future_price` (195, recursive) | Turns a request into a forecast |
-| `cultivation.py` | `add_duration` (110), `load_crop_timings` (138), `build_plan` (276), `suggest_selling_day` (241) | Planner logic |
+| `cultivation.py` | `add_duration` (110), `load_crop_timings` (138), `latest_start_in_reach` (198), `build_plan` (305), `suggest_selling_day` (270) | Planner logic |
 | `catalogue.py` | `freshness` (96), `past_date_notice` (108), `series_status` (122), `data_version` (162) | Names, freshness, which series can be forecast |
 | `ui.py` | `apply_theme` (198), `available_sources` (228), `data_source_panel` (265) | Look and feel |
 

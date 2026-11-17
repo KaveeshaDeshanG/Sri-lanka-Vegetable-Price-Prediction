@@ -64,10 +64,11 @@ unless the examiner allows Sinhala.
 ## 3. Demo narration (short lines while clicking — full steps in doc 09)
 - "I start the app with `start_app.bat`; it checks the Python environment and runs `app/Home.py`."
 - "The home page shows the accuracy against the baseline and every dataset with its source."
-- "I select Beans and click Predict — Rs 453.74 per kilogram, from the latest price of Rs 425."
-- "Now a 16-day forecast — each day uses its own model."
-- "If I ask for 46 days ahead, the system refuses, because it reaches only 30 days."
-- "This option downloads today's HARTI bulletin live."
+- "First, the source status: HARTI, CBSL and DCS were checked automatically; here is each one's newest publication."
+- "I select Beans. The forecast starts from this exact HARTI bulletin record: Rs 430 on 12 November. CBSL and DCS
+  prices are shown beside it for comparison, but never mixed in."
+- "Seven days ahead: Rs 431.62 per kilogram. This table shows 1, 7, 14 and 30 days, each with its measured error."
+- "The date picker stops at 30 days, because that's as far as the model was tested."
 - "Model Performance compares the model with the hold-last-price baseline for each range."
 - "Price History keeps HARTI wholesale, CBSL and DCS retail separate."
 - "The planner turns a planting date into a harvest window and a price where the forecast can reach."
@@ -88,10 +89,11 @@ unless the examiner allows Sinhala.
 
 ## 5. Real-time data explanation
 > There is no public real-time API for Sri Lankan vegetable prices. HARTI publishes one PDF bulletin per day, usually
-> one or two days late. My "Latest HARTI Data" option downloads and parses the newest bulletin on demand — during
-> testing it fetched the 12 November bulletin with 30 prices — fills any gap from archived bulletins, and caches it
-> for an hour. Weather and fuel prices are also fetched live. So the system is **as current as the newest published
-> data**, and it always tells the user how old the data is.
+> one to three days late. A scheduled task checks HARTI, CBSL and DCS every three hours and imports anything newly
+> published, without duplicates; one source failing doesn't stop the others, and the failure is shown. On the
+> Predict page the user sees each source's status, the records collected from each source separately, and the exact
+> HARTI bulletin the forecast starts from. So the system is **as current as the newest published data**, and it
+> always says how old the data is.
 
 සිංහල: "Real-time" යනු නවතම ප්‍රකාශිත bulletin එක. දත්ත කොපමණ පැරණිද යන්න app එක සැමවිටම පෙන්වයි.
 
@@ -101,7 +103,7 @@ unless the examiner allows Sinhala.
 > I want to be clear about the limitations. The improvement over the baseline is real but modest — 4 to 8 %.
 > At longer horizons, the model's RMSE is slightly worse than the baseline, meaning occasional bigger misses. I
 > forecast only Dambulla, and I don't have supply or arrival quantities, which drive prices. The model hasn't been
-> retrained on the full 2015 history. Daily updates are not scheduled automatically, the app isn't deployed online,
+> retrained on the full 2015 history. Updates run every three hours only while my laptop is on, the app isn't deployed online,
 > and I didn't do a study with real farmers.
 
 සිංහල: සීමාවන් අවංකව පවසන්න — එය දුර්වලතාවයක් නොව, පරිණත බවේ ලකුණකි.

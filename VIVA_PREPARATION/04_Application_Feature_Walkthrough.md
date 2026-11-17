@@ -30,41 +30,34 @@ lists the problem (`historical_dataset_problems`, `forecaster_problems` in `app/
 
 ## Page 2 — Predict (`app/pages/1_Predict.py`)
 
-### Section 1 "Historical data" — Data source radio (line 354)
-| Option | What happens | Backend |
+*Redesigned on 15 November 2026: two data sources instead of four.*
+
+**Data source** radio, exactly two options: **Upload CSV** and **Latest Real Data Prediction** (the default).
+The former "Bundled sample data (synthetic)" and live "Latest HARTI Data (real)" options were removed from the
+page; their functions remain in `app/services.py` and are still tested.
+
+> සිංහල: දැන් විකල්ප දෙකක් පමණි — ඔබේම CSV ගොනුව, හෝ නිල මූලාශ්‍රවලින් එකතු කළ නවතම සැබෑ දත්ත.
+
+### Latest Real Data Prediction: five sections
+| Section | What you see | Code |
 |---|---|---|
-| **Historical dataset (real)** (default) | Loads 76,719 real Dambulla prices + weather + fuel | `load_real_market_history` (`services.py` 264), cached by `_load_real_market_history_cached` (160) |
-| **Bundled sample data (synthetic)** | Loads 360 made-up rows (Carrot, Tomato) labelled "Not real market data" | `load_sample_history` (`services.py` 259) |
-| **Upload my own CSV** | A file uploader appears (line 365). Needs columns date, vegetable, market, price | `prepare_uploaded_history` (`services.py` 148) validates; errors shown in red |
-| **Latest HARTI Data (real)** | Downloads HARTI's newest bulletin from the internet; shows its date and a **Refresh** button (407) | `fetch_harti_latest_snapshot` (`services.py` 552) → `HartiLiveClient.fetch_latest_prices` (`harti_live_client.py` 379); cached 60 min |
+| **1. Official source status** | A card each for HARTI, CBSL, DCS: newest publication found, last checked, new data collected, failure or import problem, stale or not. **Check official sources now** button | `_render_source_status` (`1_Predict.py`); `update_status` (`app/catalogue.py`); `run_data_update` (`app/data_refresh.py`) |
+| **2. Latest collected data** | Expander: newest HARTI Dambulla price of every vegetable. Then the records of the vegetable chosen in section 3: a box naming the **forecast starting point** (bulletin, min/max/midpoint, link, collection time). Four tabs: HARTI Dambulla (used by the model), HARTI other markets (model inputs), CBSL (reference only, wholesale and retail in separate tables), DCS (reference only). Each table puts date, market, min, max, midpoint, unit, document link and collection time first, with the rest reached by scrolling sideways (date and market stay pinned) | `_render_vegetable_records`; `app/source_records.py`; `data/reference/source_item_map.csv` |
+| **3. Vegetable and market** | **Vegetable** dropdown (forecastable series only; it also drives section 2's tables), the list of series that can't be forecast and why, and Market (Dambulla); cards for data source, market, price type, latest data; latest actual price and last successful update | `ui.data_source_panel` |
+| **4. Prediction** | Model and its inputs named ("CBSL and DCS records are not inputs"). **Forecast period**: 1 day / 7 days / 14 days / 30 days / another date. **Predict** → price, chart, weather, daily path, and a table of all four horizons with the accuracy measured for each range | `_render_real_prediction` → `direct_forecast` (`app/forecasting.py`) |
+| **5. Data freshness and warnings** | Up to date, or a yellow warning (check failed, HARTI not checked, no check for 24 h, price > 3 days old) | `_render_freshness`, `update_notice` |
 
-"Preview loaded data" expander shows the first 20 rows.
+**What happens when you click Predict:**
+1. `ForecastFeatureBuilder.build_origin_features` builds features for every vegetable and date (cached).
+2. `direct_forecast` → `DirectForecaster.forecast` uses the Ridge model for that number of days: **price = last price × exp(predicted log change)**.
+3. A second call gives the 30-day path, from which the 1/7/14/30 table is taken (each from its own model).
 
-### Section 2 "Model"
-- Real data → green box "Ridge direct forecaster loaded …".
-- Sample/upload → the earlier 51-feature model is used, with an info box explaining why; an expander lets you **train a
-  sandbox model** (`_train_sandbox_model` line 484 → `train_demo_model` `services.py` 1042) saved only to `models/demo`.
+**Expected (15 Nov 2026 data, latest Beans 12 Nov Rs 430):** 1 day → 13 Nov **Rs 413.04**; 7 → 19 Nov **Rs 431.62**; 14 → 26 Nov **Rs 459.86**; 30 → 12 Dec **Rs 447.14**.
 
-### Section 3 "Request a prediction"
-| Control | Line | What it does |
-|---|---|---|
-| **Vegetable** dropdown | 578 | Only series the forecaster can forecast (`series_status`, `catalogue.py` 122) |
-| Expander "5 recorded price series can't be forecast, and why" | ~580 | Lists Bitter Gourd (Other/Village), Brinjals (Other/Village) — not trained; Cabbage (Nuwara Eliya) — last price 2025-07-12 |
-| **Market** dropdown | 596 | Dambulla |
-| Cards: Data source · Market · Price type · Latest data + freshness message | `ui.data_source_panel` (`ui.py` 265) | "Latest data 2026-11-09 is 4 days old; forecasts start from that date" |
-| **Prediction type** radio | 669 | "Latest / Next Available Prediction" or "Future Date Forecast (multi-step)" |
-| **Date to predict** / **Forecast date** | 717 / 832 | Minimum = the day after the latest price. A past date shows a yellow warning (`past_date_notice`, `catalogue.py` 108) |
-| **Predict** button | 733 | Next-day (or any single date) prediction |
-| **Generate Forecast** button | 858 | Forecast path up to the chosen date |
-
-**What happens when you click Predict / Generate Forecast (real data):**
-1. `_forecast_origin_rows` (250) → `ForecastFeatureBuilder.build_origin_features` builds features for every vegetable and date (cached).
-2. `_show_direct_forecast` (703) → `direct_forecast` (`app/forecasting.py` 116).
-3. Horizon h = target date − latest actual date. If h > 30 → error "Cannot forecast that date: … The forecaster reaches at most 30 days ahead."
-4. `DirectForecaster.forecast` (`direct_forecaster.py` 134) uses the Ridge model for horizon h; `predict_rows` (126): **price = last price × exp(predicted log change)**.
-5. `_render_direct_result` (255) shows the price, a chart of recent prices + forecast, the weather used, data sources and the "Daily forecast path" expander.
-
-**Expected (tested 13 Nov 2026):** Beans → 10 Nov 2026 → **Rs 453.74/kg**; 25 Nov 2026 (16 days ahead) → **Rs 507.96/kg**; 25 Dec 2026 → refused (46 days).
+### Upload CSV
+A file uploader (columns date, vegetable, market, price). `prepare_uploaded_history` (`services.py`) validates it;
+errors are shown in red. Uses the earlier 51-feature model (or a sandbox model saved only to `models/demo`), never
+official data. The old "Prediction type" and "Generate Forecast" controls belong to this mode now.
 
 ---
 
@@ -99,21 +92,22 @@ lists the problem (`historical_dataset_problems`, `forecaster_problems` in `app/
 
 | Control | Line | Meaning |
 |---|---|---|
-| Vegetable | 112 | Crops with DOA timings |
-| Variety or guidance | 115 | e.g. "Bush types (crop guidance) — 45 days" |
-| Market price series | 125 | Which HARTI series to price it with (or "No HARTI price series") |
+| Vegetable | 133 | Crops with DOA timings |
+| Variety or guidance | 136 | e.g. "Bush types (crop guidance) — 45 days" |
+| Market price series | 146 | Which HARTI series to price it with (or "No HARTI price series") |
 | Box "Published timing …" | — | Quote + DOA source URL + how dates are calculated |
-| Start date (label changes: Planting / Transplanting / Nursery sowing date …) | 153 | Range: 2 years back to 1 year ahead |
-| Growing location | 161 | Only changes the "recent weather" box (alphabetical default) |
-| **Generate Cultivation Plan** | 165 | Builds the plan |
+| Box "Forecast reach" | 191 | Before Generate: the forecast's last date and the latest start date that still gets a forecast |
+| Start date (label changes: Planting / Transplanting / Nursery sowing date …) | 200 | Range: 2 years back to 1 year ahead |
+| Weather to display | 209 | Only changes the "Recent weather" box. Defaults to the region the model uses (Beans: Badulla, Carrot: Nuwara Eliya). Never changes the forecast |
+| **Generate Cultivation Plan** | 220 | Builds the plan |
 
-**Backend:** `build_plan` (`app/cultivation.py` 276) → `harvest_window` (193) uses `add_duration` (110): days/weeks exact,
+**Backend:** `build_plan` (`app/cultivation.py` 305) → `harvest_window` (193) uses `add_duration` (110): days/weeks exact,
 months = calendar months (never 30 days). If the harvest is within 30 days of the latest price → `forecast_with_range`
-(227) gives price + likely range (10th–90th percentile of past errors, `reports/metrics/forecast_error_bands.json`);
-`suggest_selling_day` (241). Otherwise → "Not available" + `same_season_history` (255) from earlier years.
+(256) gives price + likely range (10th–90th percentile of past errors, all vegetables together, `reports/metrics/forecast_error_bands.json`);
+`suggest_selling_day` (270), only when the forecast covers the whole window. The plan names the starting HARTI record and the model's weather region. Otherwise → `select_price` leads with a labelled reference (section 3, "Price at harvest"): recorded prices for a passed window, else the Historical Seasonal Price Reference (`seasonal_reference`: same weeks ± 7 days, 5 most recent years, ≥ 10 prices in 3 years), else the latest actual price; a crop with no HARTI series gets "No Verified Price Available" and the missing source. `latest_start_in_reach` (198) gives the date in the "Forecast reach" box.
 
-**Expected (tested):** Beans bush, planted 13 Nov 2026 → first harvest 28 Dec 2026 → price "Not available" (beyond
-reach) + history table. Planted 20 Oct 2026 → first harvest 4 Dec 2026 → forecast **Rs 450/kg**.
+**Expected (tested):** Beans bush, planted 13 Nov 2026 → first harvest 28 Dec 2026 → Historical Seasonal Price Reference, Rs 425/kg (64 prices, 2021–2026; beyond
+reach) + history table. Planted 20 Oct 2026 → first harvest 4 Dec 2026 → forecast **Rs 463/kg** (from Rs 430 on 12 Nov; data as of 15 Nov 2026).
 
 ---
 
@@ -121,21 +115,21 @@ reach) + history table. Planted 20 Oct 2026 → first harvest 4 Dec 2026 → for
 
 1. Double-click `start_app.bat` → browser opens **Home**. Show the accuracy cards and "Data in use" table.
 2. Scroll down → "How it works" cards → click **Go to Prediction →**.
-3. Predict: keep **Historical dataset (real)**. Open **Preview loaded data**, close it.
-4. Open the expander **"5 recorded price series can't be forecast, and why"** → explain stale/untrained series.
-5. Vegetable → **Beans**. Show the four source cards and the freshness message.
-6. Keep **Latest / Next Available Prediction**; note the yellow "already passed" warning (date = day after latest data).
-7. Click **Predict** → show the price (Rs 453.74), chart, weather card, model used.
-8. Choose **Future Date Forecast (multi-step)** → set Forecast date to a date ~2 weeks ahead → **Generate Forecast** → show price, path chart, open **Daily forecast path**.
-9. Set a date > 30 days ahead → **Generate Forecast** → show the refusal message.
-10. Data source → **Latest HARTI Data (real)** → show the bulletin date and "not a real-time feed" caption (needs internet). Click **Refresh** once.
-11. Data source → **Bundled sample data (synthetic)** → show "Not real market data" and that the earlier model is used.
-12. Data source → **Upload my own CSV** → upload `Final_Project_Report\testing_evidence\inputs\missing_price_column.csv` → show the red error. Then upload `valid_upload.csv` → loads.
+3. Predict opens on **Latest Real Data Prediction**. Section 1: read the HARTI, CBSL and DCS cards (newest publication, last checked).
+4. Optional (internet): **Check official sources now** → the result message.
+5. Section 2: open **Newest HARTI Dambulla price of every vegetable**; open **"5 recorded price series can't be forecast, and why"**.
+6. Vegetable → **Beans**. Read the **forecast starting point** box; click **Bulletin** to show the original HARTI PDF.
+7. Open the tabs: HARTI other markets, **CBSL** (wholesale and retail tables apart), **DCS** (retail, weekly).
+8. Section 3: market Dambulla, wholesale, latest data card.
+9. Section 4: Forecast period **7 days** → **Predict** → Rs 431.62, chart, weather card, then the **1, 7, 14 and 30 days** table with measured accuracy.
+10. Choose **Another date** → pick a date → **Predict** (dates beyond 30 days can't be chosen).
+11. Section 5: read the freshness message.
+12. Data source → **Upload CSV** → upload `Final_Project_Report\testing_evidence\inputs\missing_price_column.csv` → the red error. Then `valid_upload.csv` → loads (no official data shown).
 13. Sidebar → **Model Performance** → explain the bar chart (model vs hold last price), the 4.3% gain and the earlier models table.
 14. Sidebar → **Price History** → HARTI: change Market to **Kandy**, change the date range, open the weather tabs (with Dambulla).
 15. Switch to **CBSL daily report** → Price type **retail** → show the three markets.
 16. Switch to **DCS weekly bulletins** → move the Years slider.
-17. Sidebar → **Cultivation Planner** → Beans, Bush types, keep today → **Generate Cultivation Plan** → "Not available" + history.
+17. Sidebar → **Cultivation Planner** → Beans, Bush types, keep today → **Generate Cultivation Plan** → orange "Historical Seasonal Price Reference – Not a Forecast" + history table.
 18. Change the Planting date to ~7 weeks ago → **Generate** → forecast price at harvest with range and selling suggestion.
 19. Open **All published durations** expander.
 20. Close the browser tab; press **Ctrl+C** in the console to stop.

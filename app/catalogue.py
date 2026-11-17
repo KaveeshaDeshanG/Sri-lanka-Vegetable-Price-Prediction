@@ -9,7 +9,7 @@ easy to confuse, so they get display names: the model's "Brinjal" is HARTI's "Eg
 which HARTI lists separately from its "Brinjals" row.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
@@ -176,20 +176,111 @@ def data_version(folders: tuple[str, ...] = ("data/raw", "models")) -> str:
     return hashlib.sha256("|".join(stamps).encode()).hexdigest()[:16]
 
 
-def latest_update(path: str | Path = "data/raw/update_log.jsonl") -> dict | None:
-    """The last line scripts/daily_update.py appended, if any."""
+def _update_runs(path: str | Path) -> list[dict]:
+    """Every readable line of scripts/daily_update.py's log, oldest first."""
+    import json
+
     try:
         lines = Path(path).read_text(encoding="utf-8").strip().splitlines()
     except OSError:
-        return None
-    import json
-
-    for line in reversed(lines):
+        return []
+    runs = []
+    for line in lines:
         try:
-            return json.loads(line)
+            entry = json.loads(line)
         except ValueError:
             continue
-    return None
+        if isinstance(entry, dict):
+            runs.append(entry)
+    return runs
+
+
+def _succeeded(run: dict) -> bool:
+    # Lines written before failures were recorded have no status: only completed runs were logged then.
+    # "partial" runs completed too; the sources they couldn't check are in run["sources"].
+    return run.get("status", "ok") in ("ok", "partial")
+
+
+def latest_update(path: str | Path = "data/raw/update_log.jsonl") -> dict | None:
+    """The last update that completed (failed attempts are skipped), if any."""
+    return next((run for run in reversed(_update_runs(path)) if _succeeded(run)), None)
+
+
+# The scheduled check runs every 3 hours; a day without a successful check means it isn't running.
+UPDATE_OVERDUE_HOURS = 24
+# HARTI publishes Dambulla prices every day (its longest gap in 2026 was 4 days).
+HARTI_BEHIND_DAYS = 3
+
+
+@dataclass(frozen=True)
+class UpdateStatus:
+    last_success: pd.Timestamp | None  # when the last completed check finished
+    newest_listed: pd.Timestamp | None  # newest HARTI bulletin the source listed at that check
+    last_attempt_failed: bool
+    last_error: str | None
+    overdue: bool  # no completed check for UPDATE_OVERDUE_HOURS
+    # Per-source results of the last completed check ({} for runs logged before sources were recorded).
+    sources: dict = field(default_factory=dict)
+
+
+def update_status(path: str | Path = "data/raw/update_log.jsonl", now=None) -> UpdateStatus:
+    """What the data-update log says about the latest checks of the official sources."""
+    runs = _update_runs(path)
+    now = pd.Timestamp(now or pd.Timestamp.now())
+    success = next((run for run in reversed(runs) if _succeeded(run)), None)
+    last = runs[-1] if runs else None
+    finished = pd.Timestamp(success["finished_at"]) if success and success.get("finished_at") else None
+    listed = (success or {}).get("harti", {}).get("newest_listed")
+    return UpdateStatus(
+        last_success=finished,
+        newest_listed=pd.Timestamp(listed) if listed and listed != "unknown" else None,
+        last_attempt_failed=last is not None and not _succeeded(last),
+        last_error=last.get("error") if last is not None and not _succeeded(last) else None,
+        overdue=finished is None or (now - finished) > pd.Timedelta(hours=UPDATE_OVERDUE_HOURS),
+        sources=(success or {}).get("sources", {}),
+    )
+
+
+def update_notice(status: UpdateStatus, latest_observation, now=None) -> tuple[str, str]:
+    """(level, message) for a page: 'warning' when the data may be behind the official source, else 'info'.
+
+    Separates the cases honestly: the source hasn't published anything newer (the data is as
+    current as it can be), the check failed, or no recent check has run at all.
+    """
+    now = pd.Timestamp(now or pd.Timestamp.now())
+    latest = pd.Timestamp(latest_observation).normalize()
+    age = (now.normalize() - latest).days
+    checked = f"last successful check {status.last_success:%Y-%m-%d %H:%M}" if status.last_success is not None else "no successful check recorded"
+    if status.last_attempt_failed:
+        return "warning", (
+            f"The latest attempt to check the official sources failed ({status.last_error}); {checked}. "
+            f"Showing the stored data, newest price {latest.date()} ({age} day(s) old)."
+        )
+    harti = status.sources.get("harti", {})
+    if harti.get("status") == "failed":
+        return "warning", (
+            f"HARTI couldn't be checked at the last update ({harti.get('error', 'no details')}). Showing the stored "
+            f"HARTI data, newest price {latest.date()} ({age} day(s) old); newer bulletins may exist."
+        )
+    if status.overdue:
+        return "warning", (
+            f"The official sources haven't been checked for over {UPDATE_OVERDUE_HOURS} hours ({checked}), so newer "
+            f"HARTI prices may exist. Newest stored price: {latest.date()} ({age} day(s) old). Use **Check for new "
+            "official data** on the Home page."
+        )
+    if age > HARTI_BEHIND_DAYS:
+        source_has_nothing_newer = status.newest_listed is not None and status.newest_listed <= latest
+        if source_has_nothing_newer:
+            return "warning", (
+                f"The newest price is {age} days old ({latest.date()}): HARTI hasn't published a newer bulletin yet "
+                f"({checked}). Forecasts start from {latest.date()}, not today."
+            )
+        return "warning", (
+            f"The newest price is {age} days old ({latest.date()}), although HARTI lists a bulletin for "
+            f"{status.newest_listed.date() if status.newest_listed is not None else 'a later date'} ({checked}). "
+            "That bulletin may not include this series."
+        )
+    return "info", f"Data is up to date with the official source ({checked}; newest HARTI bulletin listed {status.newest_listed.date() if status.newest_listed is not None else 'unknown'})."
 
 
 def load_manifest(path: str | Path = "data/raw/data_manifest.json") -> dict | None:

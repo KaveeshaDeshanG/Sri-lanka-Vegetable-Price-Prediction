@@ -291,19 +291,46 @@ Screenshots are in `docs/screenshots/`.
 - **Model Performance:** the direct forecaster's accuracy, the earlier models, and comparisons with
   the baseline, all read from the saved reports.
 - **Price History:** each vegetable's recorded prices and weather, with a date range and table view.
-- **Cultivation Planner:** for 18 crop entries (17 crops; beans has bush and vine types), the expected harvest window from a planting date, the
-  forecast price around it with a measured likely range, and a suggested selling day. Harvest
+- **Cultivation Planner:** for 77 crop and variety entries (24 crops, 17 of them with a HARTI price series), the expected
+  harvest window from a start date and, where the harvest falls within 30 days of the latest HARTI Dambulla price, the
+  forecast price around it. Before you generate a plan it states the latest start date that still gets a forecast.
+  The plan names the HARTI record the forecast starts from and the weather region the model uses. The weather
+  selector only changes the weather panel. The likely range is measured on all vegetables together. A selling day is
+  suggested only when the forecast covers the whole harvest window. Harvest
   timing is the Department of Agriculture's published guidance (`data/reference/`), not a model:
-  no planting and harvest records exist to train one. Beyond the forecaster's 30-day reach, the page
-  shows earlier years' prices for the same weeks instead. `reports/CULTIVATION_DATA_PLAN.md` explains
+  no planting and harvest records exist to train one. Every plan has a section 3, "Price at harvest", that leads
+  with one labelled price, by priority: a **Model Forecast** (harvest within the forecaster's 30-day reach); for a
+  harvest window that has passed, the **actual prices recorded** in it; beyond the reach (45, 90, 180, 365 days…), a
+  **Historical Seasonal Price Reference – Not a Forecast** (the median of HARTI Dambulla prices in the same weeks,
+  harvest dates ± 7 days, of the 5 most recent earlier years, with the count, years, range and median/average;
+  at least 10 prices in 3 years); otherwise the **Latest Available Actual Price – Not a Future Prediction**, with its
+  date and age. A crop with no HARTI series gets **No Verified Price Available** and the missing source, never Rs 0
+  or another vegetable's price. The forecaster itself is unchanged. `reports/CULTIVATION_DATA_PLAN.md` explains
   the data a trained model would need.
+
+The Predict page offers two data sources:
 
 | Data source | What it uses | Model |
 |---|---|---|
-| Historical dataset (real) | The CSVs in `data/raw/`. The default. | Direct forecaster |
-| Latest HARTI Data (real) | The same, plus HARTI's newest bulletin, with any gap filled from its archive. | Direct forecaster |
-| Upload my own CSV | `date`, `vegetable`, `market`, `price`; weather and fuel columns are optional. | Earlier model, or a sandbox model |
-| Bundled sample (synthetic) | The sample data. | Temporary sandbox model, saved to `models/demo` |
+| **Latest Real Data Prediction** (the default) | The official records in `data/raw/`, kept current by `scripts/daily_update.py` (every 3 hours, or **Check official sources now**) | Direct forecaster |
+| **Upload CSV** | Only your file: `date`, `vegetable`, `market`, `price`; weather and fuel columns are optional. Never mixed with official data. | Earlier model, or a sandbox model |
+
+Latest Real Data Prediction has five sections:
+1. **Official source status:** for HARTI, CBSL and DCS, the newest publication found, the last check,
+   whether new data arrived, a failed check or import problem, and whether the source is behind schedule.
+2. **Latest collected data:** the newest HARTI Dambulla price of every vegetable, then the selected
+   vegetable's records source by source: HARTI Dambulla (the forecaster's series), HARTI's other markets
+   (forecaster inputs), CBSL and DCS (reference only, matched through `data/reference/source_item_map.csv`).
+   Each record shows its observation and publication date, market, price type, unit, minimum, maximum,
+   average or midpoint, document link and collection time. The exact record the forecast starts from is named.
+3. **Vegetable and market:** Dambulla, wholesale, Rs per kg.
+4. **Prediction:** 1, 7, 14 or 30 days ahead (or another date within 30 days), plus a table of all four
+   with the accuracy measured for each range.
+5. **Data freshness and warnings.**
+
+CBSL and DCS records are shown, never used by the model: their collectors, price types and periods
+differ from HARTI's. The earlier "Bundled sample data" and live "Latest HARTI Data" options are no
+longer offered; their code remains in `app/services.py` and is still tested.
 
 A sandbox model never overwrites a production model, and `Predictor.load()` refuses a model, encoder
 and feature list from different training runs.
@@ -377,24 +404,25 @@ known fuel price is carried forward and the page says so.
 
 ### Daily updates
 
-The "Latest HARTI Data" option above reads a bulletin while the page is open; it saves nothing.
 The stored datasets are kept current by `scripts/daily_update.py`, which:
-- adds every newly published HARTI bulletin and CBSL Daily Price Report;
-- extends the weather and fuel prices;
-- backs up each file before changing it;
-- never changes stored rows.
+- adds every newly published HARTI bulletin, CBSL Daily Price Report and DCS weekly bulletin;
+- extends the weather and fuel prices, and the other markets' min-max ranges (once
+  `scripts/build_market_price_ranges.py` has built them);
+- checks each source separately: one that can't be reached is recorded as failed and the others
+  are still checked (exit code 4);
+- backs up each file before changing it, and never changes stored rows.
 
-`scripts/run_daily_update.bat` runs it for the Windows Task Scheduler, every day at 18:30:
+The Windows task `VegetablePriceUpdate` runs it every 3 hours (`scripts/run_daily_update.bat`):
 
 ```bat
-schtasks /Create /TN "VegetablePriceDailyUpdate" /TR "\"<project folder>\scripts\run_daily_update.bat\"" /SC DAILY /ST 18:30 /F
-schtasks /Query /TN "VegetablePriceDailyUpdate"
-schtasks /Delete /TN "VegetablePriceDailyUpdate" /F
+schtasks /Create /TN "VegetablePriceUpdate" /TR "\"<project folder>\scripts\run_daily_update.bat\"" /SC HOURLY /MO 3 /ST 07:00 /F
+schtasks /Query /TN "VegetablePriceUpdate" /V /FO LIST
+schtasks /Delete /TN "VegetablePriceUpdate" /F
 ```
 
-Output goes to `logs/daily_update.log`, and the Home page shows the last update. A full rebuild of
-every bulletin since 2015 is `scripts/update_data.py`. Details: `reports/DATA_SOURCES.md`, "Daily
-updates".
+Output goes to `logs/daily_update.log`; each run, with every source's status, is a line in
+`data/raw/update_log.jsonl`, which the Home and Predict pages read. A full rebuild of every bulletin
+since 2015 is `scripts/update_data.py`. Details: `reports/DATA_SOURCES.md`, "Daily updates".
 
 ## 11. Gaps in the data
 
@@ -404,7 +432,8 @@ it is. After that, it refuses to forecast rather than guess.
 The earlier models' lag features need a price on an exact earlier date, but HARTI has no Dambulla
 reading on some days. For them, a missing day in the trailing 30 days is filled in this order:
 
-1. A real archived bulletin, when using Latest HARTI Data.
+1. A real archived bulletin, when the live bulletin is used (the services behind the former
+   "Latest HARTI Data" option).
 2. A linear estimate between surrounding real prices, tagged `IMPUTED_HISTORICAL`.
 
 Estimates exist only in memory, are never written to disk, and are listed on the page each time they
@@ -416,7 +445,7 @@ Eliya), whose result then rests mostly on estimates.
 **Real data:** the direct forecaster reaches up to 30 days after the latest price. Error still grows
 with distance (about 25% at 22-30 days), so treat distant forecasts as rough guides.
 
-**Sample and uploaded data:** a distant date is reached by predicting one day at a time and feeding
+**Uploaded data:** a distant date is reached by predicting one day at a time and feeding
 each prediction back in. Forecast rows are tagged `FORECAST` and exist only in memory. The furthest
 reachable date is today + 45 days + the 14-day weather lag, and beyond that the forecast is refused.
 

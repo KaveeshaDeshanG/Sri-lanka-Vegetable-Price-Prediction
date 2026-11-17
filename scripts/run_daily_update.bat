@@ -4,9 +4,13 @@ rem Adds newly published HARTI and CBSL prices, weather and fuel prices to data\
 rem Output is appended to logs\daily_update.log. Exit code 2 means a new HARTI bulletin couldn't
 rem be read (its layout may have changed); 3 means another update was already running.
 rem
-rem Register it once (runs every day at 18:30), from a Command Prompt in this folder:
-rem   schtasks /Create /TN "VegetablePriceDailyUpdate" /TR "\"%CD%\scripts\run_daily_update.bat\"" /SC DAILY /ST 18:30 /F
-rem Remove it with:  schtasks /Delete /TN "VegetablePriceDailyUpdate" /F
+rem Registered on 2026-11-15 as the task "VegetablePriceUpdate": every 3 hours from 07:00, and as soon
+rem as possible after a start missed while the PC was off. HARTI uploads its bulletins at irregular
+rem times, 1-3 days late, so checking several times a day picks them up promptly; a run that finds
+rem nothing new takes seconds and changes nothing. To register it again, from a Command Prompt in this folder:
+rem   schtasks /Create /TN "VegetablePriceUpdate" /TR "\"%CD%\scripts\run_daily_update.bat\"" /SC HOURLY /MO 3 /ST 07:00 /F
+rem Check it with:   schtasks /Query /TN "VegetablePriceUpdate" /V /FO LIST
+rem Remove it with:  schtasks /Delete /TN "VegetablePriceUpdate" /F
 
 setlocal
 cd /d "%~dp0.."

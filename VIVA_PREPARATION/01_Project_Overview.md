@@ -51,7 +51,8 @@ vegetable at the Dambulla market 1 to 30 days ahead**, shown in a **Streamlit** 
 
 **Implemented and working (tested):**
 - Next-day and 1–30-day forecasts for Dambulla wholesale prices (Predict page).
-- Four data sources on the Predict page: stored real data, the latest HARTI bulletin downloaded live, a synthetic sample, and your own CSV upload.
+- Two data sources on the Predict page (since 15 Nov 2026): **Latest Real Data Prediction** (source status for HARTI, CBSL and DCS, each source's collected records, the exact starting record, forecasts at 1/7/14/30 days) and **Upload CSV**.
+- Automatic checks of HARTI, CBSL and DCS every 3 hours (Windows task `VegetablePriceUpdate`), each source logged separately.
 - Model Performance page comparing the model with the naive baseline.
 - Price History for HARTI (11 markets), CBSL (wholesale and retail) and DCS (retail), always kept separate.
 - Cultivation Planner (planting date → harvest window → forecast price where possible).
@@ -61,7 +62,7 @@ vegetable at the Dambulla market 1 to 30 days ahead**, shown in a **Streamlit** 
 - No real-time price feed (none exists publicly in Sri Lanka). Data is as current as the latest bulletin.
 - Forecasts only for **Dambulla** (other markets are inputs only).
 - No database, no user login, not deployed online (runs on your own PC).
-- The daily update is **not** registered in Windows Task Scheduler automatically — you run it or register it yourself.
+- The update runs every 3 hours only while the laptop is on and you are logged in (Windows task `VegetablePriceUpdate`, registered 15 Nov 2026).
 - The model has **not** been retrained on the full 2015–2026 history (`scripts/retrain_if_better.py` exists but was never run).
 - No ARIMA / LSTM / SHAP. A direct production-region-vs-market-weather comparison was not run.
 

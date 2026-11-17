@@ -184,12 +184,14 @@ def canonical_market_name(header: object) -> str | None:
     return None
 
 
-def parse_all_markets(table_data: list[list], bulletin_date: pd.Timestamp) -> pd.DataFrame:
+def parse_all_markets(table_data: list[list], bulletin_date: pd.Timestamp, keep_range: bool = False) -> pd.DataFrame:
     """Every market's readings from one bulletin's table.
 
     `published` is the bulletin's date: the day a reading actually became known. Some
     markets are always reported a day late, so a reading's own `reported` date can't be used
     to decide what a forecast made on a given day could have seen.
+
+    keep_range: also return the published `low` and `high` (price is always their midpoint).
     """
     date_row, market_row = table_data[0], table_data[1]
     records = []
@@ -209,9 +211,11 @@ def parse_all_markets(table_data: list[list], bulletin_date: pd.Timestamp) -> pd
                         "market": market,
                         "vegetable": vegetable,
                         "price": sum(price_range) / 2,
+                        **({"low": price_range[0], "high": price_range[1]} if keep_range else {}),
                     }
                 )
-    return pd.DataFrame(records, columns=["published", "reported", "market", "vegetable", "price"])
+    columns = ["published", "reported", "market", "vegetable", "price"] + (["low", "high"] if keep_range else [])
+    return pd.DataFrame(records, columns=columns)
 
 
 def cell_text(words: list, cell_box: tuple | None) -> str:

@@ -19,9 +19,11 @@ from app.cultivation import (
     add_duration,
     build_plan,
     harvest_window,
+    latest_start_in_reach,
     load_crop_timings,
     load_error_bands,
     same_season_history,
+    select_price,
     suggest_selling_day,
 )
 from scripts.forecast_error_bands import error_bands
@@ -228,7 +230,8 @@ def test_status_depends_on_the_forecasts_reach(start, status):
 def test_beyond_reach_shows_earlier_years_not_a_forecast():
     plan = build_plan(_timing(), "Carrot", "2026-11-09", _actual(), None, None, None, today=pd.Timestamp("2026-11-09"))
     assert plan.forecast is None and plan.window_forecast is None and plan.best_day is None
-    assert list(plan.same_season["Period"]) == ["2026-01-08 to 2026-01-18", "2025-01-08 to 2025-01-18", "2024-01-08 to 2024-01-18"]
+    # the harvest window (8-18 Jan) widened by SEASONAL_PAD_DAYS on each side, in each earlier year
+    assert list(plan.same_season["Period"]) == ["2026-01-01 to 2026-01-25", "2025-01-01 to 2025-01-25", "2024-01-01 to 2024-01-25"]
 
 
 def test_a_passed_window_shows_the_prices_actually_recorded_in_it():
@@ -366,3 +369,177 @@ def test_planned_harvest_price_is_the_trained_forecasters_output():
     assert plan.window_forecast.iloc[0]["price"] == pytest.approx(direct)
     expected_low = direct * np.exp(json.loads((ROOT / "reports/metrics/forecast_error_bands.json").read_text())["bands"][6]["q10"])
     assert plan.window_forecast.iloc[0]["low"] == pytest.approx(expected_low)
+
+
+# --- reach and coverage (fixes from the Cultivation Planner audit, 2026-11-15) ---------------------
+
+
+class _PathForecaster:
+    """Stands in for the forecaster: a flat 100 Rs/kg path, so only the plan's own logic is tested."""
+
+    def forecast(self, origin_rows, vegetable, origin, horizons):
+        return pd.DataFrame(
+            {
+                "horizon": horizons,
+                "target_date": [origin + pd.Timedelta(days=h) for h in horizons],
+                "predicted_price": [100.0 + h for h in horizons],
+                "last_price": 100.0,
+            }
+        )
+
+
+@pytest.mark.parametrize("timing", TIMINGS, ids=lambda t: f"{t.crop}-{t.variety}")
+def test_latest_start_in_reach_is_the_last_date_whose_harvest_is_forecast(timing):
+    end = pd.Timestamp("2026-12-12")
+    start = latest_start_in_reach(timing, end)
+    assert add_duration(start, timing.min_value, timing.unit) <= end
+    assert add_duration(start + pd.Timedelta(days=1), timing.min_value, timing.unit) > end
+
+
+def test_latest_start_in_reach_examples():
+    sanjaya = next(t for t in TIMINGS if t.variety == "Sanjaya")
+    new_kuroda = next(t for t in TIMINGS if t.variety == "New Kuroda")
+    assert latest_start_in_reach(sanjaya, "2026-12-12") == pd.Timestamp("2026-10-28")  # 45 days
+    assert latest_start_in_reach(new_kuroda, "2026-12-12") == pd.Timestamp("2026-08-24")  # 110 days
+
+
+def test_a_partly_forecast_window_gets_no_selling_suggestion():
+    """Found in the audit: Manioc's advice rested on 23 of its window's 93 days."""
+    plan = build_plan(_timing(), "Carrot", "2026-10-01", _actual(), _PathForecaster(), object(), None, today=pd.Timestamp("2026-11-09"))
+    assert plan.status == "partly_in_reach"
+    assert 0 < plan.forecast_days < plan.window_days and not plan.fully_forecast
+    assert plan.best_day is None and not plan.clear_advantage
+    assert any(f"covers only {plan.forecast_days} of the {plan.window_days} days" in w for w in plan.warnings)
+
+
+def test_a_fully_forecast_window_still_gets_a_suggestion():
+    plan = build_plan(_timing(), "Carrot", "2026-09-15", _actual(), _PathForecaster(), object(), None, today=pd.Timestamp("2026-11-09"))
+    assert plan.status == "in_reach" and plan.fully_forecast and plan.forecast_days == plan.window_days == 11
+    assert plan.best_day is not None and plan.best_day["date"] == plan.harvest_end  # the path rises
+
+
+# --- the price a plan leads with, for every harvest distance (fix of 2026-11-15) ------------------
+# Root cause of the missing prices: beyond the forecaster's 30-day reach, and for stale series, the
+# plan's price was a hard-coded "Not available", and the earlier-years table used only the exact
+# harvest days (2-10 prices in all for a one-day harvest). select_price() now always leads with a
+# labelled price, or says why none exists.
+
+HORIZONS = [1, 7, 14, 30, 45, 60, 90, 120, 180, 365]  # days after the latest recorded price
+
+
+@pytest.fixture(scope="module")
+def real():
+    return _real_inputs()
+
+
+def _days_timing(days: int, labels=("x",)) -> CropTiming:
+    return CropTiming("Test crop", "Crop guidance", list(labels), days, days, "days", "planting", "harvest", "", "crop guidance", "https://doa.gov.lk/x/", "text")
+
+
+def _independent_seasonal(prices: pd.DataFrame, harvest: pd.Timestamp) -> tuple[float, int, list[int]]:
+    """Median, count and years of the same weeks (harvest ± 7 days) in the 5 most recent earlier years with prices."""
+    windows = []
+    for years_back in range(1, 13):
+        day = date(harvest.year - years_back, harvest.month, min(harvest.day, 28) if harvest.month == 2 else harvest.day)
+        low, high = pd.Timestamp(day - timedelta(days=7)), pd.Timestamp(day + timedelta(days=7))
+        found = prices[(prices["date"] >= low) & (prices["date"] <= high) & (prices["price"] > 0)]
+        if len(found):
+            windows.append(found)
+    used = pd.concat(windows[:5])
+    return float(used["price"].median()), len(used), sorted(used["date"].dt.year.unique().tolist())
+
+
+@pytest.mark.parametrize("vegetable", ["Beans", "Carrot", "Manioc"])
+@pytest.mark.parametrize("days", HORIZONS)
+def test_every_harvest_distance_gets_a_correctly_labelled_price(real, vegetable, days):
+    history, origin_rows, forecaster = real
+    actual = history[(history["vegetable"] == vegetable) & history["price"].notna()][["date", "price"]].sort_values("date")
+    latest = actual["date"].max()
+    harvest = latest + pd.Timedelta(days=days)
+    timing = _days_timing(60, [vegetable])
+    plan = build_plan(timing, vegetable, harvest - pd.Timedelta(days=60), actual, forecaster, origin_rows, None, today=latest)
+    assert plan.harvest_start == harvest  # the planting-to-harvest arithmetic is unchanged
+    result = select_price(plan, actual, latest)
+    assert result.price is not None and result.price > 0
+    assert (result.source, result.market, result.price_type, result.unit) == ("HARTI daily bulletin", "Dambulla", "Wholesale", "Rs/kg")
+    if days <= MAX_HORIZON_DAYS:
+        direct = forecaster.forecast(origin_rows, vegetable, latest, [days])["predicted_price"].iloc[0]
+        assert result.kind == "model_forecast" and result.label == "Model Forecast"
+        assert result.horizon == days and result.date == harvest
+        assert result.price == pytest.approx(direct)
+    else:
+        # never a model output beyond its reach: nothing was even requested from the forecaster
+        assert plan.forecast is None and plan.window_forecast is None
+        assert result.kind == "seasonal_reference"
+        assert result.label == "Historical Seasonal Price Reference – Not a Forecast"
+        median, count, years = _independent_seasonal(actual, harvest)
+        assert result.price == pytest.approx(median) and result.observations == count and result.years == years
+        assert result.observations >= 10 and len({p.split(" to ")[0][:4] for p in result.period.split("; ")}) >= 3
+        assert result.low > 0 and result.low <= result.median <= result.high
+        assert "not a prediction" in result.explanation
+
+
+@pytest.mark.parametrize("days", HORIZONS)
+def test_a_stale_series_never_gets_a_forecast(real, days):
+    history, origin_rows, forecaster = real
+    series = "Cabbage (Nuwara Eliya)"
+    actual = history[(history["vegetable"] == series) & history["price"].notna()][["date", "price"]].sort_values("date")
+    today = pd.Timestamp("2026-11-15")
+    assert (today - actual["date"].max()).days > MAX_HORIZON_DAYS  # the precondition: its last price is from 2025-07-12
+    harvest = today + pd.Timedelta(days=days)
+    plan = build_plan(_days_timing(90, [series]), series, harvest - pd.Timedelta(days=90), actual, forecaster, origin_rows, None, today=today)
+    result = select_price(plan, actual, today)
+    assert plan.stale and plan.forecast is None
+    assert result.kind in ("seasonal_reference", "latest_actual") and result.price > 0
+    assert "more than 30 days old" in result.explanation
+    if result.kind == "latest_actual":
+        assert result.date == pd.Timestamp("2025-07-12") and result.age_days == (today - pd.Timestamp("2025-07-12")).days
+
+
+def test_a_crop_with_no_price_series_gets_an_explanation_not_a_price():
+    cauliflower = next(t for t in TIMINGS if t.crop == "Cauliflower")
+    plan = build_plan(cauliflower, None, "2026-11-15", None, None, None, None, today=pd.Timestamp("2026-11-15"))
+    result = select_price(plan, None, "2026-11-15")
+    assert result.kind == "unavailable" and result.price is None and result.label == "No Verified Price Available"
+    assert "no price series" in result.explanation and "harti_prices.csv" in result.explanation
+
+
+def test_too_few_seasonal_prices_fall_back_to_the_latest_actual_price():
+    # prices only from mid-2025 on: the same weeks of earlier years hold one year's prices at most
+    actual = _actual(start="2025-06-01", end="2026-11-06")
+    plan = build_plan(_timing(), "Carrot", "2026-11-09", actual, None, None, None, today=pd.Timestamp("2026-11-09"))
+    record = {"date": pd.Timestamp("2026-11-06"), "price": 120.0, "low": 110.0, "high": 130.0}
+    result = select_price(plan, actual, "2026-11-09", record)
+    assert not plan.seasonal["sufficient"]
+    assert result.kind == "latest_actual" and result.label == "Latest Available Actual Price – Not a Future Prediction"
+    assert (result.price, result.low, result.high, result.age_days) == (120.0, 110.0, 130.0, 3)
+    assert f"Only {plan.seasonal['observations']} price(s)" in result.explanation
+
+
+def test_no_same_season_prices_at_all_still_shows_the_latest_price():
+    actual = _actual(start="2026-09-01", end="2026-11-06")
+    plan = build_plan(_timing(), "Carrot", "2026-11-09", actual, None, None, None, today=pd.Timestamp("2026-11-09"))
+    result = select_price(plan, actual, "2026-11-09")
+    assert result.kind == "latest_actual" and result.price == actual["price"].iloc[-1]
+    assert "No price was recorded in the same weeks" in result.explanation
+
+
+def test_zero_coded_prices_are_never_counted_as_rs_0():
+    actual = _actual()
+    january = actual["date"].dt.month == 1
+    actual.loc[january & actual["date"].dt.day.between(10, 20), "price"] = 0.0  # coded 0: no price published
+    actual.loc[january & (actual["date"].dt.day == 5), "price"] = np.nan
+    plan = build_plan(_timing(), "Carrot", "2026-11-09", actual, None, None, None, today=pd.Timestamp("2026-11-09"))
+    result = select_price(plan, actual, "2026-11-09")
+    # harvest 8-18 Jan 2027, so the same weeks are 1-25 January: 1-4, 6-9 and 21-25 January keep real prices
+    assert result.kind == "seasonal_reference" and result.low > 0
+    assert result.observations == 3 * 13  # 2024, 2025 and 2026
+    assert (plan.same_season["Lowest (Rs/kg)"] > 0).all()
+
+
+def test_a_passed_window_leads_with_the_prices_recorded_in_it():
+    actual = _actual()
+    plan = build_plan(_timing(), "Carrot", "2026-07-01", actual, None, None, None, today=pd.Timestamp("2026-11-09"))
+    result = select_price(plan, actual, "2026-11-09")
+    recorded = actual[actual["date"].between("2026-08-30", "2026-09-09")]["price"]
+    assert result.kind == "recorded_actual" and result.price == recorded.median() and result.observations == len(recorded)

@@ -17,6 +17,7 @@ import streamlit as st
 
 from app import ui
 from app.catalogue import data_version, freshness, latest_update, load_manifest
+from app.data_refresh import run_data_update
 from app.services import forecaster_problems, historical_dataset_problems
 from config.config_loader import ConfigLoader
 from src.models.direct_forecaster import DirectForecaster
@@ -116,7 +117,7 @@ else:
     if _harti:
         _fresh = freshness(_harti["latest_observation"])
         if _fresh.level != "current":
-            st.warning(_fresh.message + " Run `scripts/update_data.py` to import newer bulletins.")
+            st.warning(_fresh.message + " Use **Check for new official data** below (or run `scripts/daily_update.py`) to import newer bulletins.")
     st.caption(f"Read from the files themselves when they were last built ({_manifest['generated_at'][:10]}). Wholesale and retail prices are separate datasets.")
 
 _update = latest_update(ConfigLoader(CONFIG_PATH).get("paths.raw_data_dir", "data/raw") + "/update_log.jsonl")
@@ -129,9 +130,26 @@ if _update is not None:
     ]
     if _update.get("cbsl", {}).get("days_added"):
         _parts.append(f"CBSL reports added: {', '.join(_update['cbsl']['days_added'][-3:])}")
-    st.caption("; ".join(_parts) + ". Updates run daily from official bulletins (`scripts/daily_update.py`); prices are not real-time.")
+    st.caption("; ".join(_parts) + ". Updates import newly published official bulletins (`scripts/daily_update.py`, run by the scheduled task or the button below); prices are not real-time.")
     if _harti.get("unreadable"):
         st.warning(f"HARTI bulletin(s) {', '.join(_harti['unreadable'])} couldn't be read, so their prices are missing. The bulletin layout may have changed.")
+
+# Runs only when clicked: downloads newly published HARTI, CBSL and DCS bulletins plus weather and
+# fuel, appending to the datasets (with a backup first). Pages pick the new files up through data_version().
+_refresh = st.session_state.pop("data_refresh_result", None)
+if _refresh is not None:
+    getattr(st, _refresh.level)(_refresh.message)
+    if _refresh.output_tail and _refresh.level != "success":
+        with st.expander("Update log (last lines)"):
+            st.code(_refresh.output_tail, language="text")
+if st.button(
+    "Check for new official data",
+    help="Downloads any HARTI, CBSL or DCS bulletins published since the last update, plus weather and fuel prices. "
+    "Takes about a minute. Existing data is backed up first and never overwritten.",
+):
+    with st.spinner("Checking HARTI, CBSL, DCS, Open-Meteo and CEYPETCO for newly published data..."):
+        st.session_state["data_refresh_result"] = run_data_update()
+    st.rerun()
 _decision_path = Path(ConfigLoader(CONFIG_PATH).get("paths.metrics_dir", "reports/metrics")) / "retrain_decision.json"
 try:
     _decision = json.loads(_decision_path.read_text(encoding="utf-8"))
@@ -139,9 +157,10 @@ except (OSError, ValueError):
     _decision = None
 if _decision:
     _verdict = "accepted and saved" if _decision.get("saved") else ("accepted (dry run, not saved)" if _decision.get("accepted") else "rejected; the saved model was kept")
+    _gain = _decision["overall"]["gain_pct"]
     st.caption(
         f"Last retraining check {_decision['decided_at'][:10]}: {_verdict}. Held-out prices {_decision['holdout_start']} to "
-        f"{_decision['holdout_end']}, MAE {_decision['overall']['gain_pct']:.1f}% lower than holding the last price."
+        f"{_decision['holdout_end']}: the candidate's MAE was {abs(_gain):.1f}% {'lower' if _gain >= 0 else 'higher'} than holding the last price."
         + (f" Reasons: {'; '.join(_decision['reasons_rejected'])}." if _decision.get("reasons_rejected") else "")
     )
 

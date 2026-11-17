@@ -195,17 +195,27 @@ _MATPLOTLIB_STYLE = {
 }
 
 
-def apply_theme() -> None:
-    """Call once per page, right after st.set_page_config()."""
+def apply_theme(page_sources: tuple[str, ...] | None = None) -> None:
+    """Call once per page, right after st.set_page_config().
+
+    page_sources: the sources (names from _SOURCE_FILES) this page actually uses. The sidebar then
+    lists only those, under "Used on this page", so a page never appears to use a source it doesn't.
+    Omitted, it lists every source the app has data for.
+    """
     mpl.rcParams.update(_MATPLOTLIB_STYLE)
     st.markdown(_CSS, unsafe_allow_html=True)
     if (_ASSETS / "logo.svg").exists():
         st.logo(str(_ASSETS / "logo.svg"), icon_image=str(_ASSETS / "logo_icon.svg"), size="large")
-    rows = "".join(f'<div class="vp-side-row"><span class="vp-dot"></span>{escape(name)}</div>' for name in available_sources())
+    names = available_sources()
+    title = "Data sources"
+    if page_sources is not None:
+        names = [name for name in names if name in page_sources]
+        title = "Used on this page"
+    rows = "".join(f'<div class="vp-side-row"><span class="vp-dot"></span>{escape(name)}</div>' for name in names)
     st.sidebar.markdown(
         f"""
         <div class="vp-side-card">
-          <div class="vp-side-title">Data sources</div>
+          <div class="vp-side-title">{escape(title)}</div>
           {rows}
         </div>
         <div class="vp-side-foot">Dambulla wholesale market &middot; Ridge direct forecaster, 1&ndash;30 days ahead</div>
@@ -215,6 +225,10 @@ def apply_theme() -> None:
 
 
 # Source name -> the file that must exist for the app to be using it.
+SOURCE_HARTI = "HARTI daily bulletins (wholesale)"
+SOURCE_HORDI = "DOA HORDI crop guidance"
+SOURCE_WEATHER = "Open-Meteo weather"
+SOURCE_FUEL = "CEYPETCO fuel prices"
 _SOURCE_FILES = (
     ("HARTI daily bulletins (wholesale)", "paths.raw_files.harti_prices"),
     ("CBSL daily report (wholesale & retail)", "paths.raw_files.cbsl_daily_prices"),

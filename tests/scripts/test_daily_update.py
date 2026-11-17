@@ -188,3 +188,107 @@ def test_backups_keep_only_the_newest_folders(tmp_path):
     backup = Backup(tmp_path, keep=2)
     backup.prune()
     assert sorted(p.name for p in (tmp_path / "daily").iterdir()) == ["20260102_000000", "20260103_000000"]
+
+
+def test_a_failed_run_is_recorded_and_the_data_is_left_alone(tmp_path, monkeypatch):
+    """E.g. harti.gov.lk unreachable: exit code 1 and a 'failed' log line, never a fake success."""
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "update_log.jsonl").write_text(json.dumps({"status": "ok", "finished_at": "2026-11-15T11:48:03"}) + "\n", encoding="utf-8")
+    (raw / "harti_prices.csv").write_text("date,vegetable,market,price\n2026-11-12,Beans,Dambulla,430.0\n", encoding="utf-8")
+    before = (raw / "harti_prices.csv").read_bytes()
+
+    def unreachable(args):
+        raise ConnectionError("harti.gov.lk unreachable")
+
+    monkeypatch.setattr(daily_update, "run", unreachable)
+    monkeypatch.setattr(daily_update, "_resolve", lambda path: raw)
+    assert daily_update.main([]) == 1
+    lines = [json.loads(line) for line in (raw / "update_log.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert lines[0]["status"] == "ok"
+    assert lines[-1]["status"] == "failed" and "unreachable" in lines[-1]["error"]
+    assert (raw / "harti_prices.csv").read_bytes() == before
+
+
+def test_a_run_that_is_already_in_progress_is_not_recorded_as_failed(tmp_path, monkeypatch):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    monkeypatch.setattr(daily_update, "_resolve", lambda path: raw)
+    with single_run(raw / ".update.lock"):
+        assert daily_update.main([]) == 3
+    assert not (raw / "update_log.jsonl").exists()
+
+
+def test_cbsl_network_errors_are_reported_not_mistaken_for_unpublished_days(tmp_path, monkeypatch):
+    import requests
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+
+    def offline(day, session):
+        raise requests.exceptions.ConnectionError("www.cbsl.gov.lk unreachable")
+
+    monkeypatch.setattr(daily_update, "fetch_cbsl_report", offline)
+    summary = import_cbsl(raw, tmp_path / "cache", Backup(tmp_path / "backups", keep=3), pd.Timestamp("2026-11-02"), TODAY)
+    assert summary["days_added"] == [] and summary["not_published_yet"] == []
+    assert len(summary["request_errors"]) == 6 and "unreachable" in summary["request_errors"]["2026-11-09"]
+    # Nothing settled as "not published", so every day is asked again next time.
+    assert json.loads((raw / "cbsl_import_state.json").read_text())["not_published"] == []
+
+
+def test_newest_dcs_week_is_read_from_the_listed_file_names():
+    listing = [
+        {"link": "https://www.statistics.gov.lk/InflationAndPrices/StaticalInformation/retail/DCSB-WRP-2026-10-W4"},
+        {"link": "https://www.statistics.gov.lk/InflationAndPrices/StaticalInformation/retail/DCSB-WRP-2026-11-W1"},
+        {"link": "https://www.statistics.gov.lk/InflationAndPrices/StaticalInformation/retail/DCSB-WRP-2026-9-W3"},
+        {"link": "https://example/other.pdf"},
+    ]
+    assert daily_update.newest_dcs_week(listing) == "2026-11 week 1"
+    assert daily_update.newest_dcs_week([{"link": "https://example/other.pdf"}]) is None
+
+
+def _isolated_run(tmp_path, monkeypatch, harti, cbsl, dcs):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "data_manifest.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(daily_update, "_resolve", lambda path: raw)
+    monkeypatch.setattr(daily_update, "import_harti", harti)
+    monkeypatch.setattr(daily_update, "import_cbsl", cbsl)
+    monkeypatch.setattr(daily_update, "import_dcs", dcs)
+    monkeypatch.setattr(daily_update, "topup_weather", lambda *a: {})
+    monkeypatch.setattr(daily_update, "topup_fuel", lambda *a: "already current")
+    code = daily_update.main(["--today", "2026-11-15"])
+    entry = json.loads((raw / "update_log.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+    return code, entry
+
+
+def _cbsl_ok(*args):
+    return {"days_added": ["2026-11-13"], "not_published_yet": [], "unreadable": {}, "request_errors": {}, "newest_report": "2026-11-13"}
+
+
+def _dcs_ok(*args):
+    return {"listed": 736, "new_bulletins": 0, "unavailable": 0, "newest_listed": "2026-11 week 1"}
+
+
+def test_one_unreachable_source_does_not_stop_the_others(tmp_path, monkeypatch):
+    def harti_down(*args):
+        raise ConnectionError("www.harti.gov.lk unreachable")
+
+    code, entry = _isolated_run(tmp_path, monkeypatch, harti_down, _cbsl_ok, _dcs_ok)
+    assert code == 4 and entry["status"] == "partial"
+    sources = entry["sources"]
+    assert sources["harti"]["status"] == "failed" and "unreachable" in sources["harti"]["error"]
+    assert sources["cbsl"] == {**sources["cbsl"], "status": "ok", "newest_published": "2026-11-13", "new_records": 1}
+    assert sources["dcs"]["status"] == "ok" and sources["dcs"]["newest_published"] == "2026-11 week 1"
+
+
+def test_every_source_reported_when_all_are_checked(tmp_path, monkeypatch):
+    def harti_ok(*args):
+        return {"bulletins_listed": 3149, "newest_listed": "2026-11-12", "bulletins_read": 1, "dambulla_rows_added": 30,
+                "all_market_rows_added": 223, "unreadable": [], "download_failed": []}
+
+    code, entry = _isolated_run(tmp_path, monkeypatch, harti_ok, _cbsl_ok, _dcs_ok)
+    assert code == 0 and entry["status"] == "ok"
+    assert entry["sources"]["harti"]["newest_published"] == "2026-11-12" and entry["sources"]["harti"]["new_records"] == 253
+    assert {name: s["status"] for name, s in entry["sources"].items()} == {"harti": "ok", "cbsl": "ok", "weather": "ok", "fuel": "ok", "dcs": "ok"}
+    assert all("checked_at" in s for s in entry["sources"].values())

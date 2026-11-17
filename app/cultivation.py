@@ -9,7 +9,9 @@ Streamlit-free, so it can be tested with plain pytest. Three sources, each label
 - Prices up to 30 days after the latest recorded price come from the Ridge direct forecaster, with
   a likely range from its measured test-period errors (reports/metrics/forecast_error_bands.json).
 - Beyond that, there is no forecast. The planner shows recorded prices from the same weeks of
-  earlier years instead, and says that it is history, not a prediction.
+  earlier years instead (the harvest window widened by SEASONAL_PAD_DAYS on each side), and says
+  that it is history, not a prediction. select_price() picks the one price the plan leads with,
+  in a fixed order of priority, and labels what kind of price it is.
 
 Durations are kept in the unit the source uses and converted only when a date is calculated:
 days and weeks exactly (a week is 7 days), months as calendar months. No month is assumed to be
@@ -53,6 +55,28 @@ EVENTS = {
     "harvesting period": "harvesting period",
 }
 SAME_SEASON_YEARS = 12
+# "The same weeks" of an earlier year: the harvest window widened by a week on each side. A one-day
+# harvest window on its own matches at most one bulletin per year (none on a weekend or holiday),
+# which left the earlier-years reference with only 2-10 prices in all.
+SEASONAL_PAD_DAYS = 7
+# The headline seasonal reference uses the most recent years that have prices in those weeks, so a
+# decade-old price level (before the 2022 price rises) doesn't pull it down. Older years stay in the table.
+SEASONAL_REFERENCE_YEARS = 5
+# Fewer than this, and the seasonal reference is shown with its count but doesn't lead the plan.
+MIN_SEASONAL_YEARS = 3
+MIN_SEASONAL_OBSERVATIONS = 10
+
+PRICE_SOURCE = "HARTI daily bulletin"
+PRICE_MARKET = "Dambulla"
+PRICE_TYPE = "Wholesale"
+PRICE_UNIT = "Rs/kg"
+PRICE_KINDS = {
+    "model_forecast": "Model Forecast",
+    "recorded_actual": "Actual Recorded Price – Harvest Window Already Passed",
+    "seasonal_reference": "Historical Seasonal Price Reference – Not a Forecast",
+    "latest_actual": "Latest Available Actual Price – Not a Future Prediction",
+    "unavailable": "No Verified Price Available",
+}
 
 
 class CultivationReferenceError(Exception):
@@ -195,6 +219,21 @@ def harvest_window(timing: CropTiming, start_date) -> tuple[pd.Timestamp, pd.Tim
     return add_duration(start_date, timing.min_value, timing.unit), add_duration(start_date, timing.max_value, timing.unit)
 
 
+def latest_start_in_reach(timing: CropTiming, forecast_end) -> pd.Timestamp:
+    """The latest start date whose earliest harvest day still falls on or before forecast_end.
+
+    Searched day by day backwards (at most one year plus a month), so it uses add_duration()'s own
+    calendar rules rather than an approximation of them.
+    """
+    forecast_end = pd.Timestamp(forecast_end).normalize()
+    start = forecast_end
+    for _ in range(400):
+        if add_duration(start, timing.min_value, timing.unit) <= forecast_end:
+            return start
+        start -= pd.Timedelta(days=1)
+    raise ValueError(f"No start date reaches {forecast_end.date()} for {timing.duration_text}.")
+
+
 def load_error_bands(path: str | Path) -> dict[int, dict] | None:
     """Per-horizon quantiles of log(actual / forecast), or None if the report isn't usable."""
     try:
@@ -219,9 +258,24 @@ class CultivationPlan:
     recorded_in_window: pd.DataFrame | None = None  # recorded prices inside the harvest window
     best_day: dict | None = None
     clear_advantage: bool = False
-    same_season: pd.DataFrame | None = None
+    same_season: pd.DataFrame | None = None  # per earlier year, the same weeks (see SEASONAL_PAD_DAYS)
+    seasonal: dict | None = None  # seasonal_reference() summary
     warnings: list[str] = field(default_factory=list)
     stale: bool = False  # the series' latest price is too old to forecast from
+
+    @property
+    def window_days(self) -> int:
+        """Days in the harvest window, both ends included."""
+        return (self.harvest_end - self.harvest_start).days + 1
+
+    @property
+    def forecast_days(self) -> int:
+        """Harvest-window days the forecast actually covers."""
+        return 0 if self.window_forecast is None else len(self.window_forecast)
+
+    @property
+    def fully_forecast(self) -> bool:
+        return self.forecast_days > 0 and self.forecast_days == self.window_days
 
 
 def forecast_with_range(
@@ -252,12 +306,24 @@ def suggest_selling_day(window_forecast: pd.DataFrame) -> tuple[dict | None, boo
     return {"date": best["date"], "price": float(best["price"]), "low": best["low"], "high": best["high"]}, clear
 
 
-def same_season_history(actual: pd.DataFrame, harvest_start: pd.Timestamp, harvest_end: pd.Timestamp) -> pd.DataFrame:
-    """Recorded prices in the same calendar window of each earlier year that has any."""
+def _valid(actual: pd.DataFrame) -> pd.DataFrame:
+    """Rows with a real price: a missing or zero-coded value is not a price of Rs 0."""
+    prices = pd.to_numeric(actual["price"], errors="coerce")
+    return actual.assign(price=prices)[prices > 0]
+
+
+def same_season_history(
+    actual: pd.DataFrame, harvest_start: pd.Timestamp, harvest_end: pd.Timestamp, pad_days: int = 0
+) -> pd.DataFrame:
+    """Recorded prices in the same calendar window of each earlier year that has any.
+
+    pad_days widens the window on each side, so a one-day harvest is compared with the same weeks.
+    """
+    actual = _valid(actual)
     rows = []
     for years_back in range(1, SAME_SEASON_YEARS + 1):
-        start = harvest_start - pd.DateOffset(years=years_back)
-        end = harvest_end - pd.DateOffset(years=years_back)
+        start = harvest_start - pd.DateOffset(years=years_back) - pd.Timedelta(days=pad_days)
+        end = harvest_end - pd.DateOffset(years=years_back) + pd.Timedelta(days=pad_days)
         prices = actual.loc[actual["date"].between(start, end), "price"]
         if prices.empty:
             continue
@@ -271,6 +337,201 @@ def same_season_history(actual: pd.DataFrame, harvest_start: pd.Timestamp, harve
             }
         )
     return pd.DataFrame(rows, columns=["Period", "Days recorded", "Lowest (Rs/kg)", "Median (Rs/kg)", "Highest (Rs/kg)"])
+
+
+def seasonal_reference(
+    actual: pd.DataFrame, harvest_start: pd.Timestamp, harvest_end: pd.Timestamp, pad_days: int = SEASONAL_PAD_DAYS
+) -> dict:
+    """A summary of recorded prices in the same weeks of earlier years.
+
+    Uses the SEASONAL_REFERENCE_YEARS most recent earlier years that have prices in those weeks.
+    `sufficient` says whether that is enough (MIN_SEASONAL_YEARS years and MIN_SEASONAL_OBSERVATIONS
+    prices) for the reference to lead the plan.
+    """
+    actual = _valid(actual)
+    per_year = []
+    for years_back in range(1, SAME_SEASON_YEARS + 1):
+        start = harvest_start - pd.DateOffset(years=years_back) - pd.Timedelta(days=pad_days)
+        end = harvest_end - pd.DateOffset(years=years_back) + pd.Timedelta(days=pad_days)
+        rows = actual[actual["date"].between(start, end)]
+        if not rows.empty:
+            per_year.append((start, end, rows))
+    used = per_year[:SEASONAL_REFERENCE_YEARS]
+    recorded = pd.concat([r for _, _, r in used]) if used else actual.iloc[0:0]
+    prices = recorded["price"]
+    years = sorted(recorded["date"].dt.year.unique().tolist())
+    summary = {
+        "observations": len(prices),
+        "years": years,
+        "years_available": len(per_year),
+        "periods": [f"{start.date()} to {end.date()}" for start, end, _ in used],
+        "pad_days": pad_days,
+        "median": float(prices.median()) if len(prices) else None,
+        "mean": float(prices.mean()) if len(prices) else None,
+        "low": float(prices.min()) if len(prices) else None,
+        "high": float(prices.max()) if len(prices) else None,
+    }
+    summary["seasons"] = len(used)
+    summary["sufficient"] = len(used) >= MIN_SEASONAL_YEARS and len(prices) >= MIN_SEASONAL_OBSERVATIONS
+    return summary
+
+
+@dataclass
+class PriceResult:
+    """The one price a plan leads with, and exactly what kind of price it is."""
+
+    kind: str  # a key of PRICE_KINDS
+    price: float | None = None  # Rs/kg; None only for "unavailable"
+    low: float | None = None
+    high: float | None = None
+    median: float | None = None
+    mean: float | None = None
+    date: pd.Timestamp | None = None  # forecast date, or the actual observation date
+    horizon: int | None = None  # days after the latest recorded price (forecasts only)
+    period: str | None = None  # the dates a historical figure covers
+    observations: int | None = None
+    years: list[int] = field(default_factory=list)
+    age_days: int | None = None  # how old an actual observation is
+    explanation: str = ""
+    limitation: str | None = None
+    source: str = PRICE_SOURCE
+    market: str = PRICE_MARKET
+    price_type: str = PRICE_TYPE
+    unit: str = PRICE_UNIT
+
+    @property
+    def label(self) -> str:
+        return PRICE_KINDS[self.kind]
+
+
+def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=None, latest_record: dict | None = None) -> PriceResult:
+    """The price the plan leads with, by priority. Never a made-up or zero price.
+
+    1. Model forecast: the harvest falls within the forecaster's reach (the first harvest day it covers).
+       A harvest window that has already passed shows the prices actually recorded in it instead.
+    2. Historical seasonal reference: the same weeks of earlier years, when there are enough prices.
+    3. Latest available actual price: the series' newest recorded price, with its age.
+    Otherwise "unavailable", with the reason.
+
+    latest_record: the newest HARTI Dambulla record of this series (keys date, price, low, high), used
+    for the latest price's range; without it only the price itself is shown.
+    """
+    today = pd.Timestamp(today or pd.Timestamp.now()).normalize()
+    if plan.status == "no_prices" or actual is None or _valid(actual).empty:
+        return PriceResult(
+            "unavailable",
+            explanation=(
+                f"No verified price can be shown for {plan.timing.crop}: HARTI's daily bulletin has no price series for it, "
+                "so the project's HARTI Dambulla data (data/raw/harti_prices.csv) holds none, and no other "
+                "vegetable's prices are substituted for it."
+            ),
+        )
+    actual = _valid(actual)
+
+    if plan.window_forecast is not None and not plan.window_forecast.empty:
+        first = plan.window_forecast.iloc[0]
+        coverage = (
+            None
+            if plan.fully_forecast
+            else f"The forecast covers {plan.forecast_days} of the {plan.window_days} harvest days; "
+            "the rest are beyond its 30-day reach."
+        )
+        return PriceResult(
+            "model_forecast",
+            price=float(first["price"]),
+            low=None if pd.isna(first["low"]) else float(first["low"]),
+            high=None if pd.isna(first["high"]) else float(first["high"]),
+            date=pd.Timestamp(first["date"]),
+            horizon=int(first["horizon"]),
+            explanation=(
+                f"The Ridge direct forecaster's prediction for {first['date']:%Y-%m-%d}, {int(first['horizon'])} day(s) after "
+                f"the latest recorded price ({plan.latest_price_date:%Y-%m-%d}). The range is the middle 80% of the "
+                "forecaster's test-period errors for all vegetables together at that many days ahead."
+            ),
+            limitation=coverage,
+        )
+
+    if plan.status == "passed" and plan.recorded_in_window is not None and not plan.recorded_in_window.empty:
+        prices = plan.recorded_in_window["price"]
+        return PriceResult(
+            "recorded_actual",
+            price=float(prices.median()),
+            low=float(prices.min()),
+            high=float(prices.max()),
+            median=float(prices.median()),
+            mean=float(prices.mean()),
+            period=f"{plan.harvest_start.date()} to {plan.harvest_end.date()}",
+            observations=len(prices),
+            years=sorted(plan.recorded_in_window["date"].dt.year.unique().tolist()),
+            explanation="The harvest window has already passed, so these are the prices actually recorded in it (median shown).",
+        )
+
+    seasonal = plan.seasonal
+    reason = _no_forecast_reason(plan)
+    if seasonal and seasonal["sufficient"]:
+        return PriceResult(
+            "seasonal_reference",
+            price=seasonal["median"],
+            low=seasonal["low"],
+            high=seasonal["high"],
+            median=seasonal["median"],
+            mean=seasonal["mean"],
+            period="; ".join(seasonal["periods"]),
+            observations=seasonal["observations"],
+            years=seasonal["years"],
+            explanation=(
+                f"{reason} This is the median of the {seasonal['observations']} prices recorded in the same weeks "
+                f"(the harvest dates ± {seasonal['pad_days']} days) of the {seasonal['seasons']} most recent earlier years "
+                f"that have prices then (dates from {seasonal['years'][0]} to {seasonal['years'][-1]}): "
+                "what the price has been at this time of year, not a prediction of this year's price."
+            ),
+            limitation=(
+                "Earlier years' prices are not adjusted for inflation, and a year can differ a lot from the next."
+                + (
+                    f" The most recent of these prices is from {seasonal['years'][-1]}, so they may be a poor guide to today's level."
+                    if plan.harvest_start.year - seasonal["years"][-1] > 2
+                    else ""
+                )
+            ),
+        )
+
+    last = actual.sort_values("date").iloc[-1]
+    record = latest_record or {}
+    observed = pd.Timestamp(record.get("date", last["date"]))
+    thin = ""
+    if seasonal and seasonal["observations"]:
+        thin = (
+            f" Only {seasonal['observations']} price(s) in {seasonal['seasons']} earlier year(s) fall in the same weeks, "
+            f"too few for a seasonal reference (at least {MIN_SEASONAL_OBSERVATIONS} prices in {MIN_SEASONAL_YEARS} years are needed)."
+        )
+    elif seasonal is not None:
+        thin = " No price was recorded in the same weeks of any earlier year."
+    return PriceResult(
+        "latest_actual",
+        price=float(record.get("price", last["price"])),
+        low=None if pd.isna(record.get("low", float("nan"))) else float(record["low"]),
+        high=None if pd.isna(record.get("high", float("nan"))) else float(record["high"]),
+        date=observed,
+        age_days=int((today - observed).days),
+        explanation=f"{reason}{thin} This is the newest price actually recorded, shown for reference.",
+        limitation="Today's price says little about the price at a harvest weeks or months away.",
+    )
+
+
+def _no_forecast_reason(plan: "CultivationPlan") -> str:
+    if plan.stale:
+        return (
+            f"No forecast: the latest recorded price ({plan.latest_price_date:%Y-%m-%d}) is more than "
+            f"{MAX_HORIZON_DAYS} days old."
+        )
+    if plan.status in ("beyond", "partly_in_reach"):
+        return (
+            f"No forecast: the harvest is after {plan.forecast_end:%Y-%m-%d}, the furthest date the model forecasts "
+            f"({MAX_HORIZON_DAYS} days after the latest recorded price)."
+        )
+    if plan.status == "passed":
+        return "The harvest window has passed and no price was recorded in it."
+    return "No forecast is available."
 
 
 def build_plan(
@@ -328,16 +589,21 @@ def build_plan(
         plan.forecast = forecast_with_range(forecaster, origin_rows, price_label, latest, bands)
         inside = plan.forecast["date"].between(harvest_start, harvest_end)
         plan.window_forecast = plan.forecast[inside].reset_index(drop=True)
-        plan.best_day, plan.clear_advantage = suggest_selling_day(plan.window_forecast)
+        # A selling day is suggested only when the forecast covers the whole window: the best of the
+        # days it does cover says nothing about the days it doesn't.
+        if plan.fully_forecast:
+            plan.best_day, plan.clear_advantage = suggest_selling_day(plan.window_forecast)
         if status == "partly_in_reach":
             plan.warnings.append(
-                f"Only part of the harvest window falls within the forecast's reach, which ends {forecast_end.date()}."
+                f"The forecast covers only {plan.forecast_days} of the {plan.window_days} days in the harvest window "
+                f"(its reach ends {forecast_end.date()}), so no selling day is suggested."
             )
     if status in ("passed", "partly_in_reach"):
         recorded = actual[actual["date"].between(harvest_start, harvest_end)]
         plan.recorded_in_window = recorded.reset_index(drop=True) if not recorded.empty else None
-    if plan.stale or status in ("beyond", "partly_in_reach", "passed"):
-        plan.same_season = same_season_history(actual, harvest_start, harvest_end)
+    if plan.stale or status in ("beyond", "partly_in_reach", "passed") or plan.forecast is None:
+        plan.same_season = same_season_history(actual, harvest_start, harvest_end, pad_days=SEASONAL_PAD_DAYS)
+        plan.seasonal = seasonal_reference(actual, harvest_start, harvest_end)
     return plan
 
 

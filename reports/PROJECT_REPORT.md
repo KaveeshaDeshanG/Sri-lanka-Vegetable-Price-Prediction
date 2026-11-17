@@ -220,19 +220,19 @@ The Streamlit dashboard (`app/Home.py`) has five pages:
 - **Predict:** next-day and multi-day forecasts, with a chart, the weather used, the sources and the model behind each result.
 - **Model Performance:** the results above, read directly from the saved reports.
 - **Price History:** each vegetable's prices and weather. The line breaks across gaps longer than 7 days rather than implying prices were recorded.
-- **Cultivation Planner:** from a planting date, the expected harvest window, the price around it and a suggested selling period, for 18 crop entries (17 crops).
-  - **Harvest timing** is the Department of Agriculture's published guidance (`data/reference/doa_harvest_durations.csv`), shown with its source. It is not a model prediction: no farm-level planting and harvest records exist to train one.
-  - **Prices** are the direct forecaster's output, shown only when the harvest falls within its 30-day reach, and only when the price series is recent. Each forecast carries a likely range: the middle 80% of the forecaster's errors on the test period, from `scripts/forecast_error_bands.py`.
-  - **A selling day** is suggested only when its low estimate beats the first harvest day's forecast.
-  - **Otherwise**, the page shows recorded prices from the same weeks of earlier years, labelled as history.
+- **Cultivation Planner:** from a planting date, the expected harvest window, the price around it and a suggested selling period, for 77 crop and variety entries (24 crops, 17 with a HARTI price series).
+  - **Harvest timing** is the Department of Agriculture's published guidance (`data/reference/doa_harvest_durations_v2.csv`), shown with its source. It is not a model prediction: no farm-level planting and harvest records exist to train one.
+  - **Prices** are the direct forecaster's output, shown only when the harvest falls within its 30-day reach, and only when the price series is recent. Each forecast carries a likely range: the middle 80% of the forecaster's errors on the test period for all vegetables together (not per crop), from `scripts/forecast_error_bands.py`. The page states the latest start date that still gets a forecast, and names the HARTI record the forecast starts from and the weather region the model uses.
+  - **A selling day** is suggested only when the forecast covers the whole harvest window and that day's low estimate beats the first harvest day's forecast.
+  - **Otherwise**, the page leads with a labelled price reference, never a forecast: the prices recorded in a harvest window that has passed; else a Historical Seasonal Price Reference (median of the same weeks, ± 7 days, of the 5 most recent earlier years, needing at least 10 prices in 3 years); else the latest actual price with its age. A crop with no HARTI series gets an explanation and no price (`select_price` in `app/cultivation.py`).
   - **Further reading:** `reports/CULTIVATION_DATA_PLAN.md` sets out the data a trained harvest-duration model, and longer price forecasts, would need.
 
-| Data source | Model |
+| Data source (since 2026-11-15) | Model |
 |---|---|
-| Historical dataset (real) | Direct forecaster |
-| Latest HARTI Data (real, adds the newest published bulletin) | Direct forecaster |
-| Upload a CSV | Earlier comparison model, or a temporary sandbox model |
-| Bundled sample (synthetic) | Temporary sandbox model |
+| Latest Real Data Prediction: the stored official records, with HARTI, CBSL and DCS status and each source's records shown separately | Direct forecaster (HARTI data, weather and fuel only) |
+| Upload CSV | Earlier comparison model, or a temporary sandbox model |
+
+Earlier versions also offered "Bundled sample (synthetic)" and a live "Latest HARTI Data" download; they were removed from the page, and the scheduled update (every 3 hours) keeps the stored records current instead.
 
 **No silent model changes.** The forecaster needs its model file, the all-markets dataset and the regional weather file. Final verification found that removing one of those datasets could change a forecast or switch model with no warning. This was corrected. The page now names the problem and gives no real-data prediction, and the earlier model is used only if the user explicitly asks for it. A sandbox model is saved separately and can't overwrite the project's models.
 

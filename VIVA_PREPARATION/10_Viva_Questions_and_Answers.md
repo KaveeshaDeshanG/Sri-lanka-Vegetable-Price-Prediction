@@ -161,7 +161,7 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 
 **59. How do you know the displayed price is correct?** TC19: recomputed Beans forecasts outside the app directly from the saved model — exactly the same (Rs 453.74, Rs 507.96).
 
-**60. What was not tested?** Real users, other browsers, load/performance, Windows Task Scheduler, the retraining script.
+**60. What was not tested?** Real users, other browsers, load/performance, and a real source outage (simulated in tests only). The retraining script was run once as a dry run (rejected).
 
 **61. Did any test fail?** In the first UI run, two date-input tests failed because of how the test typed into the date box (a test-script issue, not the app); fixed and re-run — all pass.
 
@@ -169,8 +169,8 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 
 ## F. Real-time, limitations, ethics, future (63–72)
 
-**63. Is it real-time?** No true real-time — the "Latest HARTI Data" option downloads the newest published bulletin on demand (tested: bulletin of 12 Nov 2026). Weather and fuel are fetched live.
-සිංහල: සම්පූර්ණ real-time නොවේ; නවතම bulletin එක ඉල්ලුම මත බාගත කරයි.
+**63. Is it real-time?** No true real-time exists: HARTI publishes one PDF a day, 1–3 days late. A scheduled task checks HARTI, CBSL and DCS every 3 hours and imports anything new; the Predict page shows each source's newest publication, when it was checked, and whether the check failed. ⚠ *"How do I know a prediction used the latest data?"* → Section 2 names the exact HARTI record the forecast starts from, with a link to the bulletin.
+සිංහල: සම්පූර්ණ real-time නොවේ; පැය 3කට වරක් නිල මූලාශ්‍ර ස්වයංක්‍රීයව පරීක්ෂා කර නවතම bulletin එක එකතු කරයි.
 
 **64. Why can't you forecast beyond 30 days?** Error grows to ~25 % at 22–30 days; beyond that it would be guessing. The app refuses (TC06).
 

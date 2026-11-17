@@ -1,6 +1,8 @@
 """Streamlit page: train a demo model if needed, then request a price prediction."""
 
+import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -14,7 +16,17 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_version, display_name, past_date_notice, series_status
+from app.catalogue import data_version, display_name, past_date_notice, series_status, update_notice, update_status
+from app.data_refresh import run_data_update
+from app.source_records import (
+    cbsl_records,
+    dcs_records,
+    harti_dambulla_records,
+    harti_other_market_records,
+    latest_dambulla_overview,
+    mapping_note,
+    records_for_series,
+)
 from app.forecasting import (
     ForecastDataUnavailableError,
     ForecastInputError,
@@ -76,10 +88,17 @@ _FUEL_CACHE_TTL_SECONDS = ConfigLoader(CONFIG_PATH).get("fuel_api.cache_minutes"
 _WEATHER_LAG_DAYS = ConfigLoader(CONFIG_PATH).get("feature_engineering.weather_lag_days", 14)
 _STALE_AFTER_DAYS = 30
 _MANY_IMPUTED_DAYS = 7
-SOURCE_HISTORICAL = "Historical dataset (real)"
-SOURCE_SAMPLE = "Bundled sample data (synthetic)"
-SOURCE_UPLOAD = "Upload my own CSV"
-SOURCE_LATEST = "Latest HARTI Data (real)"
+# The page offers two data sources. Real data is the project's stored official records, kept current
+# by scripts/daily_update.py (scheduled, or "Check official sources now" below). The former
+# "Bundled sample data" and live "Latest HARTI Data" options are no longer offered; their loaders
+# (app/services.py: load_sample_history, fetch_harti_latest_snapshot, ...) are kept and tested.
+SOURCE_UPLOAD = "Upload CSV"
+SOURCE_REAL = "Latest Real Data Prediction"
+SOURCE_HISTORICAL = SOURCE_REAL  # the name the code below has always used for the real-data path
+SOURCE_LATEST = None  # live-bulletin mode: not offered, so live_snapshot below is always None
+# Horizons offered for real data, with the Model Performance band each was scored in.
+_HORIZON_CHOICES = {"1 day": 1, "7 days": 7, "14 days": 14, "30 days": 30}
+_HORIZON_BANDS = {1: "1", 7: "4-7", 14: "8-14", 30: "22-30"}
 # What a damaged CSV can raise while loading: pandas' parser and decoding errors are ValueErrors.
 _DATA_READ_ERRORS = (DataValidationError, ValueError, KeyError, TypeError, OSError)
 # A sandbox model stays on disk, so it may have been trained before this data was loaded.
@@ -92,7 +111,7 @@ st.set_page_config(page_title="Predict | Vegetable Price Prediction", page_icon=
 ui.apply_theme()
 ui.page_header(
     "Predict a vegetable price",
-    "Choose a data source and vegetable, then request a next-day price or a forecast up to 30 days ahead.",
+    "Forecast from the latest official prices, which you can inspect source by source, or from your own CSV.",
     "Price forecasting",
 )
 
@@ -163,6 +182,8 @@ def _load_real_market_history_cached(version: str) -> pd.DataFrame:
 
 
 _DATA_VERSION = data_version()
+# Read on every run (a small file), so a scheduled update's result shows on the next click.
+_UPDATE_STATUS = update_status(Path(ConfigLoader(CONFIG_PATH).get("paths.raw_data_dir", "data/raw")) / "update_log.jsonl")
 
 
 @st.cache_data(ttl=_HARTI_CACHE_TTL_SECONDS)
@@ -272,8 +293,10 @@ def _render_direct_result(
             label=f"{label} Price -- {result.vegetable} at {result.market} on {result.target_date.date()}",
             value=f"Rs. {result.predicted_price:.2f} / kg",
         )
+        _latest_actual = actual_history.loc[actual_history["date"] == result.latest_actual_date, "price"]
+        _latest_price = f" (Rs. {_latest_actual.iloc[-1]:,.2f} / kg)" if not _latest_actual.empty else ""
         st.caption(
-            f"Latest actual data: **{result.latest_actual_date.date()}**. Each day's forecast uses only what was "
+            f"Latest actual data: **{result.latest_actual_date.date()}**{_latest_price}. Each day's forecast uses only what was "
             f"known then, including other markets' published prices. **Data source:** {source_label}."
         )
         st.caption(f"**Model used:** {_model_used}")
@@ -335,33 +358,366 @@ def _model_summary() -> str:
 
 
 # ---------------------------------------------------------------------------
+# Latest Real Data Prediction: source status, collected records, prediction, freshness
+# ---------------------------------------------------------------------------
+
+# Source key in update_log.jsonl -> (name, what it publishes, days after which its newest publication is
+# behind its usual schedule). HARTI publishes daily (longest 2026 gap: 4 days); CBSL on working days;
+# DCS weekly, as "week n of a month", whose age is counted from the week's first day (day 1, 8, 15 or 22).
+_OFFICIAL_SOURCES = {
+    "harti": ("HARTI", "Daily wholesale bulletin, every market", 3),
+    "cbsl": ("CBSL", "Daily Price Report, wholesale and retail", 4),
+    "dcs": ("DCS", "Weekly retail prices, Colombo District", 21),
+}
+# DCS's 21 days (three weekly cycles), from its bulletins' own PDF creation dates (16 consecutive bulletins,
+# 2024 and 2026; reports/DATA_SOURCES.md, "DCS freshness"): a bulletin appears 3-20 days after its week
+# starts, and a "week 4" label starts on the 22nd but runs to the month's end, so on schedule the newest
+# week is up to 20 days old just before the next one appears (median 15). 14 days flagged 10 of those 16
+# cycles as stale (9 on schedule); 21 flags only October 2026, when week 2 came 15 days late.
+
+
+def _publication_date(value) -> pd.Timestamp | None:
+    """A source's newest publication as a date: '2026-11-12', or DCS's '2026-11 week 1' (its week's first day)."""
+    if not value:
+        return None
+    week = re.fullmatch(r"(\d{4})-(\d{2}) week (\d)", str(value))
+    if week:
+        year, month, number = map(int, week.groups())
+        return pd.Timestamp(year=year, month=month, day=1) + pd.Timedelta(days=7 * (number - 1))
+    parsed = pd.to_datetime(value, errors="coerce")
+    return None if pd.isna(parsed) else parsed
+
+
+def _render_source_status() -> None:
+    st.header("1. Official source status")
+    refresh = st.session_state.pop("real_data_refresh_result", None)
+    if refresh is not None:
+        getattr(st, refresh.level)(refresh.message)
+        if refresh.output_tail and refresh.level != "success":
+            with st.expander("Update log (last lines)"):
+                st.code(refresh.output_tail, language="text")
+    status = _UPDATE_STATUS
+    if status.last_attempt_failed:
+        st.warning(f"The latest update attempt failed ({status.last_error}). The status below is from the last completed check.")
+    today = pd.Timestamp.now().normalize()
+    for column, (key, (name, publishes, behind_days)) in zip(st.columns(3, gap="small"), _OFFICIAL_SOURCES.items()):
+        info = status.sources.get(key)
+        with column, st.container(border=True):
+            st.markdown(f"**{name}**  \n{publishes}")
+            if info is None:
+                st.info("Not recorded yet: the last completed check predates source-by-source status. Use **Check official sources now**.")
+                continue
+            if info["status"] == "failed":
+                st.error("Couldn't be checked at the last update. Its stored records are shown unchanged.")
+                st.caption(f"Error: {info.get('error', 'no details')}")
+            else:
+                st.success("Checked successfully")
+            newest = _publication_date(info.get("newest_published"))
+            age = (today - newest).days if newest is not None else None
+            lines = [
+                f"**Newest publication found:** {info.get('newest_published') or 'unknown'}"
+                + (f" ({age} day(s) ago)" if age is not None else ""),
+                f"**Last checked:** {pd.Timestamp(info['checked_at']):%Y-%m-%d %H:%M}",
+            ]
+            if info["status"] != "failed":
+                new = info.get("new_records", 0)
+                lines.append(f"**New data collected:** {f'{new} record(s)' if key == 'harti' else f'{new} report(s)'}" if new else "**New data collected:** none, nothing newer was published")
+            for problem in info.get("problems", []):
+                lines.append(f"**Import problem:** {problem}")
+            if age is not None and age > behind_days:
+                lines.append(f"**Stale:** the newest {name} publication is {age} days old")
+            st.markdown("  \n".join(lines))
+    others = [f"{name.capitalize()}: {'couldn' + chr(39) + 't be updated' if status.sources[name]['status'] == 'failed' else 'checked'}" for name in ("weather", "fuel") if name in status.sources]
+    st.caption(
+        (f"Last completed check of all sources: **{status.last_success:%Y-%m-%d %H:%M}**. " if status.last_success is not None else "No completed check recorded. ")
+        + "Checks run automatically every 3 hours (Windows task `VegetablePriceUpdate`), and on request below. "
+        + ("; ".join(others) + "." if others else "")
+    )
+    if st.button("Check official sources now", help="Downloads any newly published HARTI, CBSL and DCS reports (about a minute). Nothing already stored is changed."):
+        with st.spinner("Checking HARTI, CBSL and DCS for newly published reports..."):
+            st.session_state["real_data_refresh_result"] = run_data_update()
+        st.rerun()
+
+
+@st.cache_data(show_spinner="Reading the collected official records...")
+def _load_source_records(version: str) -> dict[str, pd.DataFrame]:
+    """Each source's stored records with their traceability fields. Cached per data_version()."""
+    return {
+        "harti_dambulla": harti_dambulla_records(CONFIG_PATH),
+        "harti_other": harti_other_market_records(CONFIG_PATH),
+        "cbsl": cbsl_records(CONFIG_PATH),
+        "dcs": dcs_records(CONFIG_PATH),
+    }
+
+
+# Record tables: the columns a reader needs first (when, where, the prices, the document and when it was
+# collected) fit side by side at 1440 px; the descriptive ones that follow are reached by scrolling the
+# table sideways, while the pinned date and market stay in view. No column is dropped.
+_RECORD_COLUMN_ORDER = [
+    "Observation date",
+    "Market / location",
+    "Minimum",
+    "Maximum",
+    "Average / midpoint",
+    "Unit",
+    "Source document",
+    "Collected",
+    "Price type",
+    "Published",
+    "Vegetable (as published)",
+    "Source",
+]
+
+
+def _record_column_config() -> dict:
+    text = st.column_config.TextColumn  # prices arrive pre-formatted, so a missing one can say why
+    return {
+        "Observation date": text("Observation date", width=126, pinned=True),
+        "Market / location": text("Market / location", width=130, pinned=True, help="Market, or the area the price covers"),
+        "Minimum": text("Min", width=72, help="Lowest price in the source's published range"),
+        "Maximum": text("Max", width=72, help="Highest price in the source's published range"),
+        "Average / midpoint": text("Average / midpoint", width=128, help="HARTI: midpoint of its range (the model's price). CBSL: its single price. DCS: weekly average."),
+        "Unit": text("Unit", width=92),
+        "Source document": st.column_config.LinkColumn("Document", display_text="Open", width=84, help="The official bulletin or report this record was read from"),
+        "Collected": text("Collected", width=128, help="When this project downloaded the document"),
+        "Price type": text("Price type", width=136),
+        "Published": text("Published", width=112),
+        "Vegetable (as published)": text("Vegetable (as published)", width=170),
+        "Source": text("Source", width=250),
+    }
+
+
+def _render_records(frame: pd.DataFrame, key: str, missing: str = "not published") -> None:
+    """A record table: dates as dates, missing values named, never shown as zero."""
+    if frame.empty:
+        st.info("No records.")
+        return
+    shown = frame.copy()
+    for column in ("Observation date", "Published"):
+        shown[column] = shown[column].map(lambda v: v.date().isoformat() if isinstance(v, pd.Timestamp) else str(v))
+    shown["Collected"] = shown["Collected"].map(lambda v: f"{v:%Y-%m-%d %H:%M}" if pd.notna(v) else "not recorded")
+    for column in ("Minimum", "Maximum", "Average / midpoint"):
+        shown[column] = shown[column].map(lambda v: f"{v:,.2f}" if pd.notna(v) else missing)
+    st.dataframe(
+        shown,
+        hide_index=True,
+        width="stretch",
+        key=f"records_{key}",
+        column_order=[column for column in _RECORD_COLUMN_ORDER if column in shown.columns],
+        column_config=_record_column_config(),
+    )
+    st.caption(
+        f"{len(shown)} record(s), {len(_RECORD_COLUMN_ORDER)} columns. ↔ Scroll the table sideways (scrollbar under it, or "
+        "Shift + mouse wheel) to reach the last columns, Vegetable (as published) and Source; the date and market stay pinned."
+    )
+
+
+def _render_vegetable_records(series: str, tables: dict[str, pd.DataFrame]) -> None:
+    """The selected vegetable's newest records, source by source, and the one the forecast starts from."""
+    records = records_for_series(series, tables)
+    dambulla = records["harti_dambulla"]
+    if dambulla.empty:
+        st.error(f"No HARTI Dambulla price is stored for {display_name(series)}, so no prediction is possible. Nothing is estimated in its place.")
+        st.stop()
+    start = dambulla.iloc[0]
+    with st.container(border=True):
+        st.markdown(
+            f"**Forecast starting point (used by the model):** {start['Source']}, {display_name(series)}, observed "
+            f"**{start['Observation date']:%Y-%m-%d}**: Rs **{start['Average / midpoint']:,.2f}** per kg (midpoint of "
+            f"{start['Minimum']:,.2f} to {start['Maximum']:,.2f}), wholesale. "
+            f"[Bulletin]({str(start['Source document']).replace(' ', '%20')}) · collected "
+            + (f"{start['Collected']:%Y-%m-%d %H:%M}" if pd.notna(start["Collected"]) else "time not recorded")
+        )
+
+    def newest(frame: pd.DataFrame, periods: int) -> pd.DataFrame:
+        keep = frame["Observation date"].drop_duplicates().head(periods)
+        return frame[frame["Observation date"].isin(keep)]
+
+    note = mapping_note(series)
+    tabs = st.tabs([
+        "HARTI Dambulla · used by the model",
+        "HARTI other markets · model inputs",
+        "CBSL · reference only",
+        "DCS · reference only",
+    ])
+    with tabs[0]:
+        st.caption("The forecaster's own series: the midpoint of HARTI's published min-max range, Rs per kg. Newest 10 bulletins.")
+        _render_records(newest(dambulla, 10), "dambulla")
+    with tabs[1]:
+        st.caption(
+            "The same bulletins' other markets. The model uses their prices relative to Dambulla as inputs; it doesn't "
+            "forecast them. Newest 3 bulletins. Min and max are shown where the bulletin's range has been extracted."
+        )
+        _render_records(newest(records["harti_other"], 3), "other", missing="not extracted")
+    with tabs[2]:
+        st.caption(
+            "Collected by CBSL separately from HARTI, so its prices differ and are never combined with HARTI's. CBSL prints "
+            "one price per market (no range). Not used by the model. Newest 3 reports."
+            + (f" Matching: {note}." if note else "")
+        )
+        cbsl = newest(records["cbsl"], 3)
+        if cbsl.empty:
+            st.info(f"CBSL's report has no item that clearly matches {display_name(series)}.")
+        for price_type in ("Wholesale", "Retail"):
+            part = cbsl[cbsl["Price type"] == price_type]
+            if not part.empty:
+                st.markdown(f"**{price_type}**")
+                _render_records(part, f"cbsl_{price_type}")
+    with tabs[3]:
+        st.caption(
+            "Retail weekly averages for Colombo District. DCS publishes a week ('week n of a month'), not a date. "
+            "Retail, so never comparable with HARTI's wholesale prices. Not used by the model. Newest 4 weeks."
+            + (f" Matching: {note}." if note else "")
+        )
+        dcs = newest(records["dcs"], 4)
+        if dcs.empty:
+            st.info(f"DCS's bulletin has no item that clearly matches {display_name(series)}.")
+        else:
+            _render_records(dcs, "dcs")
+
+
+@st.cache_data
+def _band_metrics(version: str) -> dict[str, dict]:
+    path = Path(ConfigLoader(CONFIG_PATH).get("paths.metrics_dir", "reports/metrics")) / "direct_forecaster_metrics.json"
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {"period": f"{report.get('test_start')} to {report.get('test_end')}", **{band["days_ahead"]: band for band in report.get("bands", [])}}
+
+
+def _render_real_prediction() -> None:
+    st.header("4. Prediction")
+    st.caption(
+        f"**Model:** Ridge direct forecaster, one model per number of days ahead (1 to {MAX_HORIZON_DAYS}), trained on "
+        f"data through {forecaster.trained_through.date()}. **Its inputs:** HARTI Dambulla prices, other HARTI markets' "
+        "prices, Open-Meteo weather for the vegetable's growing region, and CEYPETCO fuel prices (next-day model only). "
+        "CBSL and DCS records are not inputs."
+    )
+    labels = [*_HORIZON_CHOICES, f"Another date (up to {MAX_HORIZON_DAYS} days)"]
+    choice = st.radio("Forecast period", labels, horizontal=True, key="real_forecast_period")
+    if choice in _HORIZON_CHOICES:
+        horizon = _HORIZON_CHOICES[choice]
+        target = latest_actual_date + pd.Timedelta(days=horizon)
+    else:
+        picked = st.date_input(
+            "Forecast date",
+            value=(latest_actual_date + pd.Timedelta(days=1)).date(),
+            min_value=(latest_actual_date + pd.Timedelta(days=1)).date(),
+            max_value=(latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS)).date(),
+            key="real_forecast_date",
+        )
+        target = pd.Timestamp(picked)
+        horizon = (target - latest_actual_date).days
+    st.caption(
+        f"Forecast date **{target.date()}**: {horizon} day(s) after the latest actual price ({latest_actual_date.date()}). "
+        "Forecasts count from the latest published price, not from today."
+    )
+    if not st.button("Predict", type="primary", key="real_predict"):
+        return
+    _show_direct_forecast(target, multi_day=horizon > 1)
+
+    try:
+        path = direct_forecast(
+            forecaster, _direct_rows, vegetable, market, latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS), latest_actual_date, [_direct_sources]
+        ).daily_forecast
+    except (ForecastInputError, ForecastDataUnavailableError):
+        return
+    metrics = _band_metrics(_DATA_VERSION)
+    rows = []
+    for days in _HORIZON_CHOICES.values():
+        point, band = path[days - 1], metrics.get(_HORIZON_BANDS[days], {})
+        rows.append(
+            {
+                "Days ahead": days,
+                "Forecast date": point.date.date().isoformat(),
+                "Forecast (Rs per kg)": round(point.predicted_price, 2),
+                "Accuracy measured for": f"{_HORIZON_BANDS[days]} {'day' if _HORIZON_BANDS[days] == '1' else 'days'} ahead",
+                "Measured MAE (Rs per kg)": round(band["model_mae"], 2) if band else None,
+                "Measured MAPE (%)": round(band["model_mape"], 1) if band else None,
+                "MAE of holding the last price (Rs per kg)": round(band["hold_mae"], 2) if band else None,
+            }
+        )
+    st.markdown("**Forecasts at 1, 7, 14 and 30 days**")
+    # Short headers and fixed widths so all seven columns fit at 1440 px; the full names are in each header's tooltip.
+    number = st.column_config.NumberColumn
+    st.dataframe(
+        pd.DataFrame(rows),
+        hide_index=True,
+        width="stretch",
+        key="real_horizon_table",
+        column_config={
+            "Days ahead": number("Days ahead", width=88, format="%d"),
+            "Forecast date": st.column_config.TextColumn("Forecast date", width=112),
+            "Forecast (Rs per kg)": number("Forecast (Rs/kg)", width=124, format="%.2f", help="Forecast (Rs per kg)"),
+            "Accuracy measured for": st.column_config.TextColumn("Accuracy measured for", width=164, help="The range of days ahead whose test errors are shown"),
+            "Measured MAE (Rs per kg)": number("Model MAE (Rs/kg)", width=138, format="%.2f", help="Measured MAE (Rs per kg) of the model over that range"),
+            "Measured MAPE (%)": number("Model MAPE (%)", width=122, format="%.1f", help="Measured MAPE (%) of the model over that range"),
+            "MAE of holding the last price (Rs per kg)": number(
+                "Hold-last-price MAE (Rs/kg)", width=196, format="%.2f", help="MAE of holding the last price (Rs per kg): the naive baseline over that range"
+            ),
+        },
+    )
+    st.caption(
+        "**Model MAE** and **Hold-last-price MAE** are the average error in Rs per kg of this model and of simply "
+        "repeating the last price, over the range in **Accuracy measured for**. "
+        f"Each forecast comes from that day's own model, starting from Rs {actual_group_history['price'].iloc[-1]:,.2f} on "
+        f"{latest_actual_date.date()}. Accuracy was measured on all {len(forecaster.vegetables)} vegetables over the held-out "
+        f"test period {metrics.get('period', 'unknown')} (`reports/metrics/direct_forecaster_metrics.json`), not on "
+        f"{display_name(vegetable)} alone; see **Model Performance**."
+    )
+
+
+def _render_freshness(series: str, market_name: str, latest: pd.Timestamp, level, message, stale) -> None:
+    st.header("5. Data freshness and warnings")
+    if message:
+        (st.warning if level == "warning" else st.info)(message)
+    if stale:
+        st.warning(stale)
+    failed = [_OFFICIAL_SOURCES[key][0] for key, info in _UPDATE_STATUS.sources.items() if key in _OFFICIAL_SOURCES and info.get("status") == "failed"]
+    if failed:
+        st.warning(f"{', '.join(failed)} couldn't be checked at the last update, so newer records from it may exist.")
+    if latest + pd.Timedelta(days=1) < pd.Timestamp.now().normalize():
+        st.caption(
+            f"The forecast path starts on {(latest + pd.Timedelta(days=1)).date()}, the day after the latest actual price. "
+            "Its days before today have already passed: they are forecasts, not recorded prices."
+        )
+    st.caption(
+        f"Prices are HARTI's published Dambulla wholesale prices for {display_name(series)} at {market_name}, not real-time "
+        "prices. No price is invented: a day HARTI didn't publish stays missing in the records. For its inputs, the model "
+        "carries the last real price forward over at most 7 missing days (`MAX_CARRY_DAYS`), and treats older gaps as unknown."
+    )
+
+
+# ---------------------------------------------------------------------------
 # 1. Historical data source
 # ---------------------------------------------------------------------------
 
-st.header("1. Historical data")
 _missing_datasets = missing_historical_datasets(CONFIG_PATH)
-_data_source_options = [SOURCE_SAMPLE, SOURCE_UPLOAD]
-if not _missing_datasets:
-    _data_source_options.insert(0, SOURCE_HISTORICAL)
-    if _HARTI_LATEST_DATA_ENABLED:
-        _data_source_options.append(SOURCE_LATEST)
-else:
+_data_source_options = [SOURCE_UPLOAD] + ([] if _missing_datasets else [SOURCE_REAL])
+if _missing_datasets:
     st.warning(
-        f"The real-data options are unavailable because of missing file(s): "
-        f"{', '.join(f'`{path}`' for path in _missing_datasets)}. Only sample and uploaded data can be used. "
+        f"Latest Real Data Prediction is unavailable because of missing file(s): "
+        f"{', '.join(f'`{path}`' for path in _missing_datasets)}. Only an uploaded CSV can be used. "
         "`reports/DATA_SOURCES.md` explains how to rebuild them."
     )
-data_source = st.radio("Data source", _data_source_options, horizontal=True)
+data_source = st.radio(
+    "Data source",
+    _data_source_options,
+    index=len(_data_source_options) - 1,
+    horizontal=True,
+    help="Latest Real Data Prediction uses the official HARTI, CBSL and DCS records this project has collected. "
+    "Upload CSV uses only your file, with a different model.",
+)
+REAL_MODE = data_source == SOURCE_REAL
 
 history_df = None
 live_snapshot: HartiLiveSnapshot | None = None
-if data_source == SOURCE_SAMPLE:
-    history_df = _load_sample_history_cached()
-    st.caption(
-        f"Loaded `app/sample_data/sample_history.csv` -- {len(history_df)} synthetic row(s), "
-        f"{history_df['date'].min().date()} to {history_df['date'].max().date()}. Not real market data."
-    )
-elif data_source == SOURCE_UPLOAD:
+if REAL_MODE:
+    _render_source_status()
+else:
+    st.header("1. Your data")
+if data_source == SOURCE_UPLOAD:
     uploaded_file = st.file_uploader(
         "CSV with columns: date (YYYY-MM-DD), vegetable, market, price. Optional: rainfall_mm, temperature_c, "
         "humidity_pct, and diesel_price, petrol_price (needed if the loaded model uses fuel prices).",
@@ -381,42 +737,12 @@ elif data_source == SOURCE_UPLOAD:
             st.stop()
         for _note in _upload_notes:
             st.warning(_note)
-elif data_source == SOURCE_HISTORICAL:
+else:  # SOURCE_REAL: the stored official records, as last imported
     try:
         history_df = _load_real_market_history_cached(_DATA_VERSION)
     except _DATA_READ_ERRORS as error:
         st.error(f"Couldn't load the real datasets: {error}")
         st.stop()
-    st.caption(
-        f"Real HARTI/Dambulla prices with real weather and fuel data -- {len(history_df)} rows, "
-        f"{history_df['date'].min().date()} to {history_df['date'].max().date()}. Sources: `reports/DATA_SOURCES.md`."
-    )
-else:  # SOURCE_LATEST
-    try:
-        history_df = _load_real_market_history_cached(_DATA_VERSION)
-        live_snapshot = _fetch_harti_snapshot_cached()
-    except HartiLiveDataError as error:
-        st.error(f"Couldn't fetch the latest HARTI bulletin: {error}")
-        st.stop()
-    except _DATA_READ_ERRORS as error:
-        st.error(f"Couldn't load the real datasets: {error}")
-        st.stop()
-
-    refresh_col, info_col = st.columns([1, 5])
-    with refresh_col:
-        if st.button("Refresh"):
-            _fetch_harti_snapshot_cached.clear()
-            st.rerun()
-    with info_col:
-        st.caption(
-            f"Historical context: real HARTI/Dambulla dataset (`data/raw/harti_prices.csv`, "
-            f"{len(history_df)} rows, {history_df['date'].min().date()} to "
-            f"{history_df['date'].max().date()}). **Latest HARTI bulletin: "
-            f"{live_snapshot.bulletin_date.date()}** ({len(live_snapshot.data)} vegetable prices, "
-            f"fetched {live_snapshot.retrieved_at.strftime('%Y-%m-%d %H:%M')}). This is HARTI's own "
-            f"most recently *published* daily bulletin, not a real-time feed -- HARTI typically "
-            f"publishes 1-2 days behind today, and not every market reports every day."
-        )
 
 if history_df is None:
     st.info("Upload a CSV to continue.")
@@ -445,14 +771,16 @@ except (ValueError, KeyError, TypeError, OSError) as error:
         "rather than each vegetable's production-region weather, even where the weather details below name a region."
     )
 
-with st.expander("Preview loaded data"):
-    st.dataframe(history_df.head(20))
+if not REAL_MODE:
+    with st.expander("Preview loaded data"):
+        st.dataframe(history_df.head(20))
 
 # ---------------------------------------------------------------------------
-# 2. Model
+# 2. Model (shown as its own section for uploaded data; inside the prediction for real data)
 # ---------------------------------------------------------------------------
 
-st.header("2. Model")
+if not REAL_MODE:
+    st.header("2. Model")
 
 demo_models_dir = resolve_demo_models_dir(CONFIG_PATH)
 
@@ -508,10 +836,11 @@ _missing_for_production = (
 if use_direct:
     predictor = None
     _model_used = f"Ridge direct forecaster, with a separate model for each day up to {MAX_HORIZON_DAYS} days ahead."
-    st.success(
-        f"Ridge direct forecaster loaded: one model for each day up to {MAX_HORIZON_DAYS} days ahead, trained on data "
-        f"through {forecaster.trained_through.date()}. See **Model Performance** for measured accuracy."
-    )
+    if not REAL_MODE:
+        st.success(
+            f"Ridge direct forecaster loaded: one model for each day up to {MAX_HORIZON_DAYS} days ahead, trained on data "
+            f"through {forecaster.trained_through.date()}. See **Model Performance** for measured accuracy."
+        )
 elif production_predictor is not None and not _missing_for_production:
     st.success(_model_summary())
     predictor = production_predictor
@@ -560,7 +889,17 @@ else:
 # 3. Prediction request
 # ---------------------------------------------------------------------------
 
-st.header("3. Request a prediction")
+if REAL_MODE:
+    st.header("2. Latest collected data")
+    _source_tables = _load_source_records(_DATA_VERSION)
+    with st.expander("Newest HARTI Dambulla price of every vegetable (what a forecast would start from)"):
+        _render_records(latest_dambulla_overview(_source_tables["harti_dambulla"]), key="overview")
+    # The chosen vegetable's records are drawn here, in section 2, once it is chosen in section 3 below:
+    # one selector drives both, so the tables and the prediction always describe the same vegetable.
+    _vegetable_records_area = st.container()
+    st.header("3. Vegetable and market")
+else:
+    st.header("3. Request a prediction")
 
 _priced_rows = history_df[history_df["price"].notna()]
 if _priced_rows.empty:
@@ -593,12 +932,26 @@ if use_direct:
             st.caption("Their recorded prices are still on the **Price History** page.")
 else:
     vegetable = st.selectbox("Vegetable", sorted(_priced_rows["vegetable"].unique()), key="predict_vegetable")
-market = st.selectbox("Market", sorted(_priced_rows.loc[_priced_rows["vegetable"] == vegetable, "market"].unique()))
+if REAL_MODE:
+    with _vegetable_records_area:
+        st.markdown(f"**Records for {display_name(vegetable)}** (the vegetable chosen in section 3)")
+        _render_vegetable_records(vegetable, _source_tables)
+market =st.selectbox("Market", sorted(_priced_rows.loc[_priced_rows["vegetable"] == vegetable, "market"].unique()))
+_update_level, _update_message = None, None
 if use_direct:
     ui.data_source_panel(
         "HARTI daily bulletins", market, "Wholesale (Rs/kg)",
         _priced_rows.loc[_priced_rows["vegetable"] == vegetable, "date"].max(),
         extra=f"Forecasts run from the latest recorded price, up to {MAX_HORIZON_DAYS} days ahead.",
+    )
+    # Stored data: when the official sources were last checked, and whether the data may be behind
+    # (shown under "Data freshness and warnings").
+    _series_rows = _priced_rows[(_priced_rows["vegetable"] == vegetable) & (_priced_rows["market"] == market)].sort_values("date")
+    _update_level, _update_message = update_notice(_UPDATE_STATUS, _series_rows["date"].iloc[-1])
+    st.caption(
+        f"**Latest actual price:** Rs. {_series_rows['price'].iloc[-1]:,.2f} / kg on {_series_rows['date'].iloc[-1].date()} "
+        f"&nbsp;|&nbsp; **Last successful data update:** "
+        + (f"{_UPDATE_STATUS.last_success:%Y-%m-%d %H:%M}" if _UPDATE_STATUS.last_success is not None else "none recorded")
     )
 
 if use_direct and vegetable not in forecaster.vegetables:
@@ -660,11 +1013,42 @@ latest_actual_date = actual_group_history["date"].max()
 default_target = (latest_actual_date + pd.Timedelta(days=1)).date()
 
 _days_since_reading = (pd.Timestamp.now().normalize() - latest_actual_date).days
-if _days_since_reading > _STALE_AFTER_DAYS:
-    st.warning(
-        f"The latest price for {vegetable} at {market} is from **{latest_actual_date.date()}**, "
-        f"{_days_since_reading} days ago. A prediction here continues from that date, not from today."
-    )
+_stale_message = (
+    f"The latest price for {vegetable} at {market} is from **{latest_actual_date.date()}**, "
+    f"{_days_since_reading} days ago. A prediction here continues from that date, not from today."
+    if _days_since_reading > _STALE_AFTER_DAYS
+    else None
+)
+if _stale_message and not REAL_MODE:
+    st.warning(_stale_message)
+
+_direct_rows = None
+if use_direct:
+    _latest_markets = live_snapshot.all_markets if live_snapshot is not None else None
+    _rows_key = (f"{vegetable}|{live_snapshot.bulletin_date.date()}" if live_snapshot is not None else "historical") + f"|{_DATA_VERSION}"
+    _direct_rows = _forecast_origin_rows(_rows_key, history_df, _latest_markets)
+    _direct_sources = "HARTI bulletins (Dambulla and other markets), Open-Meteo archive weather, CEYPETCO fuel prices"
+    if live_snapshot is not None:
+        _direct_sources += f", including the bulletin dated {live_snapshot.bulletin_date.date()} (not real-time)"
+
+
+def _show_direct_forecast(requested_date, multi_day: bool) -> None:
+    """Run and display a direct forecast, reporting a refusal on the page."""
+    try:
+        with st.spinner("Calculating the forecast..."):
+            result = direct_forecast(
+                forecaster, _direct_rows, vegetable, market, requested_date, latest_actual_date, [_direct_sources]
+            )
+    except (ForecastInputError, ForecastDataUnavailableError) as error:
+        st.error(f"Cannot forecast that date: {error}")
+        return
+    _render_direct_result(result, _direct_rows, actual_group_history, resolved_location, _direct_sources, multi_day)
+
+
+if REAL_MODE and use_direct:
+    _render_real_prediction()
+    _render_freshness(vegetable, market, latest_actual_date, _update_level, _update_message, _stale_message)
+    st.stop()
 
 prediction_type = st.radio(
     "Prediction type",
@@ -689,28 +1073,6 @@ use_live_weather = use_direct or st.checkbox(
         "history."
     ),
 )
-
-_direct_rows = None
-if use_direct:
-    _latest_markets = live_snapshot.all_markets if live_snapshot is not None else None
-    _rows_key = (f"{vegetable}|{live_snapshot.bulletin_date.date()}" if live_snapshot is not None else "historical") + f"|{_DATA_VERSION}"
-    _direct_rows = _forecast_origin_rows(_rows_key, history_df, _latest_markets)
-    _direct_sources = "HARTI bulletins (Dambulla and other markets), Open-Meteo archive weather, CEYPETCO fuel prices"
-    if live_snapshot is not None:
-        _direct_sources += f", including the bulletin dated {live_snapshot.bulletin_date.date()} (not real-time)"
-
-
-def _show_direct_forecast(requested_date, multi_day: bool) -> None:
-    """Run and display a direct forecast, reporting a refusal on the page."""
-    try:
-        with st.spinner("Calculating the forecast..."):
-            result = direct_forecast(
-                forecaster, _direct_rows, vegetable, market, requested_date, latest_actual_date, [_direct_sources]
-            )
-    except (ForecastInputError, ForecastDataUnavailableError) as error:
-        st.error(f"Cannot forecast that date: {error}")
-        return
-    _render_direct_result(result, _direct_rows, actual_group_history, resolved_location, _direct_sources, multi_day)
 
 
 if prediction_type == "Latest / Next Available Prediction":

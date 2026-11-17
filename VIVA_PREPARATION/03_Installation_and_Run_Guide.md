@@ -130,7 +130,7 @@ Expected: `1060 passed` (last run 13 Nov 2026).
 | `running scripts is disabled on this system` | PowerShell execution policy | `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` or skip activation |
 | App opens on port **8502** | 8501 already used (an old copy is running) | Close the old window, or use the 8502 URL |
 | "The forecaster's model file could not be read" / "missing file" on Home | Model or data file missing/damaged | Restore from `D:\ECU\Sri-lanka-Vegetable-Price-Backups\…` or rebuild with `scripts\update_data.py` and `scripts\train_forecaster.py` |
-| "Couldn't fetch the latest HARTI bulletin" | No internet / HARTI site down | Use "Historical dataset (real)" instead |
+| A source card says "Couldn't be checked" | No internet / that site down | Nothing to fix: its stored records are still used; it is checked again in 3 hours |
 | Browser shows nothing / spinner | First load builds features (~10 s) | Wait; the next clicks are fast (cached) |
 | `.venv312 is missing packages the app needs` (from start_app.bat) | Incomplete install | `.\.venv312\Scripts\python.exe -m pip install -r requirements.txt` |
 

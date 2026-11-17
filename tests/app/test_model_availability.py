@@ -208,7 +208,8 @@ def _text(elements) -> str:
 def test_real_data_uses_the_forecaster_and_says_so():
     at = _run_predict([])
     assert not at.exception
-    assert "Ridge direct forecaster loaded" in _text(at.success)
+    # Latest Real Data Prediction names its model in the prediction section (since 2026-11-15).
+    assert "**Model:** Ridge direct forecaster" in _text(at.caption)
     assert not at.checkbox
 
     next(button for button in at.button if button.label == "Predict").click()

@@ -54,12 +54,14 @@ which is why the datasets once began in 2024.
 ## Daily updates
 
 There is no live price API in Sri Lanka. HARTI and CBSL publish PDF reports, checked on 2026-11-09.
-The project therefore updates **daily from the official reports**. Prices are normally 0 to 1 day
-old; they are never described as real-time.
+The project therefore updates **from the official reports as they are published**, checking every
+3 hours. They are never described as real-time. HARTI's upload delay varies: on 2026-11-11 03:45 its
+newest bulletin was 2026-11-09, on 2026-11-13 20:06 it was 2026-11-12, and on 2026-11-15 11:47 it was
+still 2026-11-12. So the newest price is usually 1 to 3 days old.
 
 | Source | Published | What it gives | How it's read |
 |---|---|---|---|
-| HARTI daily bulletin ([daily-price.php](https://www.harti.gov.lk/daily-price.php)) | Every day, uploaded the same afternoon; weekend bulletins usually the next morning | Wholesale min-max ranges for about 10 markets, each with its own reporting date | The same parser as the full build (`extract_market_rows`, `parse_all_markets`) |
+| HARTI daily bulletin ([daily-price.php](https://www.harti.gov.lk/daily-price.php)) | Every day, including weekends (297 Dambulla dates in 2026, never more than 4 days apart); uploaded 1 to 3 days late, at irregular times | Wholesale min-max ranges for about 10 markets, each with its own reporting date | The same parser as the full build (`extract_market_rows`, `parse_all_markets`) |
 | CBSL Daily Price Report | Working days, same day | Wholesale and retail for Pettah, Dambulla and Narahenpita | `src/data_collection/cbsl_price_report_parser.py`: columns found from the printed headings. Checked on 2021, 2024 and 2026 layouts; the 2018 layout is rejected, not guessed. |
 
 `scripts/daily_update.py` works as follows:
@@ -75,8 +77,83 @@ old; they are never described as real-time.
 - Exit code 2 means a newly published HARTI bulletin couldn't be read, which usually means its
   layout changed. Nothing from it is stored until the parser is checked.
 
-Schedule it with `scripts/run_daily_update.bat`. The file explains the one-line `schtasks` command,
-for example daily at 18:30. Output goes to `logs/daily_update.log`.
+- Each source (HARTI, CBSL, DCS, weather, fuel) is checked separately. The log line's `"sources"`
+  entry records, per source: `status` (`ok` or `failed`), `checked_at`, `newest_published` (HARTI's
+  newest listed bulletin, CBSL's newest stored report, DCS's newest listed week), `new_records`,
+  `problems` (unreadable or undownloadable reports) and `error`. A CBSL request that fails is recorded
+  as an error and retried, never mistaken for "not published".
+- Every run adds a line to `data/raw/update_log.jsonl`:
+  - `"status": "ok"` when every source was checked;
+  - `"partial"` when a source couldn't be checked: its stored data is kept and the run exits with code 4;
+  - `"failed"`, with the error and exit code 1, when the run itself stopped.
+
+  The datasets stay as they were for anything not checked.
+- Once `scripts/build_market_price_ranges.py` has built `harti_all_markets_ranges.csv`, it also adds
+  the other markets' published min-max ranges for new bulletins (display only; see below).
+
+**Schedule:** the Windows task `VegetablePriceUpdate` runs `scripts/run_daily_update.bat` every 3 hours
+from 07:00. It also runs as soon as possible after a start missed while the PC was off. It was
+registered on 2026-11-15, and the batch file has the command to register it again. Output goes to
+`logs/daily_update.log`. The Home page's **Check for new official data** button runs the same update
+on request.
+
+**What the Predict page shows** (Latest Real Data Prediction; `app/catalogue.py: update_status,
+update_notice`, `app/source_records.py`):
+- **Official source status:** a card per source (HARTI, CBSL, DCS) from the last completed check, with
+  a **Check official sources now** button that runs the same update. A card says **Stale** when the
+  newest publication is older than 3 days (HARTI), 4 days (CBSL) or 21 days (DCS; see "DCS freshness"
+  below).
+- **Latest collected data:** each source's records, kept apart, with every field the source publishes:
+  - observation and publication dates, market or location, price type and unit;
+  - minimum, maximum and average or midpoint;
+  - document link and collection time.
+
+  Fields a source doesn't publish are labelled "not published", never filled. Collection times come
+  from `cbsl_daily_prices.csv` (`retrieved_at`), `harti_import_log.csv`, or the saved PDF's download
+  time. CBSL and DCS items are matched to HARTI series only through the hand-reviewed
+  `data/reference/source_item_map.csv`; ambiguous names (the two brinjal rows) are left unmatched.
+- **Prediction:** the starting record (HARTI Dambulla, with its bulletin), the forecasts at 1, 7, 14
+  and 30 days, and the accuracy measured for each range.
+- **Data freshness and warnings:** a yellow warning when the last check failed, when HARTI couldn't be
+  checked, when no check has completed for 24 hours, or when the newest price is more than 3 days old.
+  In that last case it says whether HARTI simply hasn't published anything newer.
+
+Only HARTI data (Dambulla and the other markets), Open-Meteo weather and CEYPETCO fuel prices are
+model inputs. CBSL and DCS are reference only: CBSL collects its own prices (on 13 Nov 2026 its
+Dambulla wholesale Beans was Rs 375, against HARTI's Rs 430 on 12 Nov), and DCS publishes weekly
+retail averages for Colombo District.
+
+**DCS freshness (why 21 days).** DCS labels each bulletin "week n of a month", and the app measures
+its age from that week's first day (the 1st, 8th, 15th or 22nd). The bulletins' own PDF creation dates
+show when each was produced. Only 20 of the 184 saved 2023–2026 PDFs carry one, giving 16 pairs of
+consecutive bulletins (2024-06 to 2024-07 and 2026-07 to 2026-11). They show:
+- a bulletin appears 3 to 20 days after its week starts (median 8);
+- "week 4" starts on the 22nd but runs to the end of the month, so the next week can start up to
+  10 days later;
+- just before the next bulletin appears, the newest week is 10 to 22 days old (median 15; 20 days
+  occurred twice, both times after a "week 4").
+
+The earlier 14-day limit would have marked 10 of the 16 cycles as stale, 9 of them on a normal
+schedule, a warning users would learn to ignore. The limit is now **21 days, three weekly cycles**.
+Only one cycle crosses it: in October 2026, week 2 appeared 15 days after its week started, when
+week 1 was 22 days old. That bulletin was genuinely late, so the warning would have been correct.
+
+The evidence is small (16 cycles), so the limit should be reviewed as more bulletins are collected.
+`daily_update.py` saves each new DCS PDF, so its creation date is kept.
+
+**DCS "0.00" values.** DCS prints 0.00 (with a -100% change) for an item it couldn't price that week.
+This happened for Butter beans in 2023-03 week 3, 2024-11 week 4 and 2025-12 week 1.
+`dcs_weekly_retail_prices.csv` keeps those values exactly as published. The app reads the file through
+`app/source_records.py: load_dcs_weekly`, which marks a zero or negative price or range as unavailable;
+every positive price is unchanged. As a result:
+- Price History doesn't plot or count those weeks, breaks the line there, and lists them in a note;
+- the Predict page shows them as "not published".
+
+**Other markets' min-max ranges.** `harti_all_markets.csv` stores each range's midpoint only.
+`scripts/build_market_price_ranges.py` reads the saved bulletin PDFs again and writes
+`data/raw/harti_all_markets_ranges.csv` (low and high), keeping a range only when its midpoint
+equals the stored price. Its counts, including rows left out, are in
+`harti_all_markets_ranges_report.json`. Display only: the forecaster never reads it.
 
 Retraining is separate: `scripts/retrain_if_better.py` fits a candidate on everything except the most
 recent 60 days of prices. It keeps the candidate only if, on those 60 unseen days, its error is clearly

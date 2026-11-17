@@ -45,6 +45,13 @@ from src.feature_engineering.forecast_features import ForecastFeatureBuilder, ad
 from src.models.direct_forecaster import FORECASTER_FILENAME, DirectForecaster, mae_gain_vs_holding_price, score_predictions, usable_rows  # noqa: E402
 
 
+def _json_value(value):
+    """json.dumps fallback: NumPy scalars (e.g. the numpy.bool_ from comparing two MAEs) as plain Python values."""
+    if hasattr(value, "item"):
+        return value.item()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def _resolve(path: str) -> Path:
     candidate = Path(path)
     return candidate if candidate.is_absolute() else (_PROJECT_ROOT / candidate).resolve()
@@ -179,10 +186,10 @@ def main(argv: list[str] | None = None) -> int:
         decision["saved_model_trained_through"] = str(DirectForecaster.load(args.config).trained_through.date())
     decision["saved"] = bool(decision["accepted"] and not args.dry_run)
 
-    (metrics_dir / "retrain_decision.json").write_text(json.dumps(decision, indent=2), encoding="utf-8")
+    (metrics_dir / "retrain_decision.json").write_text(json.dumps(decision, indent=2, default=_json_value), encoding="utf-8")
     with (metrics_dir / "retrain_history.jsonl").open("a", encoding="utf-8") as history:
-        history.write(json.dumps(decision) + "\n")
-    print(json.dumps({k: decision[k] for k in ("data_first_date", "data_last_date", "holdout_start", "holdout_end", "overall", "checks", "accepted", "reasons_rejected", "saved")}, indent=2))
+        history.write(json.dumps(decision, default=_json_value) + "\n")
+    print(json.dumps({k: decision[k] for k in ("data_first_date", "data_last_date", "holdout_start", "holdout_end", "overall", "checks", "accepted", "reasons_rejected", "saved")}, indent=2, default=_json_value))
     return 0 if decision["accepted"] else 1
 
 

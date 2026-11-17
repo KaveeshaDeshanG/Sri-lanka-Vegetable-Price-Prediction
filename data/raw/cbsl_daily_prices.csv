@@ -9276,3 +9276,913 @@ date,item,item_as_printed,vegetable,unit,market,price_type,price,source_url,retr
 2026-11-10,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261110_e.pdf,2026-11-11T03:39:37
 2026-11-10,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261110_e.pdf,2026-11-11T03:39:37
 2026-11-10,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261110_e.pdf,2026-11-11T03:39:37
+2026-11-11,Apple (Imp),Apple (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Apple (Imp),Apple (Imp),,Rs./Each,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Balaya,Balaya,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Balaya,Balaya,,Rs./kg,Narahenpita,retail,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Balaya,Balaya,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Balaya,Balaya,,Rs./kg,Pettah,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,retail,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Banana (Sour),Banana (Sour),,Rs./kg,Narahenpita,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,wholesale,145.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,wholesale,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Beans,Beans,Beans,Rs./kg,Dambulla,retail,430.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Beans,Beans,Beans,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Beans,Beans,Beans,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Beans,Beans,Beans,Rs./kg,Dambulla,wholesale,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Beans,Beans,Beans,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,retail,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Narahenpita,retail,380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,retail,310.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,wholesale,267.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,retail,315.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,retail,335.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,wholesale,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,wholesale,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,retail,455.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Brinjal,Brinjal,Brinjal,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,wholesale,425.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,retail,605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Cabbage,Cabbage,Cabbage,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,wholesale,575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Carrot,Carrot,Carrot,Rs./kg,Dambulla,retail,630.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Carrot,Carrot,Carrot,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Carrot,Carrot,Carrot,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Carrot,Carrot,Carrot,Rs./kg,Dambulla,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Carrot,Carrot,Carrot,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,retail,160.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Narahenpita,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,retail,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,wholesale,155.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,wholesale,173.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut oil,Coconut oil,,Rs./Ltr,Narahenpita,retail,852.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,retail,882.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,wholesale,843.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,retail,1605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,retail,1617.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,wholesale,1575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,wholesale,1530.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Egg (White),Egg (White),,Rs./Each,Narahenpita,retail,40.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Egg (White),Egg (White),,Rs./Each,Pettah,retail,38.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Egg (White),Egg (White),,Rs./Each,Pettah,wholesale,37.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,retail,305.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,retail,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Hurulla,Hurulla,,Rs./kg,Dambulla,retail,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Hurulla,Hurulla,,Rs./kg,Narahenpita,retail,1070.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Hurulla,Hurulla,,Rs./kg,Dambulla,wholesale,950.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Hurulla,Hurulla,,Rs./kg,Pettah,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Katta (Imp),Katta (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,retail,2500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,wholesale,1900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (Red),Kekulu (Red),,Rs./kg,Narahenpita,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,wholesale,188.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,wholesale,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White),Kekulu (White),,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,retail,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,wholesale,182.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,wholesale,181.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kelawalla,Kelawalla,,Rs./kg,Dambulla,retail,2090.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kelawalla,Kelawalla,,Rs./kg,Narahenpita,retail,2240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kelawalla,Kelawalla,,Rs./kg,Dambulla,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Kelawalla,Kelawalla,,Rs./kg,Pettah,wholesale,1300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Lime,Lime,Lime,Rs./kg,Dambulla,retail,955.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Lime,Lime,Lime,Rs./kg,Narahenpita,retail,2000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Lime,Lime,Lime,Rs./kg,Pettah,retail,1400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Lime,Lime,Lime,Rs./kg,Dambulla,wholesale,925.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Lime,Lime,Lime,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Linna,Linna,,Rs./kg,Dambulla,retail,1040.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Linna,Linna,,Rs./kg,Narahenpita,retail,1060.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Linna,Linna,,Rs./kg,Dambulla,wholesale,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Linna,Linna,,Rs./kg,Pettah,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu,Nadu,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu,Nadu,,Rs./kg,Narahenpita,retail,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu,Nadu,,Rs./kg,Pettah,retail,218.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu,Nadu,,Rs./kg,Dambulla,wholesale,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu,Nadu,,Rs./kg,Pettah,wholesale,195.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu (Imp),Nadu (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu (Imp),Nadu (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Orange (Imp),Orange (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Orange (Imp),Orange (Imp),,Rs./Each,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Papaw,Papaw,,Rs./kg,Dambulla,retail,105.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Papaw,Papaw,,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Papaw,Papaw,,Rs./kg,Pettah,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Papaw,Papaw,,Rs./kg,Dambulla,wholesale,75.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Papaw,Papaw,,Rs./kg,Pettah,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Paraw,Paraw,,Rs./kg,Dambulla,retail,2340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Paraw,Paraw,,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Paraw,Paraw,,Rs./kg,Dambulla,wholesale,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Paraw,Paraw,,Rs./kg,Pettah,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pineapple,Pineapple,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pineapple,Pineapple,,Rs./kg,Narahenpita,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pineapple,Pineapple,,Rs./kg,Pettah,retail,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pineapple,Pineapple,,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pineapple,Pineapple,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,retail,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,wholesale,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Imp),Potato (Imp),Potato,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,retail,214.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,wholesale,189.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Local),Potato (Local),Potato,Rs./kg,Narahenpita,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,retail,347.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,wholesale,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,wholesale,288.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Narahenpita,retail,320.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,wholesale,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Dhal,Red Dhal,,Rs./kg,Narahenpita,retail,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Dhal,Red Dhal,,Rs./kg,Pettah,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Dhal,Red Dhal,,Rs./kg,Pettah,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,retail,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,retail,575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,retail,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,wholesale,555.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,wholesale,514.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Salaya,Salaya,,Rs./kg,Dambulla,retail,680.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Salaya,Salaya,,Rs./kg,Narahenpita,retail,620.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Salaya,Salaya,,Rs./kg,Dambulla,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Salaya,Salaya,,Rs./kg,Pettah,wholesale,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Samba,Samba,,Rs./kg,Dambulla,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Samba,Samba,,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Samba,Samba,,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Samba,Samba,,Rs./kg,Dambulla,wholesale,223.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Samba,Samba,,Rs./kg,Pettah,wholesale,233.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Narahenpita,retail,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,retail,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sprat (Imp),Sprat (Imp),,Rs./kg,Narahenpita,retail,2000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,retail,1350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,wholesale,1170.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sugar (White),Sugar (White),,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sugar (White),Sugar (White),,Rs./kg,Pettah,retail,245.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Sugar (White),Sugar (White),,Rs./kg,Pettah,wholesale,228.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Thalapath,Thalapath,,Rs./kg,Dambulla,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Thalapath,Thalapath,,Rs./kg,Narahenpita,retail,2600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Thalapath,Thalapath,,Rs./kg,Dambulla,wholesale,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Thalapath,Thalapath,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Tomato,Tomato,Tomato,Rs./kg,Dambulla,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Tomato,Tomato,Tomato,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-11,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261111_e.pdf,2026-11-13T20:07:03
+2026-11-12,Apple (Imp),Apple (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Apple (Imp),Apple (Imp),,Rs./Each,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Balaya,Balaya,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Balaya,Balaya,,Rs./kg,Narahenpita,retail,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Balaya,Balaya,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Balaya,Balaya,,Rs./kg,Pettah,wholesale,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,retail,155.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Banana (Sour),Banana (Sour),,Rs./kg,Narahenpita,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,wholesale,125.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,wholesale,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Beans,Beans,Beans,Rs./kg,Dambulla,retail,520.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Beans,Beans,Beans,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Beans,Beans,Beans,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Beans,Beans,Beans,Rs./kg,Dambulla,wholesale,490.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Beans,Beans,Beans,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,retail,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Narahenpita,retail,380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,wholesale,261.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,retail,315.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,retail,360.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,wholesale,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,retail,430.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Brinjal,Brinjal,Brinjal,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,wholesale,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,retail,605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Cabbage,Cabbage,Cabbage,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,retail,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,wholesale,575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,wholesale,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Carrot,Carrot,Carrot,Rs./kg,Dambulla,retail,570.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Carrot,Carrot,Carrot,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Carrot,Carrot,Carrot,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Carrot,Carrot,Carrot,Rs./kg,Dambulla,wholesale,540.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Carrot,Carrot,Carrot,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,retail,158.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Narahenpita,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,retail,173.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,wholesale,153.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,wholesale,173.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut oil,Coconut oil,,Rs./Ltr,Narahenpita,retail,852.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,retail,893.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,wholesale,843.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,retail,1605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,wholesale,1575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,wholesale,1530.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Egg (White),Egg (White),,Rs./Each,Narahenpita,retail,40.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Egg (White),Egg (White),,Rs./Each,Pettah,retail,38.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Egg (White),Egg (White),,Rs./Each,Pettah,wholesale,37.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,retail,285.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,wholesale,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,wholesale,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Hurulla,Hurulla,,Rs./kg,Dambulla,retail,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Hurulla,Hurulla,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Hurulla,Hurulla,,Rs./kg,Dambulla,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Hurulla,Hurulla,,Rs./kg,Pettah,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Katta (Imp),Katta (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,retail,2600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,wholesale,1900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (Red),Kekulu (Red),,Rs./kg,Narahenpita,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,wholesale,188.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,wholesale,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White),Kekulu (White),,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,retail,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,wholesale,182.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,wholesale,181.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kelawalla,Kelawalla,,Rs./kg,Dambulla,retail,1980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kelawalla,Kelawalla,,Rs./kg,Narahenpita,retail,2240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kelawalla,Kelawalla,,Rs./kg,Dambulla,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Kelawalla,Kelawalla,,Rs./kg,Pettah,wholesale,1300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Lime,Lime,Lime,Rs./kg,Dambulla,retail,1180.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Lime,Lime,Lime,Rs./kg,Narahenpita,retail,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Lime,Lime,Lime,Rs./kg,Pettah,retail,1400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Lime,Lime,Lime,Rs./kg,Dambulla,wholesale,1150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Lime,Lime,Lime,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Linna,Linna,,Rs./kg,Dambulla,retail,980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Linna,Linna,,Rs./kg,Narahenpita,retail,1060.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Linna,Linna,,Rs./kg,Dambulla,wholesale,820.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Linna,Linna,,Rs./kg,Pettah,wholesale,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu,Nadu,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu,Nadu,,Rs./kg,Narahenpita,retail,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu,Nadu,,Rs./kg,Pettah,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu,Nadu,,Rs./kg,Dambulla,wholesale,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu,Nadu,,Rs./kg,Pettah,wholesale,195.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu (Imp),Nadu (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu (Imp),Nadu (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Orange (Imp),Orange (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Orange (Imp),Orange (Imp),,Rs./Each,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Papaw,Papaw,,Rs./kg,Dambulla,retail,85.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Papaw,Papaw,,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Papaw,Papaw,,Rs./kg,Pettah,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Papaw,Papaw,,Rs./kg,Dambulla,wholesale,55.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Papaw,Papaw,,Rs./kg,Pettah,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Paraw,Paraw,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Paraw,Paraw,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Paraw,Paraw,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Paraw,Paraw,,Rs./kg,Pettah,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pineapple,Pineapple,,Rs./kg,Dambulla,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pineapple,Pineapple,,Rs./kg,Narahenpita,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pineapple,Pineapple,,Rs./kg,Pettah,retail,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pineapple,Pineapple,,Rs./kg,Dambulla,wholesale,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pineapple,Pineapple,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,retail,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,wholesale,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Imp),Potato (Imp),Potato,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,retail,210.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,wholesale,189.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,retail,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Local),Potato (Local),Potato,Rs./kg,Narahenpita,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,retail,347.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,wholesale,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,wholesale,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Narahenpita,retail,360.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,wholesale,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Dhal,Red Dhal,,Rs./kg,Narahenpita,retail,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Dhal,Red Dhal,,Rs./kg,Pettah,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Dhal,Red Dhal,,Rs./kg,Pettah,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,retail,545.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,retail,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,retail,510.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,retail,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,wholesale,490.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,wholesale,508.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Salaya,Salaya,,Rs./kg,Dambulla,retail,680.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Salaya,Salaya,,Rs./kg,Narahenpita,retail,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Salaya,Salaya,,Rs./kg,Dambulla,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Salaya,Salaya,,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Samba,Samba,,Rs./kg,Dambulla,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Samba,Samba,,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Samba,Samba,,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Samba,Samba,,Rs./kg,Dambulla,wholesale,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Samba,Samba,,Rs./kg,Pettah,wholesale,233.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,retail,305.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sprat (Imp),Sprat (Imp),,Rs./kg,Narahenpita,retail,2100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,retail,1367.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,wholesale,1158.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sugar (White),Sugar (White),,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sugar (White),Sugar (White),,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Sugar (White),Sugar (White),,Rs./kg,Pettah,wholesale,228.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Thalapath,Thalapath,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Thalapath,Thalapath,,Rs./kg,Narahenpita,retail,2600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Thalapath,Thalapath,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Thalapath,Thalapath,,Rs./kg,Pettah,wholesale,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Tomato,Tomato,Tomato,Rs./kg,Dambulla,retail,530.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Tomato,Tomato,Tomato,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-12,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261112_e.pdf,2026-11-13T20:07:13
+2026-11-13,Apple (Imp),Apple (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Apple (Imp),Apple (Imp),,Rs./Each,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Balaya,Balaya,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Balaya,Balaya,,Rs./kg,Narahenpita,retail,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Balaya,Balaya,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Balaya,Balaya,,Rs./kg,Pettah,wholesale,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,retail,140.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Banana (Sour),Banana (Sour),,Rs./kg,Narahenpita,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,wholesale,110.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,wholesale,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Beans,Beans,Beans,Rs./kg,Dambulla,retail,405.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Beans,Beans,Beans,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Beans,Beans,Beans,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Beans,Beans,Beans,Rs./kg,Dambulla,wholesale,375.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Beans,Beans,Beans,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,retail,288.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Narahenpita,retail,380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,retail,306.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,wholesale,268.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,wholesale,263.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,retail,310.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,retail,360.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,wholesale,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,retail,455.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Brinjal,Brinjal,Brinjal,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,wholesale,425.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,retail,595.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Cabbage,Cabbage,Cabbage,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,retail,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,wholesale,565.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,wholesale,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Carrot,Carrot,Carrot,Rs./kg,Dambulla,retail,495.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Carrot,Carrot,Carrot,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Carrot,Carrot,Carrot,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Carrot,Carrot,Carrot,Rs./kg,Dambulla,wholesale,465.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Carrot,Carrot,Carrot,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Narahenpita,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,retail,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,wholesale,145.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,wholesale,173.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut oil,Coconut oil,,Rs./Ltr,Narahenpita,retail,852.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,retail,875.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,wholesale,843.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,retail,1605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,retail,1583.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,wholesale,1575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,wholesale,1530.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Egg (White),Egg (White),,Rs./Each,Narahenpita,retail,40.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Egg (White),Egg (White),,Rs./Each,Pettah,retail,39.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Egg (White),Egg (White),,Rs./Each,Pettah,wholesale,37.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,retail,340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,wholesale,310.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,wholesale,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Hurulla,Hurulla,,Rs./kg,Dambulla,retail,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Hurulla,Hurulla,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Hurulla,Hurulla,,Rs./kg,Dambulla,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Hurulla,Hurulla,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Katta (Imp),Katta (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,retail,2500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,wholesale,1988.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (Red),Kekulu (Red),,Rs./kg,Narahenpita,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,retail,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,wholesale,188.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,wholesale,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White),Kekulu (White),,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,retail,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,wholesale,182.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,wholesale,181.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kelawalla,Kelawalla,,Rs./kg,Dambulla,retail,1980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kelawalla,Kelawalla,,Rs./kg,Narahenpita,retail,2380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kelawalla,Kelawalla,,Rs./kg,Dambulla,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Kelawalla,Kelawalla,,Rs./kg,Pettah,wholesale,1300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Lime,Lime,Lime,Rs./kg,Dambulla,retail,1130.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Lime,Lime,Lime,Rs./kg,Narahenpita,retail,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Lime,Lime,Lime,Rs./kg,Pettah,retail,1400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Lime,Lime,Lime,Rs./kg,Dambulla,wholesale,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Lime,Lime,Lime,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Linna,Linna,,Rs./kg,Dambulla,retail,980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Linna,Linna,,Rs./kg,Narahenpita,retail,980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Linna,Linna,,Rs./kg,Dambulla,wholesale,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Linna,Linna,,Rs./kg,Pettah,wholesale,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu,Nadu,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu,Nadu,,Rs./kg,Narahenpita,retail,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu,Nadu,,Rs./kg,Pettah,retail,218.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu,Nadu,,Rs./kg,Dambulla,wholesale,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu,Nadu,,Rs./kg,Pettah,wholesale,195.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu (Imp),Nadu (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu (Imp),Nadu (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Orange (Imp),Orange (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Orange (Imp),Orange (Imp),,Rs./Each,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Papaw,Papaw,,Rs./kg,Dambulla,retail,95.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Papaw,Papaw,,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Papaw,Papaw,,Rs./kg,Pettah,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Papaw,Papaw,,Rs./kg,Dambulla,wholesale,65.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Papaw,Papaw,,Rs./kg,Pettah,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Paraw,Paraw,,Rs./kg,Dambulla,retail,2340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Paraw,Paraw,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Paraw,Paraw,,Rs./kg,Dambulla,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Paraw,Paraw,,Rs./kg,Pettah,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pineapple,Pineapple,,Rs./kg,Dambulla,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pineapple,Pineapple,,Rs./kg,Narahenpita,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pineapple,Pineapple,,Rs./kg,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pineapple,Pineapple,,Rs./kg,Dambulla,wholesale,195.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pineapple,Pineapple,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,retail,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,wholesale,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Imp),Potato (Imp),Potato,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,retail,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,wholesale,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,retail,305.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Local),Potato (Local),Potato,Rs./kg,Narahenpita,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,retail,340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,wholesale,285.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,wholesale,296.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Narahenpita,retail,340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,retail,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Dhal,Red Dhal,,Rs./kg,Narahenpita,retail,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Dhal,Red Dhal,,Rs./kg,Pettah,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Dhal,Red Dhal,,Rs./kg,Pettah,wholesale,239.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,retail,530.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,retail,568.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,wholesale,510.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,wholesale,568.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,retail,545.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,retail,538.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,wholesale,538.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Salaya,Salaya,,Rs./kg,Dambulla,retail,580.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Salaya,Salaya,,Rs./kg,Narahenpita,retail,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Salaya,Salaya,,Rs./kg,Dambulla,wholesale,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Salaya,Salaya,,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Samba,Samba,,Rs./kg,Dambulla,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Samba,Samba,,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Samba,Samba,,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Samba,Samba,,Rs./kg,Dambulla,wholesale,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Samba,Samba,,Rs./kg,Pettah,wholesale,233.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,wholesale,205.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sprat (Imp),Sprat (Imp),,Rs./kg,Narahenpita,retail,2100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,retail,1363.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,wholesale,1170.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sugar (White),Sugar (White),,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sugar (White),Sugar (White),,Rs./kg,Pettah,retail,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Sugar (White),Sugar (White),,Rs./kg,Pettah,wholesale,231.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Thalapath,Thalapath,,Rs./kg,Dambulla,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Thalapath,Thalapath,,Rs./kg,Narahenpita,retail,2600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Thalapath,Thalapath,,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Thalapath,Thalapath,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Tomato,Tomato,Tomato,Rs./kg,Dambulla,retail,555.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Tomato,Tomato,Tomato,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-13,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261113_e.pdf,2026-11-13T20:07:23
+2026-11-16,Apple (Imp),Apple (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Apple (Imp),Apple (Imp),,Rs./Each,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Balaya,Balaya,,Rs./kg,Dambulla,retail,1640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Balaya,Balaya,,Rs./kg,Narahenpita,retail,1190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Balaya,Balaya,,Rs./kg,Dambulla,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Balaya,Balaya,,Rs./kg,Pettah,wholesale,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,retail,155.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Banana (Sour),Banana (Sour),,Rs./kg,Narahenpita,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,wholesale,125.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,wholesale,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Beans,Beans,Beans,Rs./kg,Dambulla,retail,505.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Beans,Beans,Beans,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Beans,Beans,Beans,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Beans,Beans,Beans,Rs./kg,Dambulla,wholesale,475.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Beans,Beans,Beans,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,retail,285.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Narahenpita,retail,380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,wholesale,265.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,wholesale,257.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,wholesale,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,wholesale,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,retail,455.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Brinjal,Brinjal,Brinjal,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,wholesale,425.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,retail,595.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Cabbage,Cabbage,Cabbage,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,wholesale,565.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Carrot,Carrot,Carrot,Rs./kg,Dambulla,retail,470.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Carrot,Carrot,Carrot,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Carrot,Carrot,Carrot,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Carrot,Carrot,Carrot,Rs./kg,Dambulla,wholesale,440.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Carrot,Carrot,Carrot,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,retail,163.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Narahenpita,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,retail,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,wholesale,158.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,wholesale,173.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut oil,Coconut oil,,Rs./Ltr,Narahenpita,retail,852.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,retail,875.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,wholesale,843.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,retail,1605.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,retail,1650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,wholesale,1575.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,wholesale,1610.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Egg (White),Egg (White),,Rs./Each,Narahenpita,retail,40.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Egg (White),Egg (White),,Rs./Each,Pettah,retail,41.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Egg (White),Egg (White),,Rs./Each,Pettah,wholesale,40.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,retail,305.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,retail,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Hurulla,Hurulla,,Rs./kg,Dambulla,retail,1180.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Hurulla,Hurulla,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Hurulla,Hurulla,,Rs./kg,Dambulla,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Hurulla,Hurulla,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Katta (Imp),Katta (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,retail,2500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,wholesale,1963.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (Red),Kekulu (Red),,Rs./kg,Narahenpita,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,retail,197.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,wholesale,192.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,wholesale,178.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White),Kekulu (White),,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,retail,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,wholesale,187.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,wholesale,181.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kelawalla,Kelawalla,,Rs./kg,Dambulla,retail,1980.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kelawalla,Kelawalla,,Rs./kg,Narahenpita,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kelawalla,Kelawalla,,Rs./kg,Dambulla,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Kelawalla,Kelawalla,,Rs./kg,Pettah,wholesale,1300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Lime,Lime,Lime,Rs./kg,Dambulla,retail,1155.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Lime,Lime,Lime,Rs./kg,Narahenpita,retail,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Lime,Lime,Lime,Rs./kg,Pettah,retail,1400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Lime,Lime,Lime,Rs./kg,Dambulla,wholesale,1125.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Lime,Lime,Lime,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Linna,Linna,,Rs./kg,Dambulla,retail,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Linna,Linna,,Rs./kg,Narahenpita,retail,1060.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Linna,Linna,,Rs./kg,Dambulla,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Linna,Linna,,Rs./kg,Pettah,wholesale,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu,Nadu,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu,Nadu,,Rs./kg,Narahenpita,retail,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu,Nadu,,Rs./kg,Pettah,retail,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu,Nadu,,Rs./kg,Dambulla,wholesale,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu,Nadu,,Rs./kg,Pettah,wholesale,198.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu (Imp),Nadu (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu (Imp),Nadu (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Orange (Imp),Orange (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Orange (Imp),Orange (Imp),,Rs./Each,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Papaw,Papaw,,Rs./kg,Dambulla,retail,95.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Papaw,Papaw,,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Papaw,Papaw,,Rs./kg,Pettah,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Papaw,Papaw,,Rs./kg,Dambulla,wholesale,65.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Papaw,Papaw,,Rs./kg,Pettah,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Paraw,Paraw,,Rs./kg,Dambulla,retail,2340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Paraw,Paraw,,Rs./kg,Narahenpita,retail,1500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Paraw,Paraw,,Rs./kg,Dambulla,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Paraw,Paraw,,Rs./kg,Pettah,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pineapple,Pineapple,,Rs./kg,Dambulla,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pineapple,Pineapple,,Rs./kg,Narahenpita,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pineapple,Pineapple,,Rs./kg,Pettah,retail,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pineapple,Pineapple,,Rs./kg,Dambulla,wholesale,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pineapple,Pineapple,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,wholesale,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Imp),Potato (Imp),Potato,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,retail,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,wholesale,215.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,wholesale,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,retail,288.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Local),Potato (Local),Potato,Rs./kg,Narahenpita,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,retail,340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,wholesale,268.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,wholesale,306.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,retail,320.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Narahenpita,retail,360.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,retail,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,wholesale,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Dhal,Red Dhal,,Rs./kg,Narahenpita,retail,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Dhal,Red Dhal,,Rs./kg,Pettah,retail,253.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Dhal,Red Dhal,,Rs./kg,Pettah,wholesale,239.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,retail,545.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,retail,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,wholesale,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,retail,570.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,retail,675.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,wholesale,620.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Salaya,Salaya,,Rs./kg,Dambulla,retail,780.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Salaya,Salaya,,Rs./kg,Narahenpita,retail,640.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Salaya,Salaya,,Rs./kg,Dambulla,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Salaya,Salaya,,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Samba,Samba,,Rs./kg,Dambulla,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Samba,Samba,,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Samba,Samba,,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Samba,Samba,,Rs./kg,Dambulla,wholesale,218.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Samba,Samba,,Rs./kg,Pettah,wholesale,233.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,retail,330.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,wholesale,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sprat (Imp),Sprat (Imp),,Rs./kg,Narahenpita,retail,2100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,retail,1313.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,wholesale,1090.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sugar (White),Sugar (White),,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sugar (White),Sugar (White),,Rs./kg,Pettah,retail,257.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Sugar (White),Sugar (White),,Rs./kg,Pettah,wholesale,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Thalapath,Thalapath,,Rs./kg,Dambulla,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Thalapath,Thalapath,,Rs./kg,Narahenpita,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Thalapath,Thalapath,,Rs./kg,Dambulla,wholesale,1650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Thalapath,Thalapath,,Rs./kg,Pettah,wholesale,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Tomato,Tomato,Tomato,Rs./kg,Dambulla,retail,555.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Tomato,Tomato,Tomato,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-16,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261116_e.pdf,2026-11-16T19:42:27
+2026-11-17,Apple (Imp),Apple (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Apple (Imp),Apple (Imp),,Rs./Each,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Balaya,Balaya,,Rs./kg,Dambulla,retail,2000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Balaya,Balaya,,Rs./kg,Narahenpita,retail,1180.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Balaya,Balaya,,Rs./kg,Dambulla,wholesale,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Balaya,Balaya,,Rs./kg,Pettah,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,retail,130.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Banana (Sour),Banana (Sour),,Rs./kg,Narahenpita,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Banana (Sour),Banana (Sour),,Rs./kg,Dambulla,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Banana (Sour),Banana (Sour),,Rs./kg,Pettah,wholesale,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Beans,Beans,Beans,Rs./kg,Dambulla,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Beans,Beans,Beans,Rs./kg,Narahenpita,retail,800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Beans,Beans,Beans,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Beans,Beans,Beans,Rs./kg,Dambulla,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Beans,Beans,Beans,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,retail,283.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Narahenpita,retail,380.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,retail,292.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Dambulla,wholesale,263.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Imp),Big Onion (Imp),Big Onion,Rs./kg,Pettah,wholesale,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,retail,315.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Dambulla,wholesale,295.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Big Onion (Local),Big Onion (Local),Big Onion,Rs./kg,Pettah,wholesale,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,retail,430.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Brinjal,Brinjal,Brinjal,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Brinjal,Brinjal,Brinjal,Rs./kg,Dambulla,wholesale,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Brinjal,Brinjal,Brinjal,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,retail,580.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Cabbage,Cabbage,Cabbage,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Cabbage,Cabbage,Cabbage,Rs./kg,Dambulla,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Cabbage,Cabbage,Cabbage,Rs./kg,Pettah,wholesale,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Carrot,Carrot,Carrot,Rs./kg,Dambulla,retail,445.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Carrot,Carrot,Carrot,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Carrot,Carrot,Carrot,Rs./kg,Pettah,retail,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Carrot,Carrot,Carrot,Rs./kg,Dambulla,wholesale,415.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Carrot,Carrot,Carrot,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,retail,160.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Narahenpita,retail,200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,retail,175.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Dambulla,wholesale,155.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut (Avg.),Coconut (Avg.),,Rs./Nut,Pettah,wholesale,170.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut oil,Coconut oil,,Rs./Ltr,Narahenpita,retail,852.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,retail,875.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Coconut oil,Coconut oil,,Rs./Ltr,Pettah,wholesale,843.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,retail,1625.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Narahenpita,retail,1600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,retail,1633.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Dambulla,wholesale,1595.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Dried Chilli (Imp),Dried Chilli (Imp),,Rs./kg,Pettah,wholesale,1590.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Egg (White),Egg (White),,Rs./Each,Narahenpita,retail,42.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Egg (White),Egg (White),,Rs./Each,Pettah,retail,42.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Egg (White),Egg (White),,Rs./Each,Pettah,wholesale,41.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,retail,325.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,retail,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Dambulla,wholesale,325.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Green Chilli,Green Chilli,Green Chilli,Rs./kg,Pettah,wholesale,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Hurulla,Hurulla,,Rs./kg,Dambulla,retail,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Hurulla,Hurulla,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Hurulla,Hurulla,,Rs./kg,Dambulla,wholesale,850.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Hurulla,Hurulla,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Katta (Imp),Katta (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,retail,2500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Katta (Imp),Katta (Imp),,Rs./kg,Pettah,wholesale,1963.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (Red),Kekulu (Red),,Rs./kg,Narahenpita,retail,190.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,retail,197.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (Red),Kekulu (Red),,Rs./kg,Dambulla,wholesale,192.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (Red),Kekulu (Red),,Rs./kg,Pettah,wholesale,178.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White),Kekulu (White),,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,retail,194.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White),Kekulu (White),,Rs./kg,Dambulla,wholesale,184.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White),Kekulu (White),,Rs./kg,Pettah,wholesale,181.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kekulu (White) (Imp),Kekulu (White) (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kelawalla,Kelawalla,,Rs./kg,Dambulla,retail,1880.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kelawalla,Kelawalla,,Rs./kg,Narahenpita,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kelawalla,Kelawalla,,Rs./kg,Dambulla,wholesale,1000.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Kelawalla,Kelawalla,,Rs./kg,Pettah,wholesale,1300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Lime,Lime,Lime,Rs./kg,Dambulla,retail,1180.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Lime,Lime,Lime,Rs./kg,Narahenpita,retail,1800.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Lime,Lime,Lime,Rs./kg,Pettah,retail,1400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Lime,Lime,Lime,Rs./kg,Dambulla,wholesale,1150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Lime,Lime,Lime,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Linna,Linna,,Rs./kg,Dambulla,retail,1180.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Linna,Linna,,Rs./kg,Narahenpita,retail,1140.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Linna,Linna,,Rs./kg,Dambulla,wholesale,900.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Linna,Linna,,Rs./kg,Pettah,wholesale,950.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu,Nadu,,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu,Nadu,,Rs./kg,Narahenpita,retail,230.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu,Nadu,,Rs./kg,Pettah,retail,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu,Nadu,,Rs./kg,Dambulla,wholesale,193.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu,Nadu,,Rs./kg,Pettah,wholesale,198.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu (Imp),Nadu (Imp),,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu (Imp),Nadu (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Nadu (Imp),Nadu (Imp),,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Orange (Imp),Orange (Imp),,Rs./Each,Narahenpita,retail,290.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Orange (Imp),Orange (Imp),,Rs./Each,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Papaw,Papaw,,Rs./kg,Dambulla,retail,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Papaw,Papaw,,Rs./kg,Narahenpita,retail,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Papaw,Papaw,,Rs./kg,Pettah,retail,150.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Papaw,Papaw,,Rs./kg,Dambulla,wholesale,70.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Papaw,Papaw,,Rs./kg,Pettah,wholesale,100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Paraw,Paraw,,Rs./kg,Dambulla,retail,2340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Paraw,Paraw,,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Paraw,Paraw,,Rs./kg,Dambulla,wholesale,1100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Paraw,Paraw,,Rs./kg,Pettah,wholesale,1200.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pineapple,Pineapple,,Rs./kg,Dambulla,retail,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pineapple,Pineapple,,Rs./kg,Narahenpita,retail,300.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pineapple,Pineapple,,Rs./kg,Pettah,retail,225.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pineapple,Pineapple,,Rs./kg,Dambulla,wholesale,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pineapple,Pineapple,,Rs./kg,Pettah,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Dambulla,wholesale,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Ponni Samba (Imp),Ponni Samba (Imp),,Rs./kg,Pettah,wholesale,220.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,retail,235.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Imp),Potato (Imp),Potato,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,retail,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Imp),Potato (Imp),Potato,Rs./kg,Dambulla,wholesale,215.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Imp),Potato (Imp),Potato,Rs./kg,Pettah,wholesale,191.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Local),Potato (Local),Potato,Rs./kg,Narahenpita,retail,480.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,retail,340.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Local),Potato (Local),Potato,Rs./kg,Dambulla,wholesale,250.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Potato (Local),Potato (Local),Potato,Rs./kg,Pettah,wholesale,304.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,retail,270.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Narahenpita,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,retail,400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Dambulla,wholesale,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Pumpkin,Pumpkin,Pumpkin,Rs./kg,Pettah,wholesale,350.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Dhal,Red Dhal,,Rs./kg,Narahenpita,retail,280.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Dhal,Red Dhal,,Rs./kg,Pettah,retail,253.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Dhal,Red Dhal,,Rs./kg,Pettah,wholesale,238.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,retail,560.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Narahenpita,retail,,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,retail,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Dambulla,wholesale,540.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Imp),Red Onion (Imp),Red Onion,Rs./kg,Pettah,wholesale,520.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,retail,445.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Narahenpita,retail,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,retail,675.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Dambulla,wholesale,425.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Red Onion (Local),Red Onion (Local),Red Onion,Rs./kg,Pettah,wholesale,614.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Salaya,Salaya,,Rs./kg,Dambulla,retail,740.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Salaya,Salaya,,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Salaya,Salaya,,Rs./kg,Dambulla,wholesale,550.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Salaya,Salaya,,Rs./kg,Pettah,wholesale,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Samba,Samba,,Rs./kg,Dambulla,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Samba,Samba,,Rs./kg,Narahenpita,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Samba,Samba,,Rs./kg,Pettah,retail,240.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Samba,Samba,,Rs./kg,Dambulla,wholesale,222.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Samba,Samba,,Rs./kg,Pettah,wholesale,233.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,retail,305.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Narahenpita,retail,600.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,retail,500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Dambulla,wholesale,275.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Snake gourd,Snake gourd,Snake Gourd,Rs./kg,Pettah,wholesale,450.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sprat (Imp),Sprat (Imp),,Rs./kg,Narahenpita,retail,2100.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,retail,1238.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sprat (Imp),Sprat (Imp),,Rs./kg,Pettah,wholesale,1080.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sugar (White),Sugar (White),,Rs./kg,Narahenpita,retail,260.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sugar (White),Sugar (White),,Rs./kg,Pettah,retail,255.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Sugar (White),Sugar (White),,Rs./kg,Pettah,wholesale,243.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Thalapath,Thalapath,,Rs./kg,Dambulla,retail,2400.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Thalapath,Thalapath,,Rs./kg,Narahenpita,retail,2500.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Thalapath,Thalapath,,Rs./kg,Dambulla,wholesale,1650.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Thalapath,Thalapath,,Rs./kg,Pettah,wholesale,1700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Tomato,Tomato,Tomato,Rs./kg,Dambulla,retail,555.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Tomato,Tomato,Tomato,Rs./kg,Narahenpita,retail,760.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Tomato,Tomato,Tomato,Rs./kg,Pettah,retail,750.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Tomato,Tomato,Tomato,Rs./kg,Dambulla,wholesale,525.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30
+2026-11-17,Tomato,Tomato,Tomato,Rs./kg,Pettah,wholesale,700.0,https://www.cbsl.gov.lk/sites/default/files/cbslweb_documents/statistics/pricerpt/price_report_20261117_e.pdf,2026-11-17T19:00:30

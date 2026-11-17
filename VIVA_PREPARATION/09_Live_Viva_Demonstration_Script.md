@@ -32,21 +32,27 @@ say "the data was updated this morning".
 4. Point at "Last daily update …" line.
 
 ## 4:00–9:00 — Predict page (main feature)
-5. Sidebar → **Predict**. Data source stays **Historical dataset (real)**. Open/close **Preview loaded data**.
-6. Open **"5 recorded price series can't be forecast, and why"**: "I don't hide stale series — Cabbage from Nuwara Eliya stopped in July 2025."
-7. Vegetable → **Beans**. Point at cards: Data source, Market Dambulla, Price type wholesale, Latest data + freshness.
-8. Prediction type **Latest / Next Available Prediction** → click **Predict**.
-   **Expected:** Rs 453.74/kg for 10 Nov 2026 (last price Rs 425). Note the yellow notice that the date already passed:
-   "The forecast starts from the latest published price, not from today."
-9. Choose **Future Date Forecast (multi-step)** → Forecast date **25 Nov 2026** → **Generate Forecast**.
-   **Expected:** Rs 507.96/kg, 16 days ahead. Open **Daily forecast path**: "Each day uses its own Ridge model — no error feedback."
-10. Set Forecast date **25 Dec 2026** → **Generate Forecast**.
-    **Expected:** "Cannot forecast that date: 2026-12-25 is 46 days after the latest known price … at most 30 days ahead."
-    Say: "The system refuses instead of inventing a number."
-11. Data source → **Latest HARTI Data (real)** (internet): shows the newest bulletin date (was 12 Nov 2026, 30 prices).
-    Say: "HARTI has no API; this downloads and parses today's PDF. It is cached for an hour and not saved."
-12. Data source → **Upload my own CSV** → upload `missing_price_column.csv`.
-    **Expected:** "The CSV is missing required column(s): ['price'] …" → "Input validation."
+*(Page redesigned on 15 Nov 2026: two data sources, five sections. Expected values below are from the 15 Nov data.)*
+
+5. Sidebar → **Predict**. It opens on **Latest Real Data Prediction**. Section **1. Official source status**:
+   "Every 3 hours a scheduled task checks HARTI, CBSL and DCS. Each card shows the newest publication found, when it
+   was checked, and whether anything new arrived or the check failed. A failed source is never shown as up to date."
+   Optional (internet): click **Check official sources now**.
+6. Section **3. Vegetable and market**: open **"5 recorded price series can't be forecast, and why"**: "I don't hide stale
+   series: Cabbage from Nuwara Eliya stopped in July 2025."
+7. In section 3, Vegetable → **Beans**; section 2 above now shows Beans' records. Read the **forecast starting point**: HARTI Dambulla, 12 Nov 2026, Rs 430 (midpoint of 380–480).
+   Click **Bulletin** to open HARTI's own PDF. Open the **CBSL** tab: "CBSL collects its own prices: Rs 375 wholesale
+   on 13 Nov. Shown for comparison, never mixed with HARTI or used by the model." Open **DCS**: "Retail, weekly, Colombo."
+8. Section **4. Prediction** → Forecast period **7 days** → **Predict**.
+   **Expected:** Rs 431.62/kg for 19 Nov 2026. Scroll to **Forecasts at 1, 7, 14 and 30 days**: 413.04 / 431.62 /
+   459.86 / 447.14, each with the accuracy measured for its range and the hold-last-price MAE beside it (all seven columns fit). "Each day uses its own Ridge model; no error feedback."
+9. Choose **Another date**: "The date picker stops at 30 days after the latest price; the system can't be asked for
+   more than it was tested for."
+10. Section **5. Data freshness and warnings**: "It says whether the data is up to date with the official source, and
+    warns if a check failed or HARTI hasn't published for more than 3 days."
+11. (Skip) The live-download option no longer exists; the scheduled update replaces it.
+12. Data source → **Upload CSV** → upload `missing_price_column.csv`.
+    **Expected:** "The CSV is missing required column(s): ['price'] …" → "Input validation. Uploaded data is never mixed with official data."
 
 ## 9:00–11:00 — Model Performance
 13. Sidebar → **Model Performance**. Point at the bar chart: model (green) vs **Hold last price** (grey) per range.
@@ -60,9 +66,9 @@ say "the data was updated this morning".
 19. Data source → **DCS weekly bulletins**: "Retail, weekly, Colombo — a different measurement."
 
 ## 13:30–16:30 — Cultivation Planner
-20. Sidebar → **Cultivation Planner**. Vegetable **Beans**, Variety **Bush types** (45 days). Show the DOA quote and link.
-21. Planting date **today** → **Generate Cultivation Plan** → harvest ~28 Dec 2026 → price **Not available** (beyond 30 days) + same-season history from earlier years.
-22. Planting date **20 Oct 2026** → **Generate** → first harvest **4 Dec 2026**, forecast **Rs 450/kg** with a likely range and suggested selling day.
+20. Sidebar → **Cultivation Planner**. Vegetable **Beans**, Variety **Bush types** (45 days). Show the DOA quote and link, and the **Forecast reach** box: forecasts reach 12 Dec 2026, so a planting date after 28 Oct 2026 gets history, not a forecast.
+21. Planting date **today** → **Generate Cultivation Plan** → harvest ~28 Dec 2026 → no forecast (beyond 30 days), so section 3 shows the orange **Historical Seasonal Price Reference – Not a Forecast**: about Rs 425/kg, the median of ~62 Dambulla prices in the same weeks of 2021–2026, with the range and years. Say: "History for this time of year, not a prediction."
+22. Planting date **20 Oct 2026** → **Generate** → first harvest **4 Dec 2026**, forecast **Rs 463/kg** with a likely range; the box above names the starting record (Rs 430, 12 Nov) and the model's weather region (Badulla). Change **Weather to display** to Jaffna → the forecast doesn't change.
 23. Say: "Months are counted as calendar months, not 30 days; the range comes from past forecast errors (10th–90th percentile)."
 
 ## 16:30–18:00 — Code and tests (only if asked)
