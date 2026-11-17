@@ -14,7 +14,7 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import NO_DURATION_REASONS, data_freshness, data_version, display_name
+from app.catalogue import NO_DURATION_REASONS, crop_label, data_freshness, data_version, display_name
 from app.cultivation import (
     MIN_SEASONAL_OBSERVATIONS,
     MIN_SEASONAL_YEARS,
@@ -33,6 +33,7 @@ from app.cultivation import (
     load_error_bands,
     select_price,
 )
+from app.i18n import current_language, format_date, t
 from app.services import forecaster_problems, historical_dataset_problems, load_real_market_history
 from app.source_records import harti_dambulla_records
 from config.config_loader import ConfigLoader
@@ -64,8 +65,10 @@ _freshness = data_freshness()
 with st.expander(ui.freshness_summary(_freshness)):
     ui.data_freshness_panel(_freshness)
     st.caption(
-        "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
-        "source every 3 hours and adds anything newly published."
+        t(
+            "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
+            "source every 3 hours and adds anything newly published."
+        )
     )
 
 
@@ -84,7 +87,7 @@ def _forecaster(version: str = _DATA_VERSION) -> DirectForecaster:
     return DirectForecaster.load(CONFIG_PATH)
 
 
-@st.cache_data(show_spinner="Preparing forecast features...")
+@st.cache_data(show_spinner=False)
 def _origin_rows(_history_frame: pd.DataFrame, version: str = _DATA_VERSION) -> pd.DataFrame:
     return ForecastFeatureBuilder(CONFIG_PATH).build_origin_features(_history_frame)
 
@@ -111,12 +114,12 @@ def _model_weather_region(series: str) -> tuple[str, str]:
     regional weather file (the market's own location, Dambulla, when no production region is evidenced)."""
     location = ProductionRegionResolver(config_path=CONFIG_PATH).resolve(series)
     if location.is_production_region:
-        return f"{location.region_name} (main production region)", location.region_name
-    return "Dambulla (the market's location; no evidenced production region)", "Dambulla"
+        return t("{region} (main production region)", region=location.region_name), location.region_name
+    return t("Dambulla (the market's location; no evidenced production region)"), "Dambulla"
 
 
 def _fmt_date(day: pd.Timestamp) -> str:
-    return f"{day.day} {day.strftime('%b %Y')}"
+    return format_date(day)
 
 
 # Each kind of price has its own colour, so a historical reference is never mistaken for a forecast.
@@ -133,167 +136,192 @@ def _rs(value: float) -> str:
     return f"Rs. {value:,.2f}"
 
 
+def _per_kg(value: str) -> str:
+    return t("{price} per kg", price=value)
+
+
 def _price_card(result: PriceResult) -> dict:
     """The plan's price card: the price and, underneath, what kind of price it is."""
     if result.kind == "unavailable":
-        return {"label": "Price at harvest", "value": "No verified price", "sub": "no price series for this crop"}
+        return {"label": t("Price at harvest"), "value": t("No verified price"), "sub": t("no price series for this crop")}
     sub = {
-        "model_forecast": f"model forecast for {_fmt_date(result.date)}" if result.date is not None else "model forecast",
-        "recorded_actual": "recorded in the harvest window (actual)",
-        "seasonal_reference": "same weeks of earlier years: history, not a forecast",
-        "latest_actual": f"latest actual price, {result.age_days} day(s) old: not a prediction",
+        "model_forecast": t("model forecast for {date}", date=_fmt_date(result.date)) if result.date is not None else t("model forecast"),
+        "recorded_actual": t("recorded in the harvest window (actual)"),
+        "seasonal_reference": t("same weeks of earlier years: history, not a forecast"),
+        "latest_actual": t("latest actual price, {days} day(s) old: not a prediction", days=result.age_days),
     }[result.kind]
-    return {"label": "Price at harvest", "value": f"Rs. {result.price:,.0f} / kg", "sub": sub, "accent": result.kind == "model_forecast"}
+    return {"label": t("Price at harvest"), "value": f"Rs. {result.price:,.0f} / {t('kg')}", "sub": sub, "accent": result.kind == "model_forecast"}
 
 
 def _render_price(result: PriceResult, plan, timing, series: str | None, window_text: str, today: pd.Timestamp) -> None:
     """The price section: one clearly labelled price, where it comes from, and what it is not."""
     with st.container(border=True):
-        st.markdown(f"**Price type:** :{_BADGE[result.kind]}-badge[{result.label}]")
+        st.markdown(f"**{t('Price type')}:** :{_BADGE[result.kind]}-badge[{result.label}]")
         days_ahead = (plan.harvest_start - today).days
         when = (
-            f"{days_ahead} day(s) from today" if days_ahead > 0 else ("today" if days_ahead == 0 else f"{-days_ahead} day(s) ago")
+            t("{days} day(s) from today", days=days_ahead)
+            if days_ahead > 0
+            else (t("today") if days_ahead == 0 else t("{days} day(s) ago", days=-days_ahead))
         )
         lines = [
-            f"- **Vegetable:** {timing.crop}, {timing.variety}"
-            + (f" (HARTI price series: {display_name(series)})" if series else ""),
+            f"- **{t('Vegetable')}:** {crop_label(timing.crop)}, {t(timing.variety)}"
+            + (" " + t("(HARTI price series: {series})", series=display_name(series)) if series else ""),
             f"- **{timing.date_label.split(' (')[0]}:** {_fmt_date(plan.start_date)}",
-            f"- **Expected harvest:** {window_text} ({when})",
+            f"- **{t('Expected harvest')}:** {window_text} ({when})",
         ]
         if result.kind == "unavailable":
-            lines.append("- **Price:** none. No verified price exists, so none is shown (not Rs 0).")
-            lines.append(f"- **Missing source:** {PRICE_SOURCE_NOTE}")
+            lines.append(f"- **{t('Price')}:** " + t("none. No verified price exists, so none is shown (not Rs 0)."))
+            lines.append(f"- **{t('Missing source')}:** {t(PRICE_SOURCE_NOTE)}")
         else:
             statistic = {
-                "model_forecast": "forecast",
-                "recorded_actual": "median of the prices recorded in the window",
-                "seasonal_reference": "median of the same weeks in earlier years",
-                "latest_actual": "newest recorded price (midpoint of HARTI's minimum and maximum)",
+                "model_forecast": t("forecast"),
+                "recorded_actual": t("median of the prices recorded in the window"),
+                "seasonal_reference": t("median of the same weeks in earlier years"),
+                "latest_actual": t("newest recorded price (midpoint of HARTI's minimum and maximum)"),
             }[result.kind]
-            lines.append(f"- **Price:** **{_rs(result.price)} per kg** ({statistic})")
+            lines.append(f"- **{t('Price')}:** **{_per_kg(_rs(result.price))}** ({statistic})")
             if result.low is not None and result.high is not None:
                 range_text = {
-                    "model_forecast": "the likely range, the middle 80% of past forecast errors for all vegetables together",
-                    "recorded_actual": "the lowest to highest recorded in the window",
-                    "seasonal_reference": "the lowest to highest recorded in those weeks",
-                    "latest_actual": "HARTI's minimum to maximum on that day",
+                    "model_forecast": t("the likely range, the middle 80% of past forecast errors for all vegetables together"),
+                    "recorded_actual": t("the lowest to highest recorded in the window"),
+                    "seasonal_reference": t("the lowest to highest recorded in those weeks"),
+                    "latest_actual": t("HARTI's minimum to maximum on that day"),
                 }[result.kind]
-                lines.append(f"- **Range:** {_rs(result.low)} to {_rs(result.high)} per kg: {range_text}")
+                lines.append(f"- **{t('Range')}:** " + t("{low} to {high} per kg", low=_rs(result.low), high=_rs(result.high)) + f": {range_text}")
             if result.kind in ("seasonal_reference", "recorded_actual"):
-                lines.append(f"- **Median / average:** {_rs(result.median)} / {_rs(result.mean)} per kg")
+                lines.append(f"- **{t('Median / average')}:** {_per_kg(f'{_rs(result.median)} / {_rs(result.mean)}')}")
             if result.kind == "model_forecast":
                 lines.append(
-                    f"- **Forecast date and horizon:** {_fmt_date(result.date)}, {result.horizon} day(s) after the latest "
-                    f"recorded price ({_fmt_date(plan.latest_price_date)})"
+                    f"- **{t('Forecast date and horizon')}:** "
+                    + t(
+                        "{date}, {days} day(s) after the latest recorded price ({latest})",
+                        date=_fmt_date(result.date),
+                        days=result.horizon,
+                        latest=_fmt_date(plan.latest_price_date),
+                    )
                 )
             if result.kind == "latest_actual":
-                lines.append(f"- **Observation date:** {_fmt_date(result.date)} ({result.age_days} day(s) before today)")
+                lines.append(
+                    f"- **{t('Observation date')}:** {_fmt_date(result.date)} (" + t("{days} day(s) before today", days=result.age_days) + ")"
+                )
             if result.kind in ("seasonal_reference", "recorded_actual"):
                 lines.append(
-                    f"- **Historical period:** {result.period}"
+                    f"- **{t('Historical period')}:** {result.period}"
                     if result.kind == "seasonal_reference"
-                    else f"- **Period:** {result.period}"
+                    else f"- **{t('Period')}:** {result.period}"
                 )
                 lines.append(
-                    f"- **Records used:** {result.observations} daily price(s), years {', '.join(str(y) for y in result.years)}"
+                    f"- **{t('Records used')}:** "
+                    + t("{n} daily price(s), years {years}", n=result.observations, years=", ".join(str(y) for y in result.years))
                 )
             lines.append(
-                f"- **Source:** {result.source} · **Market:** {result.market} · **Price type:** {result.price_type} · "
-                f"**Unit:** {result.unit}"
+                f"- **{t('Source')}:** {result.source} · **{t('Market')}:** {result.market} · **{t('Price type')}:** {t(result.price_type)} · "
+                f"**{t('Unit')}:** {result.unit}"
             )
         st.markdown("\n".join(lines))
-        st.markdown(f"**What this is:** {result.explanation}")
+        st.markdown(f"**{t('What this is')}:** {result.explanation}")
         if result.limitation:
-            st.caption(f"**Limitation:** {result.limitation}")
+            st.caption(f"**{t('Limitation')}:** {result.limitation}")
 
 
 def _render_comparison(
     current: CurrentPrice, harvest: PriceResult, comparison: PriceComparison, plan, crop: str, today: pd.Timestamp
 ) -> None:
     """Today's actual price and the harvest-time price side by side, and the change between them."""
-    now_meta = [("Vegetable", crop)]
+    now_meta = [(t("Vegetable"), crop)]
     if current.price is not None:
-        now_meta.append(("Price date", f"{_fmt_date(current.date)} ({current.age_days} day(s) ago), latest recorded"))
+        now_meta.append((t("Price date"), t("{date} ({days} day(s) ago), latest recorded", date=_fmt_date(current.date), days=current.age_days)))
         if current.low is not None and current.high is not None:
-            now_meta.append(("Day's range", f"Rs. {current.low:,.2f} to {current.high:,.2f} (this price is the midpoint)"))
+            now_meta.append(
+                (t("Day's range"), t("Rs. {low:,.2f} to {high:,.2f} (this price is the midpoint)", low=current.low, high=current.high))
+            )
         if current.planting_price is not None:
             now_meta.append(
-                ("On your planting date", f"Rs. {current.planting_price:,.2f} (recorded {_fmt_date(current.planting_price_date)})")
+                (
+                    t("On your planting date"),
+                    t("Rs. {price:,.2f} (recorded {date})", price=current.planting_price, date=_fmt_date(current.planting_price_date)),
+                )
             )
     else:
-        now_meta.append(("Why", current.reason))
-    now_meta.append(("Market", f"{current.market} wholesale, {current.source} (the same for every growing location)"))
+        now_meta.append((t("Why"), current.reason))
+    now_meta.append(
+        (t("Market"), t("{market} wholesale, {source} (the same for every growing location)", market=current.market, source=current.source))
+    )
     now_card = {
-        "tag": "Actual price · now" if current.is_current else ("Last recorded price" if current.price is not None else "No recorded price"),
-        "title": "Current market price (planning time)",
+        "tag": t("Actual price · now") if current.is_current else (t("Last recorded price") if current.price is not None else t("No recorded price")),
+        "title": t("Current market price (planning time)"),
         "value": current.price,
-        "value_text": "No current price",
+        "value_text": t("No current price"),
         "accent": ui.COLORS["primary"] if current.is_current else ui.COLORS["muted"],
         "meta": now_meta,
     }
 
-    harvest_meta = [("Vegetable", crop)]
+    harvest_meta = [(t("Vegetable"), crop)]
     harvest_date = harvest.date if harvest.kind == "model_forecast" and harvest.date is not None else plan.harvest_start
-    harvest_meta.append(("Expected harvest", _fmt_date(harvest_date)))
+    harvest_meta.append((t("Expected harvest"), _fmt_date(harvest_date)))
     if plan.latest_price_date is not None and harvest.kind in ("model_forecast", "seasonal_reference"):
         after_latest = (harvest_date - plan.latest_price_date).days
         from_today = (harvest_date - today).days
-        horizon = f"{after_latest} days after the latest recorded price ({from_today} days from today)"
+        horizon = t("{after} days after the latest recorded price ({today} days from today)", after=after_latest, today=from_today)
         if plan.stale:
-            horizon = f"{from_today} days from today; no forecast, as the latest recorded price is too old"
+            horizon = t("{today} days from today; no forecast, as the latest recorded price is too old", today=from_today)
         elif harvest.kind == "seasonal_reference":
-            horizon += f": beyond the model's {MAX_HORIZON_DAYS}-day forecast"
-        harvest_meta.append(("Horizon", horizon))
+            horizon += t(": beyond the model's {days}-day forecast", days=MAX_HORIZON_DAYS)
+        harvest_meta.append((t("Horizon"), horizon))
     if harvest.kind == "model_forecast":
         if harvest.low is not None and harvest.high is not None:
-            harvest_meta.append(("Likely range", f"Rs. {harvest.low:,.2f} to {harvest.high:,.2f}"))
-        harvest_meta.append(("Note", "A model forecast, not a guaranteed price"))
-        tag, title, accent = "Model forecast", "Expected price at harvest", ui.COLORS["info"]
+            harvest_meta.append((t("Likely range"), t("Rs. {low:,.2f} to {high:,.2f}", low=harvest.low, high=harvest.high)))
+        harvest_meta.append((t("Note"), t("A model forecast, not a guaranteed price")))
+        tag, title, accent = t("Model forecast"), t("Expected price at harvest"), ui.COLORS["info"]
     elif harvest.kind == "seasonal_reference":
         harvest_meta.append(
-            ("Based on", f"{harvest.observations} prices in the same weeks of {harvest.years[0]}–{harvest.years[-1]}")
+            (t("Based on"), t("{n} prices in the same weeks of {first}–{last}", n=harvest.observations, first=harvest.years[0], last=harvest.years[-1]))
         )
-        harvest_meta.append(("Range", f"Rs. {harvest.low:,.2f} to {harvest.high:,.2f}"))
-        tag, title, accent = "Seasonal reference · not a forecast", "Typical price at harvest time", ui.COLORS["forecast"]
+        harvest_meta.append((t("Range"), t("Rs. {low:,.2f} to {high:,.2f}", low=harvest.low, high=harvest.high)))
+        tag, title, accent = t("Seasonal reference · not a forecast"), t("Typical price at harvest time"), ui.COLORS["forecast"]
     elif harvest.kind == "recorded_actual":
-        harvest_meta.append(("Based on", f"{harvest.observations} price(s) recorded in the harvest window"))
-        tag, title, accent = "Actual · harvest passed", "Price recorded at harvest", ui.COLORS["secondary"]
+        harvest_meta.append((t("Based on"), t("{n} price(s) recorded in the harvest window", n=harvest.observations)))
+        tag, title, accent = t("Actual · harvest passed"), t("Price recorded at harvest"), ui.COLORS["secondary"]
     else:
         harvest_meta.append(
-            ("Why", "No forecast or seasonal reference covers the harvest dates."
-             if harvest.kind == "latest_actual" else "No verified price exists for this crop.")
+            (
+                t("Why"),
+                t("No forecast or seasonal reference covers the harvest dates.")
+                if harvest.kind == "latest_actual"
+                else t("No verified price exists for this crop."),
+            )
         )
-        tag, title, accent = "No harvest-time estimate", "Expected price at harvest", ui.COLORS["muted"]
+        tag, title, accent = t("No harvest-time estimate"), t("Expected price at harvest"), ui.COLORS["muted"]
     harvest_card = {
         "tag": tag,
         "title": title,
         "value": harvest.price if harvest.kind in ("model_forecast", "seasonal_reference", "recorded_actual") else None,
-        "value_text": "No estimate",
+        "value_text": t("No estimate"),
         "accent": accent,
         "meta": harvest_meta,
     }
 
     if comparison.comparable:
         sign = "+" if comparison.difference >= 0 else "−"
-        headline = f"{sign}Rs. {abs(comparison.difference):,.2f} / kg ({sign}{abs(comparison.percent):.1f}%)"
-        subject = "The forecast price at harvest" if harvest.kind == "model_forecast" else "The typical price at harvest time"
+        headline = f"{sign}Rs. {abs(comparison.difference):,.2f} / {t('kg')} ({sign}{abs(comparison.percent):.1f}%)"
+        subject = t("The forecast price at harvest") if harvest.kind == "model_forecast" else t("The typical price at harvest time")
         text = {
-            "higher": f"{subject} is HIGHER than today's price.",
-            "lower": f"{subject} is LOWER than today's price.",
-            "similar": f"{subject} is about the same as today's price (within ±{NEUTRAL_CHANGE_PCT:.0f}%).",
+            "higher": t("{subject} is HIGHER than today's price.", subject=subject),
+            "lower": t("{subject} is LOWER than today's price.", subject=subject),
+            "similar": t("{subject} is about the same as today's price (within ±{pct:.0f}%).", subject=subject, pct=NEUTRAL_CHANGE_PCT),
         }[comparison.direction]
         if harvest.kind == "model_forecast":
-            note = "A forecast, not a guaranteed price."
+            note = t("A forecast, not a guaranteed price.")
             if comparison.within_forecast_range:
-                note += " Today's price lies inside the forecast's likely range, so the change is within its normal error."
+                note += " " + t("Today's price lies inside the forecast's likely range, so the change is within its normal error.")
         else:
-            note = (
+            note = t(
                 "Compared with what the price has been in these weeks in earlier years (history, not a forecast); "
                 "earlier years' prices are not adjusted for inflation."
             )
         delta = {"direction": comparison.direction, "headline": headline, "text": text, "note": note}
     else:
-        delta = {"direction": None, "headline": "No comparison", "text": comparison.reason}
+        delta = {"direction": None, "headline": t("No comparison"), "text": comparison.reason}
     ui.price_comparison([now_card, harvest_card], delta)
 
 
@@ -306,17 +334,17 @@ PRICE_SOURCE_NOTE = (
 try:
     timings = load_crop_timings(REFERENCE_PATH)
 except CultivationReferenceError as error:
-    st.error(f"The harvest reference data can't be used: {error} `data/reference/README.md` explains where it comes from.")
+    st.error(t("The harvest reference data can't be used: {error} `data/reference/README.md` explains where it comes from.", error=error))
     st.stop()
 
 _data_problems = historical_dataset_problems(CONFIG_PATH)
 if _data_problems:
-    st.error("**The price datasets can't be used:**\n" + "\n".join(f"- {problem}" for problem in _data_problems))
+    st.error(t("**The price datasets can't be used:**") + "\n" + "\n".join(f"- {problem}" for problem in _data_problems))
     st.stop()
 try:
     history = _history(_DATA_VERSION)
 except (DataValidationError, ValueError, KeyError, TypeError, OSError) as error:
-    st.error(f"Couldn't load the real datasets: {error}")
+    st.error(t("Couldn't load the real datasets: {error}", error=error))
     st.stop()
 _priced_series = set(history.loc[history["price"].notna(), "vegetable"])
 
@@ -324,57 +352,79 @@ forecaster = origin_rows = None
 _model_problems = forecaster_problems(CONFIG_PATH)
 if _model_problems:
     st.warning(
-        "**Price forecasts are unavailable, so only harvest dates and earlier years' prices are shown:**\n"
+        t("**Price forecasts are unavailable, so only harvest dates and earlier years' prices are shown:**")
+        + "\n"
         + "\n".join(f"- {problem}" for problem in _model_problems)
     )
 else:
     try:
         forecaster = _forecaster(_DATA_VERSION)
-        origin_rows = _origin_rows(history, _DATA_VERSION)
+        with st.spinner(t("Preparing forecast features...")):
+            origin_rows = _origin_rows(history, _DATA_VERSION)
     except Exception as error:  # noqa: BLE001 -- a corrupt model file can raise almost anything while unpickling
         forecaster = origin_rows = None
-        st.warning(f"Price forecasts are unavailable, because the forecaster couldn't be loaded ({type(error).__name__}: {error}).")
+        st.warning(
+            t("Price forecasts are unavailable, because the forecaster couldn't be loaded ({error}).", error=f"{type(error).__name__}: {error}")
+        )
 bands = load_error_bands(ERROR_BANDS_PATH)
 
-st.header("1. Your crop")
-_crops = list(dict.fromkeys(t.crop for t in timings))
+st.header(t("1. Your crop"))
+_crops = list(dict.fromkeys(row.crop for row in timings))
 _left, _middle, _right = st.columns(3, gap="medium")
 with _left:
-    crop = st.selectbox("Vegetable", _crops, key="planner_crop")
-_crop_rows = [t for t in timings if t.crop == crop]
+    crop = st.selectbox(t("Vegetable"), _crops, key="planner_crop", format_func=crop_label)
+_crop_rows = [row for row in timings if row.crop == crop]
 with _middle:
     _variety = st.selectbox(
-        "Variety or guidance",
-        [t.variety for t in _crop_rows],
+        t("Variety or guidance"),
+        [row.variety for row in _crop_rows],
         key=f"planner_variety_{crop}",
-        format_func=lambda name: next(f"{t.variety} — {t.duration_text}" for t in _crop_rows if t.variety == name),
-        help="Released varieties have their own published durations; crop guidance applies to the crop in general.",
+        format_func=lambda name: next(f"{t(row.variety)} — {row.duration_text}" for row in _crop_rows if row.variety == name),
+        help=t("Released varieties have their own published durations; crop guidance applies to the crop in general."),
     )
-timing = next(t for t in _crop_rows if t.variety == _variety)
+timing = next(row for row in _crop_rows if row.variety == _variety)
 _series_options = [label for label in timing.price_labels if label in _priced_series]
 with _right:
     price_label = st.selectbox(
-        "Market price series (HARTI, Dambulla wholesale)",
+        t("Market price series (HARTI, Dambulla wholesale)"),
         _series_options or [NO_SERIES],
         key=f"planner_series_{crop}",
-        format_func=lambda name: name if name == NO_SERIES else display_name(name),
-        help="The HARTI daily wholesale series used for this crop's prices. Some crops have more than one.",
+        format_func=lambda name: t(name) if name == NO_SERIES else display_name(name),
+        help=t("The HARTI daily wholesale series used for this crop's prices. Some crops have more than one."),
     )
 if price_label == NO_SERIES:
     price_label = None
 
 with st.container(border=True):
-    st.markdown(f"**Published timing:** {timing.duration_text} to **{timing.event}**, counted from **{timing.date_label.split(' (')[0].lower()}**.")
+    st.markdown(
+        t(
+            "**Published timing:** {duration} to **{event}**, counted from **{stage}**.",
+            duration=timing.duration_text,
+            event=timing.event_text,
+            stage=timing.date_label.split(" (")[0].lower(),
+        )
+    )
     st.markdown(f"> {timing.source_text}")
-    st.caption(f"Department of Agriculture, HORDI ({timing.scope}), retrieved {REFERENCE_RETRIEVED}: {timing.source_url}")
-    st.caption(f"**How the dates are calculated:** {timing.calculation_basis}")
+    if current_language() != "en":
+        st.caption(t("Quoted as published by the Department of Agriculture (in English)."))
+    st.caption(
+        t(
+            "Department of Agriculture, HORDI ({scope}), retrieved {retrieved}: {url}",
+            scope=t(timing.scope),
+            retrieved=REFERENCE_RETRIEVED,
+            url=timing.source_url,
+        )
+    )
+    st.caption(f"**{t('How the dates are calculated')}:** {timing.calculation_basis}")
 if timing.start_stage == "not stated":
     st.warning(
-        "This source doesn't say which date its duration counts from (sowing, planting or transplanting). "
-        "Enter the date you consider the start, and treat the harvest dates as approximate."
+        t(
+            "This source doesn't say which date its duration counts from (sowing, planting or transplanting). "
+            "Enter the date you consider the start, and treat the harvest dates as approximate."
+        )
     )
 elif timing.start_stage in ("nursery sowing", "flowering", "seeding", "transplanting", "field planting"):
-    st.info(f"Enter the **{timing.date_label.lower()}**. {timing.stage_note}")
+    st.info(t("Enter the **{label}**.", label=timing.date_label.lower()) + f" {timing.stage_note}")
 
 _today = pd.Timestamp.now().normalize()
 # Say before Generate how far the forecast reaches for this crop, so a farmer planting today isn't
@@ -385,22 +435,40 @@ if price_label:
     _stage = timing.date_label.split(" (")[0].lower()
     if (_today - _series_latest).days > MAX_HORIZON_DAYS:
         st.warning(
-            f"**No price forecast is possible for {display_name(price_label)}:** its latest HARTI Dambulla price is from "
-            f"{_series_latest.date()}, more than {MAX_HORIZON_DAYS} days ago. The plan shows harvest dates and earlier "
-            "years' prices only."
+            t(
+                "**No price forecast is possible for {series}:** its latest HARTI Dambulla price is from "
+                "{date}, more than {days} days ago. The plan shows harvest dates and earlier "
+                "years' prices only.",
+                series=display_name(price_label),
+                date=_series_latest.date(),
+                days=MAX_HORIZON_DAYS,
+            )
         )
     else:
         _last_start = latest_start_in_reach(timing, _reach_end)
         _note = (
-            " That date has passed, so a crop started today or later gets harvest dates and earlier years' prices "
-            "(history), not a forecast."
+            t(
+                "That date has passed, so a crop started today or later gets harvest dates and earlier years' prices "
+                "(history), not a forecast."
+            )
             if _last_start < _today
-            else " A later date gets harvest dates and earlier years' prices (history), not a forecast."
+            else t("A later date gets harvest dates and earlier years' prices (history), not a forecast.")
         )
         st.info(
-            f"**Forecast reach:** the price model forecasts up to **{_fmt_date(_reach_end)}**, {MAX_HORIZON_DAYS} days after "
-            f"the latest HARTI Dambulla price ({_fmt_date(_series_latest)}). With {timing.duration_text} to {timing.event}, "
-            f"a forecast for the harvest needs a {_stage} on or before **{_fmt_date(_last_start)}**.{_note}"
+            t(
+                "**Forecast reach:** the price model forecasts up to **{reach}**, {days} days after "
+                "the latest HARTI Dambulla price ({latest}). With {duration} to {event}, "
+                "a forecast for the harvest needs a {stage} on or before **{last_start}**.",
+                reach=_fmt_date(_reach_end),
+                days=MAX_HORIZON_DAYS,
+                latest=_fmt_date(_series_latest),
+                duration=timing.duration_text,
+                event=timing.event_text,
+                stage=_stage,
+                last_start=_fmt_date(_last_start),
+            )
+            + " "
+            + _note
         )
 _regions = sorted(_regional_weather(_DATA_VERSION)["region"].unique()) if _regional_weather(_DATA_VERSION) is not None else []
 _model_region_text, _model_region = _model_weather_region(price_label) if price_label else (None, None)
@@ -412,68 +480,73 @@ with st.form("cultivation_plan"):
             value=_today.date(),
             min_value=(_today - pd.Timedelta(days=730)).date(),
             max_value=(_today + pd.Timedelta(days=365)).date(),
-            help=timing.stage_note + " A past date shows a crop already in the ground.",
+            help=timing.stage_note + " " + t("A past date shows a crop already in the ground."),
         )
     with _location_column:
         _location_options = [*_regions, OTHER_LOCATION]
         location = st.selectbox(
-            "Weather to display",
+            t("Weather to display"),
             _location_options,
             index=_location_options.index(_model_region) if _model_region in _location_options else 0,
             key=f"planner_weather_{price_label}",
+            format_func=lambda option: t(option) if option == OTHER_LOCATION else option,  # region names stay as stored
             help=(
-                "Only changes the Recent weather panel. It doesn't change the harvest dates (national HORDI guidance) or the "
-                "price forecast, which always uses the weather of the vegetable's main production region"
+                t(
+                    "Only changes the Recent weather panel. It doesn't change the harvest dates (national HORDI guidance) or the "
+                    "price forecast, which always uses the weather of the vegetable's main production region"
+                )
                 + (f": {_model_region_text}." if _model_region_text else ".")
             ),
         )
-    submitted = st.form_submit_button("Generate Cultivation Plan", type="primary")
+    submitted = st.form_submit_button(t("Generate Cultivation Plan"), type="primary")
 
-with st.expander("All published durations"):
+with st.expander(t("All published durations")):
     st.dataframe(
-        pd.DataFrame(
-            {
-                "Crop": [t.crop for t in timings],
-                "Variety or guidance": [t.variety for t in timings],
-                "Duration": [t.duration_text for t in timings],
-                "Counted from": [t.start_stage for t in timings],
-                "To": [t.event for t in timings],
-                "Source wording": [t.source_text for t in timings],
-                "Source": [t.source_url for t in timings],
-            }
+        ui.translated_columns(
+            pd.DataFrame(
+                {
+                    "Crop": [crop_label(row.crop) for row in timings],
+                    "Variety or guidance": [t(row.variety) for row in timings],
+                    "Duration": [row.duration_text for row in timings],
+                    "Counted from": [row.stage_text for row in timings],
+                    "To": [row.event_text for row in timings],
+                    "Source wording": [row.source_text for row in timings],
+                    "Source": [row.source_url for row in timings],
+                }
+            )
         ),
         hide_index=True,
         width="stretch",
-        column_config={"Source": st.column_config.LinkColumn("Source")},
+        column_config={t("Source"): st.column_config.LinkColumn(t("Source"))},
     )
     st.caption(
-        "Price series with no published harvest duration, so not offered here: "
-        + "; ".join(f"**{display_name(name)}**: {reason}" for name, reason in NO_DURATION_REASONS.items())
+        t("Price series with no published harvest duration, so not offered here: ")
+        + "; ".join(f"**{display_name(name)}**: {t(reason)}" for name, reason in NO_DURATION_REASONS.items())
     )
 
 if not submitted:
-    st.info("Choose a vegetable, variety and date, then select **Generate Cultivation Plan**.")
+    st.info(t("Choose a vegetable, variety and date, then select **Generate Cultivation Plan**."))
     st.stop()
 
 actual = None
 if price_label:
     actual = history.loc[(history["vegetable"] == price_label) & history["price"].notna(), ["date", "price"]].sort_values("date")
-with st.spinner("Building the cultivation plan..."):
+with st.spinner(t("Building the cultivation plan...")):
     try:
         plan = build_plan(timing, price_label, start_date, actual, forecaster, origin_rows, bands, today=_today)
     except ValueError as error:
-        st.error(f"Couldn't build the plan: {error}")
+        st.error(t("Couldn't build the plan: {error}", error=error))
         st.stop()
 
-st.header("2. Your cultivation plan")
+st.header(t("2. Your cultivation plan"))
 _is_window = plan.harvest_start != plan.harvest_end
 _window = _fmt_date(plan.harvest_start) + (f" – {_fmt_date(plan.harvest_end)}" if _is_window else "")
 _window_label = {
-    "first harvest": "Expected first harvest",
-    "harvesting period": "Expected harvesting period",
-    "maturity": "Expected maturity",
-    "maturity for consumption": "Expected maturity",
-}.get(timing.event, "Expected harvest")
+    "first harvest": t("Expected first harvest"),
+    "harvesting period": t("Expected harvesting period"),
+    "maturity": t("Expected maturity"),
+    "maturity for consumption": t("Expected maturity"),
+}.get(timing.event, t("Expected harvest"))
 _latest_record = None
 if price_label:
     _records = _dambulla_records(_DATA_VERSION)
@@ -492,39 +565,49 @@ price_result = select_price(plan, actual, _today, _latest_record)
 _single_day = plan.fully_forecast and plan.window_days == 1
 if plan.forecast_days and not plan.fully_forecast:
     _sell = {
-        "label": "Suggested selling period",
-        "value": "No suggestion",
-        "sub": f"the forecast covers {plan.forecast_days} of {plan.window_days} harvest days",
+        "label": t("Suggested selling period"),
+        "value": t("No suggestion"),
+        "sub": t("the forecast covers {covered} of {total} harvest days", covered=plan.forecast_days, total=plan.window_days),
     }
 elif plan.best_day and plan.clear_advantage:
-    _sell = {"label": "Suggested selling day", "value": _fmt_date(plan.best_day["date"]), "sub": f"forecast Rs. {plan.best_day['price']:.0f} / kg"}
+    _sell = {
+        "label": t("Suggested selling day"),
+        "value": _fmt_date(plan.best_day["date"]),
+        "sub": t("forecast Rs. {price:.0f} / kg", price=plan.best_day["price"]),
+    }
 elif _single_day:
-    _sell = {"label": "Suggested selling period", "value": "Sell as harvested", "sub": "the published timing gives one harvest day"}
+    _sell = {"label": t("Suggested selling period"), "value": t("Sell as harvested"), "sub": t("the published timing gives one harvest day")}
 elif plan.best_day:
-    _sell = {"label": "Suggested selling period", "value": "Sell as harvested", "sub": "no day in the window is clearly better"}
+    _sell = {"label": t("Suggested selling period"), "value": t("Sell as harvested"), "sub": t("no day in the window is clearly better")}
 else:
-    _sell = {"label": "Suggested selling period", "value": "Not forecast", "sub": "no forecast covers the harvest dates"}
+    _sell = {"label": t("Suggested selling period"), "value": t("Not forecast"), "sub": t("no forecast covers the harvest dates")}
 ui.stat_cards(
     [
-        {"label": "Growing duration", "value": timing.duration_text, "sub": f"to {timing.event}, from {timing.start_stage} (published)"},
-        {"label": _window_label, "value": _window, "sub": f"counted from {_fmt_date(plan.start_date)}"},
+        {
+            "label": t("Growing duration"),
+            "value": timing.duration_text,
+            "sub": t("to {event}, from {stage} (published)", event=timing.event_text, stage=timing.stage_text),
+        },
+        {"label": _window_label, "value": _window, "sub": t("counted from {date}", date=_fmt_date(plan.start_date))},
         _price_card(price_result),
         _sell,
     ]
 )
 
-st.header("3. Price at harvest")
+st.header(t("3. Price at harvest"))
 _current = current_price(actual, _today, _latest_record, plan.start_date, crop=timing.crop)
 _render_comparison(
-    _current, price_result, compare_prices(_current, price_result), plan, display_name(price_label) if price_label else timing.crop, _today
+    _current, price_result, compare_prices(_current, price_result), plan, display_name(price_label) if price_label else crop_label(timing.crop), _today
 )
 _render_price(price_result, plan, timing, price_label, _window, _today)
 
 if plan.latest_price_date is not None:
     ui.data_source_panel(
-        "HARTI daily bulletin", "Dambulla", "Wholesale (Rs/kg)", plan.latest_price_date, _today,
+        "HARTI daily bulletin", "Dambulla", t("Wholesale (Rs/kg)"), plan.latest_price_date, _today,
         # A stale series' freshness warning already says no forecast is offered.
-        extra="" if plan.stale else f"Forecasts reach {plan.forecast_end.date()}, {MAX_HORIZON_DAYS} days after the latest recorded price.",
+        extra=""
+        if plan.stale
+        else t("Forecasts reach {date}, {days} days after the latest recorded price.", date=plan.forecast_end.date(), days=MAX_HORIZON_DAYS),
     )
     _start = None if _latest_record is None else pd.Series(
         {
@@ -535,71 +618,101 @@ if plan.latest_price_date is not None:
         }
     )
     _heading = (
-        "Forecast starting point (used by the model)"
+        t("Forecast starting point (used by the model)")
         if plan.forecast is not None
-        else "Latest recorded price (actual, not a forecast)"
+        else t("Latest recorded price (actual, not a forecast)")
     )
     if _start is not None and pd.notna(_start["Minimum"]) and pd.notna(_start["Maximum"]):
-        _price_text = (
-            f"Rs **{_start['Average / midpoint']:,.2f}** per kg (midpoint of {_start['Minimum']:,.2f} to {_start['Maximum']:,.2f})"
+        _price_text = t(
+            "Rs **{price:,.2f}** per kg (midpoint of {low:,.2f} to {high:,.2f})",
+            price=_start["Average / midpoint"],
+            low=_start["Minimum"],
+            high=_start["Maximum"],
         )
     else:
-        _price_text = f"Rs **{actual['price'].iloc[-1]:,.2f}** per kg"
+        _price_text = t("Rs **{price:,.2f}** per kg", price=actual["price"].iloc[-1])
     _link = ""
     if _start is not None and pd.notna(_start["Source document"]):
-        _link = f" [Bulletin]({str(_start['Source document']).replace(' ', '%20')})"
+        _link = f" [{t('Bulletin')}]({str(_start['Source document']).replace(' ', '%20')})"
     with st.container(border=True):
         st.markdown(
-            f"**{_heading}:** HARTI daily bulletin, Dambulla, {display_name(price_label)}, observed "
-            f"**{plan.latest_price_date:%Y-%m-%d}**: {_price_text}, wholesale.{_link}"
+            t(
+                "**{heading}:** HARTI daily bulletin, Dambulla, {series}, observed **{date}**: {price}, wholesale.",
+                heading=_heading,
+                series=display_name(price_label),
+                date=f"{plan.latest_price_date:%Y-%m-%d}",
+                price=_price_text,
+            )
+            + _link
         )
         if plan.forecast is not None:
             st.caption(
-                "**What the forecast uses:** recorded HARTI prices (Dambulla and other markets) up to that date, and observed "
-                f"Open-Meteo weather for {_model_region_text} up to then. No weather forecast is used. Fuel prices enter "
-                "only the 1-day-ahead forecast. CBSL and DCS prices are not used."
+                t(
+                    "**What the forecast uses:** recorded HARTI prices (Dambulla and other markets) up to that date, and observed "
+                    "Open-Meteo weather for {region} up to then. No weather forecast is used. Fuel prices enter "
+                    "only the 1-day-ahead forecast. CBSL and DCS prices are not used.",
+                    region=_model_region_text,
+                )
             )
 if plan.status == "passed":
     st.warning(
-        f"This harvest window ended before the latest recorded price ({plan.latest_price_date.date()}), so the crop should "
-        "already be harvested. The prices actually recorded in that window are shown below."
+        t(
+            "This harvest window ended before the latest recorded price ({date}), so the crop should "
+            "already be harvested. The prices actually recorded in that window are shown below.",
+            date=plan.latest_price_date.date(),
+        )
     )
 elif plan.status == "beyond" and not plan.stale:  # a stale series has its own warning instead
     st.info(
-        f"The harvest window starts after {plan.forecast_end.date()}, the furthest date the price model can forecast "
-        f"({MAX_HORIZON_DAYS} days after the latest recorded price). No price is predicted for it. Prices from the same weeks "
-        "of earlier years are shown instead (section 3 and the table below); they are history, not a prediction."
+        t(
+            "The harvest window starts after {date}, the furthest date the price model can forecast "
+            "({days} days after the latest recorded price). No price is predicted for it. Prices from the same weeks "
+            "of earlier years are shown instead (section 3 and the table below); they are history, not a prediction.",
+            date=plan.forecast_end.date(),
+            days=MAX_HORIZON_DAYS,
+        )
     )
 if plan.best_day and plan.clear_advantage:
     st.success(
-        f"The forecast is highest on **{_fmt_date(plan.best_day['date'])}** (Rs. {plan.best_day['price']:.0f} / kg), and even "
-        "its low estimate is above the forecast for the first harvest day."
+        t(
+            "The forecast is highest on **{date}** (Rs. {price:.0f} / kg), and even "
+            "its low estimate is above the forecast for the first harvest day.",
+            date=_fmt_date(plan.best_day["date"]),
+            price=plan.best_day["price"],
+        )
     )
 elif _single_day:
     st.info(
-        "The published timing gives a single harvest day, so there is no window to compare. Forecasts for the days around "
-        "it are in the chart, with their likely range."
+        t(
+            "The published timing gives a single harvest day, so there is no window to compare. Forecasts for the days around "
+            "it are in the chart, with their likely range."
+        )
     )
 elif plan.best_day and plan.fully_forecast:
     st.info(
-        "Forecast prices in the harvest window differ by less than the forecast's normal error, so no single day is clearly "
-        "better. Selling as the crop is ready is reasonable."
+        t(
+            "Forecast prices in the harvest window differ by less than the forecast's normal error, so no single day is clearly "
+            "better. Selling as the crop is ready is reasonable."
+        )
     )
 for warning in plan.warnings:
     st.warning(warning)
 
 if actual is not None and not actual.empty:
-    st.subheader("Price trend around the harvest")
+    st.subheader(t("Price trend around the harvest"))
     recent = actual[actual["date"] >= plan.latest_price_date - pd.Timedelta(days=150)]
     layers = []
     shade = pd.DataFrame({"start": [plan.harvest_start], "end": [plan.harvest_end + pd.Timedelta(days=1)]})
     layers.append(
-        alt.Chart(shade).mark_rect(opacity=0.12).encode(x="start:T", x2="end:T", color=alt.value(ui.COLORS["primary"]), tooltip=[alt.Tooltip("start:T", title="Harvest from"), alt.Tooltip("end:T", title="Until")])
+        alt.Chart(shade).mark_rect(opacity=0.12).encode(
+            x="start:T", x2="end:T", color=alt.value(ui.COLORS["primary"]),
+            tooltip=[ui.date_tooltip("start:T", t("Harvest from")), ui.date_tooltip("end:T", t("Until"))],
+        )
     )
     layers.append(
         alt.Chart(recent).mark_line(strokeWidth=2).encode(
-            x=alt.X("date:T", title="Date"), y=alt.Y("price:Q", title="Rs / kg"), color=alt.value(ui.SERIES["actual"]),
-            tooltip=[alt.Tooltip("date:T", title="Date"), alt.Tooltip("price:Q", title="Recorded Rs/kg", format=".0f")],
+            x=alt.X("date:T", title=t("Date"), axis=ui.date_axis()), y=alt.Y("price:Q", title=t("Rs / kg")), color=alt.value(ui.SERIES["actual"]),
+            tooltip=[ui.date_tooltip("date:T", t("Date")), alt.Tooltip("price:Q", title=t("Recorded Rs/kg"), format=".0f")],
         )
     )
     if plan.forecast is not None:
@@ -612,102 +725,132 @@ if actual is not None and not actual.empty:
             alt.Chart(forecast).mark_line(strokeDash=[6, 4], strokeWidth=2.5, point=alt.OverlayMarkDef(color=ui.SERIES["forecast"], size=28)).encode(
                 x="date:T", y="price:Q", color=alt.value(ui.SERIES["forecast"]),
                 tooltip=[
-                    alt.Tooltip("date:T", title="Date"),
-                    alt.Tooltip("price:Q", title="Forecast Rs/kg", format=".0f"),
-                    alt.Tooltip("low:Q", title="Likely low", format=".0f"),
-                    alt.Tooltip("high:Q", title="Likely high", format=".0f"),
+                    ui.date_tooltip("date:T", t("Date")),
+                    alt.Tooltip("price:Q", title=t("Forecast Rs/kg"), format=".0f"),
+                    alt.Tooltip("low:Q", title=t("Likely low"), format=".0f"),
+                    alt.Tooltip("high:Q", title=t("Likely high"), format=".0f"),
                 ],
             )
         )
     st.altair_chart(alt.layer(*layers).properties(height=340).interactive(bind_y=False), width="stretch")
     st.caption(
-        f"Green line: recorded {display_name(price_label)} prices at Dambulla (HARTI, wholesale). "
+        t("Green line: recorded {series} prices at Dambulla (HARTI, wholesale).", series=display_name(price_label))
+        + " "
         + (
-            "Dashed amber line: Ridge direct forecast. Shaded: its likely range, the middle 80% of the forecast's errors "
-            "on the test period for all vegetables together at that many days ahead "
-            f"(not measured for {display_name(price_label)} alone). "
+            t(
+                "Dashed amber line: Ridge direct forecast. Shaded: its likely range, the middle 80% of the forecast's errors "
+                "on the test period for all vegetables together at that many days ahead "
+                "(not measured for {series} alone).",
+                series=display_name(price_label),
+            )
             if plan.forecast is not None
-            else "No forecast is drawn: it can't reach these dates. "
+            else t("No forecast is drawn: it can't reach these dates.")
         )
-        + "Green band: the expected harvest window. Drag or scroll to zoom."
+        + " "
+        + t("Green band: the expected harvest window. Drag or scroll to zoom.")
     )
 
 if plan.window_forecast is not None and not plan.window_forecast.empty:
-    with st.expander("Forecast for each harvest day"):
+    with st.expander(t("Forecast for each harvest day")):
         st.dataframe(
-            pd.DataFrame(
-                {
-                    "Date": plan.window_forecast["date"].dt.date,
-                    "Days ahead": plan.window_forecast["horizon"],
-                    "Forecast (Rs/kg)": plan.window_forecast["price"].round(2),
-                    "Likely low": plan.window_forecast["low"].round(0),
-                    "Likely high": plan.window_forecast["high"].round(0),
-                }
+            ui.translated_columns(
+                pd.DataFrame(
+                    {
+                        "Date": plan.window_forecast["date"].dt.date,
+                        "Days ahead": plan.window_forecast["horizon"],
+                        "Forecast (Rs/kg)": plan.window_forecast["price"].round(2),
+                        "Likely low": plan.window_forecast["low"].round(0),
+                        "Likely high": plan.window_forecast["high"].round(0),
+                    }
+                )
             ),
             hide_index=True,
             width="stretch",
         )
         if (plan.window_forecast["date"] <= _today).any():
             st.caption(
-                f"Dates up to today ({_fmt_date(_today)}) are forecasts too: no price has been recorded for them yet. "
-                f"All forecasts start from the {plan.latest_price_date:%Y-%m-%d} price."
+                t(
+                    "Dates up to today ({today}) are forecasts too: no price has been recorded for them yet. "
+                    "All forecasts start from the {latest} price.",
+                    today=_fmt_date(_today),
+                    latest=f"{plan.latest_price_date:%Y-%m-%d}",
+                )
             )
         if not plan.fully_forecast:
-            st.caption(f"The forecast covers {plan.forecast_days} of the {plan.window_days} days in the harvest window.")
+            st.caption(t("The forecast covers {covered} of the {total} days in the harvest window.", covered=plan.forecast_days, total=plan.window_days))
 
 if plan.recorded_in_window is not None:
-    st.subheader("Prices recorded in the harvest window")
+    st.subheader(t("Prices recorded in the harvest window"))
     st.dataframe(
-        pd.DataFrame({"Date": plan.recorded_in_window["date"].dt.date, "Recorded (Rs/kg)": plan.recorded_in_window["price"]}),
+        ui.translated_columns(pd.DataFrame({"Date": plan.recorded_in_window["date"].dt.date, "Recorded (Rs/kg)": plan.recorded_in_window["price"]})),
         hide_index=True,
         width="stretch",
     )
-    st.caption("Recorded HARTI Dambulla wholesale prices: actual history, not a forecast.")
+    st.caption(t("Recorded HARTI Dambulla wholesale prices: actual history, not a forecast."))
 
 if plan.same_season is not None and not plan.same_season.empty:
-    st.subheader("Prices in the same weeks of earlier years")
-    st.dataframe(plan.same_season.round(0), hide_index=True, width="stretch")
+    st.subheader(t("Prices in the same weeks of earlier years"))
+    st.dataframe(ui.translated_columns(plan.same_season.round(0)), hide_index=True, width="stretch")
     st.caption(
-        f"Recorded {display_name(price_label)} prices at Dambulla (HARTI, wholesale, Rs/kg) in {len(plan.same_season)} earlier "
-        f"year(s), for the harvest dates ± {SEASONAL_PAD_DAYS} days. The seasonal reference in section 3 uses the "
-        f"{SEASONAL_REFERENCE_YEARS} most recent of these years, and needs at least {MIN_SEASONAL_OBSERVATIONS} prices in "
-        f"{MIN_SEASONAL_YEARS} years. This shows past variation. It is history, not a forecast."
+        t(
+            "Recorded {series} prices at Dambulla (HARTI, wholesale, Rs/kg) in {years} earlier "
+            "year(s), for the harvest dates ± {pad} days. The seasonal reference in section 3 uses the "
+            "{recent} most recent of these years, and needs at least {min_n} prices in "
+            "{min_years} years. This shows past variation. It is history, not a forecast.",
+            series=display_name(price_label),
+            years=len(plan.same_season),
+            pad=SEASONAL_PAD_DAYS,
+            recent=SEASONAL_REFERENCE_YEARS,
+            min_n=MIN_SEASONAL_OBSERVATIONS,
+            min_years=MIN_SEASONAL_YEARS,
+        )
     )
 elif plan.seasonal is not None:
     st.info(
-        f"No {display_name(price_label)} price was recorded in the same weeks (± {SEASONAL_PAD_DAYS} days) of any earlier "
-        "year, so there is no seasonal reference."
+        t(
+            "No {series} price was recorded in the same weeks (± {pad} days) of any earlier "
+            "year, so there is no seasonal reference.",
+            series=display_name(price_label),
+            pad=SEASONAL_PAD_DAYS,
+        )
     )
 
 _source_column, _weather_column = st.columns(2, gap="medium")
-with _source_column:
-    with st.container(border=True):
-        st.markdown("**Where the harvest timing comes from**")
-        st.markdown(f"> {timing.source_text}")
-        st.caption(
-            f"Department of Agriculture, HORDI ({timing.scope}, {timing.variety}), retrieved {REFERENCE_RETRIEVED}: {timing.source_url}. "
-            "Published guidance, not a model prediction. Actual timing varies with variety, season and management."
+with _source_column, st.container(border=True):
+    st.markdown(f"**{t('Where the harvest timing comes from')}**")
+    st.markdown(f"> {timing.source_text}")
+    st.caption(
+        t(
+            "Department of Agriculture, HORDI ({scope}, {variety}), retrieved {retrieved}: {url}. "
+            "Published guidance, not a model prediction. Actual timing varies with variety, season and management.",
+            scope=t(timing.scope),
+            variety=t(timing.variety),
+            retrieved=REFERENCE_RETRIEVED,
+            url=timing.source_url,
         )
-with _weather_column:
-    with st.container(border=True):
-        st.markdown(f"**Recent weather: {location}**")
-        weather = _regional_weather(_DATA_VERSION)
-        if location == OTHER_LOCATION or weather is None:
-            st.caption("No saved weather for this location. Choose one of the listed locations to see recent conditions.")
-        else:
-            local = weather[weather["region"] == location].sort_values("date")
-            last = local["date"].max()
-            month = local[local["date"] > last - pd.Timedelta(days=30)]
-            ui.stat_cards(
-                [
-                    {"label": "Rainfall, last 30 days", "value": f"{month['rainfall_mm'].sum():.0f} mm"},
-                    {"label": "Mean temperature", "value": f"{month['temperature_c'].mean():.1f} °C"},
-                    {"label": "Mean humidity", "value": f"{month['humidity_pct'].mean():.0f} %"},
-                ],
-                compact=True,
+    )
+with _weather_column, st.container(border=True):
+    st.markdown(f"**{t('Recent weather: {location}', location=t(location) if location == OTHER_LOCATION else location)}**")
+    weather = _regional_weather(_DATA_VERSION)
+    if location == OTHER_LOCATION or weather is None:
+        st.caption(t("No saved weather for this location. Choose one of the listed locations to see recent conditions."))
+    else:
+        local = weather[weather["region"] == location].sort_values("date")
+        last = local["date"].max()
+        month = local[local["date"] > last - pd.Timedelta(days=30)]
+        ui.stat_cards(
+            [
+                {"label": t("Rainfall, last 30 days"), "value": f"{month['rainfall_mm'].sum():.0f} mm"},
+                {"label": t("Mean temperature"), "value": f"{month['temperature_c'].mean():.1f} °C"},
+                {"label": t("Mean humidity"), "value": f"{month['humidity_pct'].mean():.0f} %"},
+            ],
+            compact=True,
+        )
+        st.caption(
+            t(
+                "Open-Meteo archive, 30 days to {date}. Shown for context only: it doesn't change the harvest dates "
+                "or the price forecast.",
+                date=last.date(),
             )
-            st.caption(
-                f"Open-Meteo archive, 30 days to {last.date()}. Shown for context only: it doesn't change the harvest dates "
-                "or the price forecast."
-                + (f" The forecast uses the weather of {_model_region_text}." if _model_region_text and location != _model_region else "")
-            )
+            + (" " + t("The forecast uses the weather of {region}.", region=_model_region_text) if _model_region_text and location != _model_region else "")
+        )

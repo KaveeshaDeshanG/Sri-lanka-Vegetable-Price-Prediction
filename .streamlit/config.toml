@@ -1,4 +1,5 @@
-# Dashboard theme. Streamlit reads this automatically when started from the project folder,
+# Dashboard theme. The fonts include Sinhala and Tamil ones (Nirmala UI on Windows, Noto elsewhere).
+# Streamlit reads this automatically when started from the project folder,
 # so the usual command (or start_app.bat) is all that's needed. Shared CSS is in app/ui.py.
 
 [theme]
@@ -13,8 +14,8 @@ borderColor = "#24352C"
 showWidgetBorder = true
 baseRadius = "0.75rem"
 buttonRadius = "0.625rem"
-font = "'Segoe UI', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
-headingFont = "'Segoe UI', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
+font = "'Segoe UI', 'Nirmala UI', 'Noto Sans Sinhala', 'Noto Sans Tamil', 'Iskoola Pota', Latha, Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
+headingFont = "'Segoe UI', 'Nirmala UI', 'Noto Sans Sinhala', 'Noto Sans Tamil', 'Iskoola Pota', Latha, Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif"
 headingFontWeights = [700, 650, 600, 600, 600, 600]
 codeFont = "'Cascadia Code', Consolas, 'SFMono-Regular', monospace"
 greenColor = "#22C55E"
@@ -40,3 +41,6 @@ borderColor = "#1E2B25"
 [client]
 # Hide developer-only toolbar items (such as Deploy) for a cleaner demonstration.
 toolbarMode = "minimal"
+# The sidebar's page links are drawn by app/ui.py (apply_theme), so their names follow the chosen
+# language; Streamlit's automatic list would always show the English file names.
+showSidebarNavigation = false

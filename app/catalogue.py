@@ -10,10 +10,12 @@ which HARTI lists separately from its "Brinjals" row.
 """
 
 from dataclasses import dataclass, field
+from functools import cache
 from pathlib import Path
 
 import pandas as pd
 
+from app.i18n import current_language, t
 from src.models.direct_forecaster import MAX_HORIZON_DAYS
 
 # internal series name -> (display name, crop in the DOA reference, labels as printed in sources)
@@ -77,8 +79,50 @@ NO_DURATION_REASONS = {
 
 
 def display_name(series: str) -> str:
-    """The name shown to users for an internal series name (unknown names are shown as-is)."""
-    return HARTI_SERIES.get(series, (series,))[0]
+    """The name shown to users for an internal series name (unknown names are shown as-is).
+
+    In Sinhala or Tamil the familiar English name is kept and the local name added: "Beans · බෝංචි".
+    """
+    name = HARTI_SERIES.get(series, (series,))[0]
+    local = local_crop_name(crop_for(series) or series)
+    return f"{name} · {local}" if local else name
+
+
+def localized(name: str) -> str:
+    """A stored vegetable or series name as shown: unchanged in English, with its local name in Sinhala or Tamil."""
+    return name if current_language() == "en" else display_name(name)
+
+
+def crop_label(crop: str) -> str:
+    """A DOA crop name for display, with its Sinhala or Tamil name in those languages: "Carrot · කැරට්"."""
+    local = local_crop_name(crop)
+    return f"{crop} · {local}" if local else crop
+
+
+@cache
+def _local_names(path: str = "data/reference/vegetable_names.csv") -> dict[str, dict[str, str]]:
+    """{crop: {"si": Sinhala name, "ta": Tamil name}} from the DOA's own published names."""
+    try:
+        table = pd.read_csv(Path(__file__).resolve().parents[1] / path, dtype=str, keep_default_na=False)
+    except (OSError, ValueError):
+        return {}
+    return {row.crop: {"si": row.sinhala_name.strip(), "ta": row.tamil_name.strip()} for row in table.itertuples(index=False)}
+
+
+def local_crop_name(crop: str | None) -> str | None:
+    """The crop's name in the current language (None in English, or when no local name is known).
+
+    The DOA's HORDI pages (data/reference/vegetable_names.csv) give most names; crops they don't
+    cover (onions, chillies, lime...) use the translation files.
+    """
+    language = current_language()
+    if language == "en" or not crop:
+        return None
+    published = _local_names().get(crop, {}).get(language)
+    if published:
+        return published
+    translated = t(crop)
+    return translated if translated != crop else None
 
 
 def crop_for(series: str) -> str | None:
@@ -99,10 +143,22 @@ def freshness(latest, today=None, horizon_days: int = MAX_HORIZON_DAYS) -> Fresh
     today = pd.Timestamp(today or pd.Timestamp.now()).normalize()
     age = (today - latest).days
     if age <= 3:
-        return Freshness(latest, age, "current", f"Latest data {latest.date()} ({age} day(s) old).")
+        return Freshness(latest, age, "current", t("Latest data {date} ({age} day(s) old).", date=latest.date(), age=age))
     if age <= horizon_days:
-        return Freshness(latest, age, "ageing", f"Latest data {latest.date()} is {age} days old; forecasts start from that date, not today.")
-    return Freshness(latest, age, "stale", f"Latest data {latest.date()} is {age} days old, beyond the {horizon_days}-day forecast reach, so no forecast is offered.")
+        return Freshness(
+            latest, age, "ageing", t("Latest data {date} is {age} days old; forecasts start from that date, not today.", date=latest.date(), age=age)
+        )
+    return Freshness(
+        latest,
+        age,
+        "stale",
+        t(
+            "Latest data {date} is {age} days old, beyond the {days}-day forecast reach, so no forecast is offered.",
+            date=latest.date(),
+            age=age,
+            days=horizon_days,
+        ),
+    )
 
 
 def past_date_notice(target_date, latest_actual_date, today=None) -> str | None:
@@ -112,10 +168,13 @@ def past_date_notice(target_date, latest_actual_date, today=None) -> str | None:
     target, latest = pd.Timestamp(target_date).normalize(), pd.Timestamp(latest_actual_date).normalize()
     if target >= today:
         return None
-    return (
-        f"**{target.date()} has already passed** ({(today - target).days} day(s) ago). This is what the model "
-        f"forecasts from data through {latest.date()}; it is not the recorded price for that day, which may already "
-        "be published. Run the daily update (`scripts/daily_update.py`) to import newer bulletins."
+    return t(
+        "**{date} has already passed** ({days} day(s) ago). This is what the model "
+        "forecasts from data through {latest}; it is not the recorded price for that day, which may already "
+        "be published. Run the daily update (`scripts/daily_update.py`) to import newer bulletins.",
+        date=target.date(),
+        days=(today - target).days,
+        latest=latest.date(),
     )
 
 
@@ -127,11 +186,11 @@ def series_status(history: pd.DataFrame, trained_vegetables: list[str] | None, t
     for series, group in priced.groupby("vegetable"):
         fresh = freshness(group["date"].max(), today)
         if trained_vegetables is None:
-            supported, reason = False, "The forecaster isn't available."
+            supported, reason = False, t("The forecaster isn't available.")
         elif series not in trained_vegetables:
-            supported, reason = False, "The forecaster wasn't trained on this series (too few prices)."
+            supported, reason = False, t("The forecaster wasn't trained on this series (too few prices).")
         elif fresh.level == "stale":
-            supported, reason = False, f"Its latest Dambulla price is {fresh.latest.date()}, {fresh.age_days} days ago."
+            supported, reason = False, t("Its latest Dambulla price is {date}, {days} days ago.", date=fresh.latest.date(), days=fresh.age_days)
         else:
             supported, reason = True, ""
         rows.append(
@@ -250,37 +309,62 @@ def update_notice(status: UpdateStatus, latest_observation, now=None) -> tuple[s
     now = pd.Timestamp(now or pd.Timestamp.now())
     latest = pd.Timestamp(latest_observation).normalize()
     age = (now.normalize() - latest).days
-    checked = f"last successful check {status.last_success:%Y-%m-%d %H:%M}" if status.last_success is not None else "no successful check recorded"
+    checked = (
+        t("last successful check {when}", when=f"{status.last_success:%Y-%m-%d %H:%M}")
+        if status.last_success is not None
+        else t("no successful check recorded")
+    )
     if status.last_attempt_failed:
-        return "warning", (
-            f"The latest attempt to check the official sources failed ({status.last_error}); {checked}. "
-            f"Showing the stored data, newest price {latest.date()} ({age} day(s) old)."
+        return "warning", t(
+            "The latest attempt to check the official sources failed ({error}); {checked}. "
+            "Showing the stored data, newest price {date} ({age} day(s) old).",
+            error=status.last_error,
+            checked=checked,
+            date=latest.date(),
+            age=age,
         )
     harti = status.sources.get("harti", {})
     if harti.get("status") == "failed":
-        return "warning", (
-            f"HARTI couldn't be checked at the last update ({harti.get('error', 'no details')}). Showing the stored "
-            f"HARTI data, newest price {latest.date()} ({age} day(s) old); newer bulletins may exist."
+        return "warning", t(
+            "HARTI couldn't be checked at the last update ({error}). Showing the stored "
+            "HARTI data, newest price {date} ({age} day(s) old); newer bulletins may exist.",
+            error=harti.get("error", t("no details")),
+            date=latest.date(),
+            age=age,
         )
     if status.overdue:
-        return "warning", (
-            f"The official sources haven't been checked for over {UPDATE_OVERDUE_HOURS} hours ({checked}), so newer "
-            f"HARTI prices may exist. Newest stored price: {latest.date()} ({age} day(s) old). Use **Check for new "
-            "official data** on the Home page."
+        return "warning", t(
+            "The official sources haven't been checked for over {hours} hours ({checked}), so newer "
+            "HARTI prices may exist. Newest stored price: {date} ({age} day(s) old). Use **Check for new "
+            "official data** on the Home page.",
+            hours=UPDATE_OVERDUE_HOURS,
+            checked=checked,
+            date=latest.date(),
+            age=age,
         )
     if age > HARTI_BEHIND_DAYS:
         source_has_nothing_newer = status.newest_listed is not None and status.newest_listed <= latest
         if source_has_nothing_newer:
-            return "warning", (
-                f"The newest price is {age} days old ({latest.date()}): HARTI hasn't published a newer bulletin yet "
-                f"({checked}). Forecasts start from {latest.date()}, not today."
+            return "warning", t(
+                "The newest price is {age} days old ({date}): HARTI hasn't published a newer bulletin yet "
+                "({checked}). Forecasts start from {date}, not today.",
+                age=age,
+                date=latest.date(),
+                checked=checked,
             )
-        return "warning", (
-            f"The newest price is {age} days old ({latest.date()}), although HARTI lists a bulletin for "
-            f"{status.newest_listed.date() if status.newest_listed is not None else 'a later date'} ({checked}). "
-            "That bulletin may not include this series."
+        return "warning", t(
+            "The newest price is {age} days old ({date}), although HARTI lists a bulletin for "
+            "{listed} ({checked}). That bulletin may not include this series.",
+            age=age,
+            date=latest.date(),
+            listed=status.newest_listed.date() if status.newest_listed is not None else t("a later date"),
+            checked=checked,
         )
-    return "info", f"Data is up to date with the official source ({checked}; newest HARTI bulletin listed {status.newest_listed.date() if status.newest_listed is not None else 'unknown'})."
+    return "info", t(
+        "Data is up to date with the official source ({checked}; newest HARTI bulletin listed {listed}).",
+        checked=checked,
+        listed=status.newest_listed.date() if status.newest_listed is not None else t("unknown"),
+    )
 
 
 def load_manifest(path: str | Path = "data/raw/data_manifest.json") -> dict | None:
@@ -349,7 +433,7 @@ def _latest_stored(key: str, raw_dir: Path) -> tuple[str | None, pd.Timestamp | 
             table = pd.read_csv(raw_dir / "dcs_weekly_retail_prices.csv", usecols=["year", "month", "week_of_month"]).dropna()
             year, month, week = (int(v) for v in table.sort_values(["year", "month", "week_of_month"]).iloc[-1])
             start = pd.Timestamp(year=year, month=month, day=1) + pd.Timedelta(days=7 * (week - 1))
-            return f"{year}-{month:02d} week {week}", start, ""
+            return f"{year}-{month:02d} week {week}", start, ""  # DCS's own period label, kept as published
         elif key == "weather":
             table = pd.read_csv(raw_dir / "weather_data_by_region.csv", usecols=["date", "region"], parse_dates=["date"])
             dates = table.groupby("region")["date"].max()  # the region furthest behind
@@ -362,15 +446,17 @@ def _latest_stored(key: str, raw_dir: Path) -> tuple[str | None, pd.Timestamp | 
             return (
                 f"{revision:%Y-%m-%d}",
                 revision,
-                (
-                    f"latest revision: diesel Rs {last['diesel_price']:,.0f}, petrol 92 Rs {last['petrol_price']:,.0f} per litre, "
-                    f"in force through {table['date'].max():%Y-%m-%d}"
+                t(
+                    "latest revision: diesel Rs {diesel:,.0f}, petrol 92 Rs {petrol:,.0f} per litre, in force through {date}",
+                    diesel=last["diesel_price"],
+                    petrol=last["petrol_price"],
+                    date=f"{table['date'].max():%Y-%m-%d}",
                 ),
             )
         else:
             return None, None, ""
     except (OSError, ValueError, KeyError, IndexError):
-        return None, None, "its data file couldn't be read"
+        return None, None, t("its data file couldn't be read")
     latest = dates.max()
     return (f"{latest:%Y-%m-%d}", latest, "") if pd.notna(latest) else (None, None, "")
 
@@ -408,21 +494,27 @@ def data_freshness(raw_dir: str | Path = "data/raw", now=None) -> list[SourceFre
         if source.key == "fuel" and stored_date is not None and (today - stored_date).days <= 3:
             recent = True  # a price revision in the last few days
         if last is None:
-            label, note = "Update Pending", "Not checked by the automatic update yet."
+            label, note = "Update Pending", t("Not checked by the automatic update yet.")
         elif last.get("status") == "failed":
             label = "Source Unavailable"
-            note = f"The last check ({last_checked:%Y-%m-%d %H:%M}) failed: {last.get('error', 'no details')}. The stored data is kept unchanged."
+            note = t(
+                "The last check ({when}) failed: {error}. The stored data is kept unchanged.",
+                when=f"{last_checked:%Y-%m-%d %H:%M}",
+                error=last.get("error", t("no details")),
+            )
         elif now - last_success > pd.Timedelta(hours=UPDATE_OVERDUE_HOURS):
             label = "Update Pending"
-            note = f"Not checked for {int((now - last_success).total_seconds() // 3600)} hours; newer data may have been published."
+            note = t(
+                "Not checked for {hours} hours; newer data may have been published.", hours=int((now - last_success).total_seconds() // 3600)
+            )
         elif newest_date is not None and stored_date is not None and newest_date > stored_date:
-            label, note = "Update Pending", f"The source lists {newest}, which isn't stored yet; the next update will add it."
+            label, note = "Update Pending", t("The source lists {newest}, which isn't stored yet; the next update will add it.", newest=newest)
         elif source.key == "weather" and stored_date is not None and stored_date < today - pd.Timedelta(days=WEATHER_ARCHIVE_LAG_DAYS + 1):
-            label, note = "Update Pending", "Observed weather for the last few days hasn't been stored yet."
+            label, note = "Update Pending", t("Observed weather for the last few days hasn't been stored yet.")
         elif recent:
-            label, note = "Recently Updated", f"New data was added in the last {RECENT_HOURS} hours."
+            label, note = "Recently Updated", t("New data was added in the last {hours} hours.", hours=RECENT_HOURS)
         else:
-            label, note = "Latest Available Data", "Nothing newer has been published since the last check."
+            label, note = "Latest Available Data", t("Nothing newer has been published since the last check.")
         if extra:
             note = f"{note} {extra[0].upper()}{extra[1:]}."
         result.append(SourceFreshness(source, label, stored, stored_date, newest, last_checked, last_success, note))
@@ -450,5 +542,6 @@ def last_run_problem(raw_dir: str | Path = "data/raw") -> str | None:
         return None
     run = runs[-1]
     when = str(run.get("finished_at") or run.get("started_at", ""))[:16].replace("T", " ")
-    kind = "was interrupted" if run.get("status") == "interrupted" else "failed"
-    return f"The most recent update ({when}) {kind}: {run.get('error', 'no details')}."
+    if run.get("status") == "interrupted":
+        return t("The most recent update ({when}) was interrupted: {error}.", when=when, error=run.get("error", t("no details")))
+    return t("The most recent update ({when}) failed: {error}.", when=when, error=run.get("error", t("no details")))

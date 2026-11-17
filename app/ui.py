@@ -11,6 +11,8 @@ from pathlib import Path
 import matplotlib as mpl
 import streamlit as st
 
+from app.i18n import current_language, init_language, language_selector, t
+
 COLORS = {
     "background": "#0B0F0E",
     "sidebar": "#111916",
@@ -177,6 +179,11 @@ _CSS = """
 .vp-fresh-card b { color: var(--vp-text); font-weight: 600; }
 .vp-fresh-note { margin-top: .3rem; font-size: .78rem; }
 
+/* Language switcher, top right of every page */
+[class*="st-key-vp_lang"] { align-items: flex-end; margin-bottom: -.4rem; }
+[class*="st-key-vp_lang"] > div { width: auto !important; }
+[class*="st-key-vp_lang"] [data-testid="stButtonGroup"] { justify-content: flex-end; }
+
 /* Responsive */
 @media (max-width: 1100px) {
   .vp-stats, .vp-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -222,7 +229,7 @@ _MATPLOTLIB_STYLE = {
     "legend.labelcolor": COLORS["text"],
     "legend.framealpha": 0.95,
     "lines.linewidth": 2.0,
-    "font.family": ["Segoe UI", "DejaVu Sans", "sans-serif"],
+    "font.family": ["Segoe UI", "Nirmala UI", "DejaVu Sans", "sans-serif"],
     "font.size": 10,
 }
 
@@ -234,26 +241,47 @@ def apply_theme(page_sources: tuple[str, ...] | None = None) -> None:
     lists only those, under "Used on this page", so a page never appears to use a source it doesn't.
     Omitted, it lists every source the app has data for.
     """
+    init_language()  # the chosen language (app/i18n.py), before any text is drawn
     mpl.rcParams.update(_MATPLOTLIB_STYLE)
     st.markdown(_CSS, unsafe_allow_html=True)
     if (_ASSETS / "logo.svg").exists():
         st.logo(str(_ASSETS / "logo.svg"), icon_image=str(_ASSETS / "logo_icon.svg"), size="large")
+    _navigation()
     names = available_sources()
-    title = "Data sources"
+    title = t("Data sources")
     if page_sources is not None:
         names = [name for name in names if name in page_sources]
-        title = "Used on this page"
-    rows = "".join(f'<div class="vp-side-row"><span class="vp-dot"></span>{escape(name)}</div>' for name in names)
+        title = t("Used on this page")
+    rows = "".join(f'<div class="vp-side-row"><span class="vp-dot"></span>{escape(t(name))}</div>' for name in names)
     st.sidebar.markdown(
         f"""
         <div class="vp-side-card">
           <div class="vp-side-title">{escape(title)}</div>
           {rows}
         </div>
-        <div class="vp-side-foot">Dambulla wholesale market &middot; Ridge direct forecaster, 1&ndash;30 days ahead</div>
+        <div class="vp-side-foot">{escape(t("Dambulla wholesale market · Ridge direct forecaster, 1–30 days ahead"))}</div>
         """,
         unsafe_allow_html=True,
     )
+
+
+# Every page, with the name the sidebar shows (translated when drawn). .streamlit/config.toml turns off
+# Streamlit's own list, which can only show the file names in English.
+PAGES = (
+    ("Home.py", "Home", "🏠"),
+    ("pages/1_Predict.py", "Predict", "📈"),
+    ("pages/2_Model_Performance.py", "Model Performance", "📊"),
+    ("pages/3_Price_History.py", "Price History", "🗓️"),
+    ("pages/4_Cultivation_Planner.py", "Cultivation Planner", "🌱"),
+)
+
+
+def _navigation() -> None:
+    for path, label, icon in PAGES:
+        try:
+            st.sidebar.page_link(path, label=t(label), icon=icon)
+        except Exception:  # noqa: BLE001 -- a page run on its own (tests) has no multipage app to link within
+            return
 
 
 # Source name -> the file that must exist for the app to be using it.
@@ -285,7 +313,13 @@ def available_sources(config_path: str = "config/config.yaml") -> list[str]:
 
 
 def page_header(title: str, subtitle: str, eyebrow: str) -> None:
-    """The page's hero banner, with its title as the page heading."""
+    """The page's hero banner, with its title as the page heading, and the language switcher above it.
+
+    title, subtitle and eyebrow are English; they are translated here.
+    """
+    with st.container(key="vp_lang"):
+        language_selector()
+    title, subtitle, eyebrow = t(title), t(subtitle), t(eyebrow)
     st.markdown(
         f'<div class="vp-hero"><span class="vp-eyebrow">{escape(eyebrow)}</span>'
         f"<h1>{escape(title)}</h1><p>{escape(subtitle)}</p></div>",
@@ -309,16 +343,19 @@ def stat_cards(cards: list[dict], compact: bool = False) -> None:
 
 
 def data_source_panel(source: str, market: str, price_type: str, latest, today=None, extra: str = "") -> None:
-    """Which data a page is showing, its latest date, and a freshness warning when it is old."""
+    """Which data a page is showing, its latest date, and a freshness warning when it is old.
+
+    source and market are names, shown as given; price_type is translated by the caller.
+    """
     from app.catalogue import freshness
 
     fresh = freshness(latest, today)
     stat_cards(
         [
-            {"label": "Data source", "value": source},
-            {"label": "Market", "value": market},
-            {"label": "Price type", "value": price_type},
-            {"label": "Latest data", "value": str(fresh.latest.date()), "sub": f"{fresh.age_days} day(s) before today", "accent": fresh.level == "current"},
+            {"label": t("Data source"), "value": source},
+            {"label": t("Market"), "value": market},
+            {"label": t("Price type"), "value": price_type},
+            {"label": t("Latest data"), "value": str(fresh.latest.date()), "sub": t("{days} day(s) before today", days=fresh.age_days), "accent": fresh.level == "current"},
         ],
         compact=True,
     )
@@ -348,9 +385,9 @@ def price_comparison(cards: list[dict], delta: dict | None) -> None:
     for card in cards:
         meta = "".join(f"<li><b>{escape(label)}:</b> {escape(text)}</li>" for label, text in card.get("meta", []))
         value = (
-            f'<div class="vp-cmp-value">Rs. {card["value"]:,.2f} <small>/ kg</small></div>'
+            f'<div class="vp-cmp-value">Rs. {card["value"]:,.2f} <small>/ {escape(t("kg"))}</small></div>'
             if card.get("value") is not None
-            else f'<div class="vp-cmp-value vp-cmp-none">{escape(card.get("value_text", "No price"))}</div>'
+            else f'<div class="vp-cmp-value vp-cmp-none">{escape(card.get("value_text", t("No price")))}</div>'
         )
         items.append(
             f'<div class="vp-cmp-card" style="--vp-cmp-accent: {card["accent"]}">'
@@ -384,26 +421,26 @@ def data_freshness_panel(sources: list, compact: bool = False) -> None:
     sources: app.catalogue.data_freshness() rows. compact leaves out the publishing schedule and notes.
     """
     def when(value) -> str:
-        return f"{value:%Y-%m-%d %H:%M}" if value is not None else "never"
+        return f"{value:%Y-%m-%d %H:%M}" if value is not None else t("never")
 
     cards = []
     for row in sources:
         source = row.source
         lines = [
-            f"<div><b>Type:</b> {escape(source.category)}</div>",
-            f"<div><b>Location:</b> {escape(source.location)}</div>",
-            f"<div><b>Latest data:</b> {escape(row.latest_stored or 'none stored')}</div>",
+            f"<div><b>{escape(t('Type'))}:</b> {escape(t(source.category))}</div>",
+            f"<div><b>{escape(t('Location'))}:</b> {escape(t(source.location))}</div>",
+            f"<div><b>{escape(t('Latest data'))}:</b> {escape(row.latest_stored or t('none stored'))}</div>",
         ]
         if row.newest_published and row.newest_published != row.latest_stored:
-            lines.append(f"<div><b>Newest found at last check:</b> {escape(str(row.newest_published))}</div>")
-        lines.append(f"<div><b>Last successful sync:</b> {escape(when(row.last_success))}</div>")
+            lines.append(f"<div><b>{escape(t('Newest found at last check'))}:</b> {escape(str(row.newest_published))}</div>")
+        lines.append(f"<div><b>{escape(t('Last successful sync'))}:</b> {escape(when(row.last_success))}</div>")
         if not compact:
-            lines.append(f"<div><b>Publishes:</b> {escape(source.schedule)}</div>")
+            lines.append(f"<div><b>{escape(t('Publishes'))}:</b> {escape(t(source.schedule))}</div>")
             lines.append(f'<div class="vp-fresh-note">{escape(row.note)}</div>')
         cards.append(
             f'<div class="vp-fresh-card" style="--vp-fresh: {FRESHNESS_COLORS.get(row.label, COLORS["muted"])}">'
-            f'<div class="vp-fresh-name">{escape(source.name)}</div>'
-            f'<span class="vp-fresh-chip">{escape(row.label)}</span>{"".join(lines)}</div>'
+            f'<div class="vp-fresh-name">{escape(t(source.name))}</div>'
+            f'<span class="vp-fresh-chip">{escape(t(row.label))}</span>{"".join(lines)}</div>'
         )
     st.markdown(f'<div class="vp-fresh">{"".join(cards)}</div>', unsafe_allow_html=True)
 
@@ -414,11 +451,62 @@ def freshness_summary(sources: list) -> str:
     for row in sources:
         counts[row.label] = counts.get(row.label, 0) + 1
     up_to_date = counts.get("Latest Available Data", 0) + counts.get("Recently Updated", 0)
-    parts = [f"{up_to_date} of {len(sources)} sources up to date"]
-    for label in ("Update Pending", "Source Unavailable"):
-        if counts.get(label):
-            parts.append(f"{counts[label]} {label.lower()}")
-    return "Data freshness: " + ", ".join(parts)
+    parts = [t("{n} of {total} sources up to date", n=up_to_date, total=len(sources))]
+    if counts.get("Update Pending"):
+        parts.append(t("{n} update pending", n=counts["Update Pending"]))
+    if counts.get("Source Unavailable"):
+        parts.append(t("{n} source unavailable", n=counts["Source Unavailable"]))
+    return t("Data freshness") + ": " + ", ".join(parts)
+
+
+# Chart dates: the chart library writes month names in English ("Jul", "October"), so in Sinhala and Tamil
+# dates are shown as numbers instead. English charts are unchanged.
+NUMERIC_DATE = "%Y-%m-%d"
+
+
+def date_axis(**kwargs):
+    """An Altair date axis: as before in English, numeric dates (2026-11-17) in Sinhala and Tamil."""
+    import altair as alt
+
+    if current_language() != "en":
+        kwargs.setdefault("format", NUMERIC_DATE)
+    return alt.Axis(**kwargs)
+
+
+def date_tooltip(field: str, title: str):
+    import altair as alt
+
+    return alt.Tooltip(field, title=title, **({} if current_language() == "en" else {"format": NUMERIC_DATE}))
+
+
+def line_chart(series, y_title: str, color: str, height: int | None = None) -> None:
+    """A date-indexed series as a line. In English this is st.line_chart, exactly as before; in Sinhala
+    and Tamil an Altair line with numeric dates. Gaps marked by an empty point (services.break_long_gaps)
+    break the line in both."""
+    import altair as alt
+
+    if current_language() == "en":
+        st.line_chart(series, x_label=t("Date"), y_label=y_title, color=color, **({"height": height} if height else {}))
+        return
+    data = series.rename("value").rename_axis("date").reset_index()
+    data["segment"] = data["value"].isna().cumsum()
+    data = data.dropna(subset=["value"])
+    chart = alt.Chart(data).mark_line(strokeWidth=2).encode(
+        x=alt.X("date:T", title=t("Date"), axis=date_axis()),
+        y=alt.Y("value:Q", title=y_title),
+        detail="segment:N",
+        color=alt.value(color),
+        tooltip=[date_tooltip("date:T", t("Date")), alt.Tooltip("value:Q", title=y_title, format=",.2f")],
+    )
+    st.altair_chart(chart.properties(height=height or 300), width="stretch")
+
+
+def translated_columns(frame):
+    """A copy of a table for display, with its English column headers in the current language.
+
+    Only the headers change; the values (prices, dates, vegetable and market names as stored) don't.
+    """
+    return frame.rename(columns={column: t(column) for column in frame.columns if isinstance(column, str)})
 
 
 def step_cards(steps: list[tuple[str, str]]) -> None:

@@ -14,7 +14,8 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_freshness, data_version, display_name
+from app.i18n import t
+from app.catalogue import data_freshness, data_version, display_name, localized
 from app.source_records import load_dcs_weekly
 from app.services import break_long_gaps, load_real_market_history, missing_historical_datasets, resolve_weather_region
 from config.config_loader import ConfigLoader
@@ -41,8 +42,10 @@ _freshness = data_freshness()
 with st.expander(ui.freshness_summary(_freshness)):
     ui.data_freshness_panel(_freshness)
     st.caption(
-        "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
-        "source every 3 hours and adds anything newly published."
+        t(
+            "Each source publishes on its own schedule, so no figure here is real-time. The automatic update checks every "
+            "source every 3 hours and adds anything newly published."
+        )
     )
 
 
@@ -85,8 +88,11 @@ def _load_cbsl(version: str) -> pd.DataFrame | None:
 _missing_datasets = missing_historical_datasets(CONFIG_PATH)
 if _missing_datasets:
     st.warning(
-        f"Price history is unavailable because of missing file(s): {', '.join(f'`{path}`' for path in _missing_datasets)}. "
-        "`reports/DATA_SOURCES.md` explains how to rebuild them."
+        t(
+            "Price history is unavailable because of missing file(s): {files}. "
+            "`reports/DATA_SOURCES.md` explains how to rebuild them.",
+            files=", ".join(f"`{path}`" for path in _missing_datasets),
+        )
     )
     st.stop()
 try:
@@ -96,7 +102,7 @@ try:
     dcs = _load_dcs(_version)
     cbsl = _load_cbsl(_version)
 except (DataValidationError, ValueError, KeyError, TypeError, OSError) as error:  # a damaged CSV can raise any of these
-    st.error(f"Couldn't load the real datasets: {error}")
+    st.error(t("Couldn't load the real datasets: {error}", error=error))
     st.stop()
 
 _sources = (
@@ -104,54 +110,58 @@ _sources = (
     + ([SOURCE_CBSL] if cbsl is not None and not cbsl.empty else [])
     + ([SOURCE_DCS] if dcs is not None and not dcs.empty else [])
 )
-source = st.radio("Data source", _sources, horizontal=True, key="history_source")
+source = st.radio(t("Data source"), _sources, horizontal=True, key="history_source", format_func=t)
 
 if source == SOURCE_CBSL:
     _filters = st.columns([1, 1, 1], gap="medium")
     with _filters[0]:
-        item = st.selectbox("Item", sorted(cbsl["item"].unique()), key="history_cbsl_item")
+        item = st.selectbox(t("Item"), sorted(cbsl["item"].unique()), key="history_cbsl_item")
     group = cbsl[cbsl["item"] == item]
     with _filters[1]:
-        price_type = st.radio("Price type", sorted(group["price_type"].unique(), reverse=True), horizontal=True, key="history_cbsl_type")
+        price_type = st.radio(
+            t("Price type"), sorted(group["price_type"].unique(), reverse=True), horizontal=True, key="history_cbsl_type", format_func=t
+        )
     group = group[group["price_type"] == price_type]
     with _filters[2]:
-        chosen_markets = st.multiselect("Markets", sorted(group["market"].unique()), default=sorted(group["market"].unique()), key=f"history_cbsl_markets_{price_type}")
+        chosen_markets = st.multiselect(t("Markets"), sorted(group["market"].unique()), default=sorted(group["market"].unique()), key=f"history_cbsl_markets_{price_type}")
     selected = group[group["market"].isin(chosen_markets)].sort_values("date")
     if selected.empty:
-        st.info("Choose at least one market.")
+        st.info(t("Choose at least one market."))
         st.stop()
     ui.data_source_panel(
-        "CBSL Daily Price Report", ", ".join(chosen_markets), f"{price_type.capitalize()} ({selected['unit'].iloc[0]})", selected["date"].max(),
-        extra="Published on working days. Collected by CBSL, separately from HARTI.",
+        "CBSL Daily Price Report", ", ".join(chosen_markets), f"{t(price_type.capitalize())} ({selected['unit'].iloc[0]})", selected["date"].max(),
+        extra=t("Published on working days. Collected by CBSL, separately from HARTI."),
     )
-    st.subheader(f"{item}: {price_type} price, CBSL")
+    st.subheader(t("{item}: {price_type} price, CBSL", item=item, price_type=t(price_type)))
     # Only the markets shown appear in the legend; each keeps its own colour whichever are shown.
     _shown = [market for market in ui.MARKET_COLORS if market in set(selected["market"])]
     chart = alt.Chart(selected).mark_line(point=alt.OverlayMarkDef(size=16), strokeWidth=2).encode(
-        x=alt.X("date:T", title="Report date"),
-        y=alt.Y("price:Q", title=f"Rs per {selected['unit'].iloc[0].split('/')[-1]}"),
-        color=alt.Color("market:N", title="Market", scale=alt.Scale(domain=_shown, range=[ui.MARKET_COLORS[m] for m in _shown]), legend=alt.Legend(orient="top")),
-        tooltip=[alt.Tooltip("date:T", title="Report date"), alt.Tooltip("market:N"), alt.Tooltip("price:Q", title="Rs", format=",.2f")],
+        x=alt.X("date:T", title=t("Report date"), axis=ui.date_axis()),
+        y=alt.Y("price:Q", title=t("Rs per {unit}", unit=selected["unit"].iloc[0].split("/")[-1])),
+        color=alt.Color("market:N", title=t("Market"), scale=alt.Scale(domain=_shown, range=[ui.MARKET_COLORS[m] for m in _shown]), legend=alt.Legend(orient="top")),
+        tooltip=[ui.date_tooltip("date:T", t("Report date")), alt.Tooltip("market:N", title=t("Market")), alt.Tooltip("price:Q", title="Rs", format=",.2f")],
     )
     st.altair_chart(chart.properties(height=320).interactive(bind_y=False), width="stretch")
     st.caption(
-        "Central Bank of Sri Lanka, Daily Price Report: each report's 'Today' column, dated with the report. Wholesale "
-        "and retail are separate, and CBSL's prices are collected separately from HARTI's, so the two sources' Dambulla "
-        "prices differ and are never combined. Weekends and holidays have no report."
+        t(
+            "Central Bank of Sri Lanka, Daily Price Report: each report's 'Today' column, dated with the report. Wholesale "
+            "and retail are separate, and CBSL's prices are collected separately from HARTI's, so the two sources' Dambulla "
+            "prices differ and are never combined. Weekends and holidays have no report."
+        )
     )
-    with st.expander("View as a table"):
+    with st.expander(t("View as a table")):
         st.dataframe(selected[["date", "market", "price_type", "item", "unit", "price", "source_url"]], hide_index=True, width="stretch",
-                     column_config={"source_url": st.column_config.LinkColumn("Source")})
+                     column_config={"source_url": st.column_config.LinkColumn(t("Source"))})
     st.stop()
 
 if source == SOURCE_DCS:
     _filters = st.columns([1, 1], gap="medium")
     with _filters[0]:
-        vegetable = st.selectbox("Vegetable", sorted(dcs["vegetable"].unique()), key="history_dcs_vegetable")
+        vegetable = st.selectbox(t("Vegetable"), sorted(dcs["vegetable"].unique()), key="history_dcs_vegetable", format_func=localized)
     group = dcs[dcs["vegetable"] == vegetable].sort_values("plot_position")
     years = sorted(group["year"].unique())
     with _filters[1]:
-        year_range = st.select_slider("Years", options=years, value=(years[0], years[-1]), key="history_dcs_years") if len(years) > 1 else (years[0], years[0])
+        year_range = st.select_slider(t("Years"), options=years, value=(years[0], years[-1]), key="history_dcs_years") if len(years) > 1 else (years[0], years[0])
     selected = group[group["year"].between(year_range[0], year_range[1])].copy()
     # Weeks DCS printed 0.00 ("not available") are missing: not plotted, not in the statistics, and the
     # line breaks there instead of joining across them.
@@ -159,105 +169,132 @@ if source == SOURCE_DCS:
     unavailable = selected[selected["price_unavailable"]]
     selected_priced = selected[~selected["price_unavailable"]]
     if selected_priced.empty:
-        st.warning(f"DCS published no price for {vegetable} in the selected years (every week was printed as unavailable).")
+        st.warning(
+            t(
+                "DCS published no price for {vegetable} in the selected years (every week was printed as unavailable).",
+                vegetable=localized(vegetable),
+            )
+        )
         st.stop()
     latest = selected_priced.iloc[-1]
     ui.stat_cards(
         [
-            {"label": "Data source", "value": "DCS weekly retail prices"},
-            {"label": "Market", "value": "Colombo District (main markets)"},
-            {"label": "Price type", "value": f"Retail, weekly average ({latest['unit']})"},
-            {"label": "Latest week", "value": latest["period"], "accent": True},
+            {"label": t("Data source"), "value": t("DCS weekly retail prices")},
+            {"label": t("Market"), "value": t("Colombo District (main markets)")},
+            {"label": t("Price type"), "value": t("Retail, weekly average ({unit})", unit=latest["unit"])},
+            {"label": t("Latest week"), "value": latest["period"], "accent": True},
         ],
         compact=True,
     )
     columns = st.columns(4)
-    columns[0].metric("Latest weekly average", f"Rs. {latest['price']:,.2f}", help=latest["period"])
-    columns[1].metric("Average", f"Rs. {selected_priced['price'].mean():,.0f}")
-    columns[2].metric("Lowest", f"Rs. {selected_priced['price'].min():,.0f}")
-    columns[3].metric("Highest", f"Rs. {selected_priced['price'].max():,.0f}")
-    st.subheader(f"{vegetable}: retail price, Colombo District")
+    columns[0].metric(t("Latest weekly average"), f"Rs. {latest['price']:,.2f}", help=latest["period"])
+    columns[1].metric(t("Average"), f"Rs. {selected_priced['price'].mean():,.0f}")
+    columns[2].metric(t("Lowest"), f"Rs. {selected_priced['price'].min():,.0f}")
+    columns[3].metric(t("Highest"), f"Rs. {selected_priced['price'].max():,.0f}")
+    st.subheader(t("{vegetable}: retail price, Colombo District", vegetable=localized(vegetable)))
     chart = alt.Chart(selected_priced).mark_line(point=alt.OverlayMarkDef(size=14), strokeWidth=2).encode(
-        x=alt.X("plot_position:T", title="Month (weekly points placed by week number)"),
-        y=alt.Y("price:Q", title=f"Rs per {latest['unit']}"),
+        x=alt.X("plot_position:T", title=t("Month (weekly points placed by week number)"), axis=ui.date_axis()),
+        y=alt.Y("price:Q", title=t("Rs per {unit}", unit=latest["unit"])),
         detail="segment:N",
         color=alt.value(ui.SERIES["actual"]),
-        tooltip=[alt.Tooltip("period:N", title="Published week"), alt.Tooltip("price:Q", title="Average Rs", format=",.2f"), alt.Tooltip("item:N", title="DCS item")],
+        tooltip=[
+            alt.Tooltip("period:N", title=t("Published week")),
+            alt.Tooltip("price:Q", title=t("Average Rs"), format=",.2f"),
+            alt.Tooltip("item:N", title=t("DCS item")),
+        ],
     )
     st.altair_chart(chart.properties(height=320).interactive(bind_y=False), width="stretch")
     st.caption(
-        "Department of Census and Statistics weekly retail bulletins: each bulletin's own 'this week' average. "
-        "DCS publishes the week only as 'week n of a month', so points are placed by week number, not by a calendar date. "
-        "Retail prices: not comparable with HARTI's wholesale prices and never combined with them."
+        t(
+            "Department of Census and Statistics weekly retail bulletins: each bulletin's own 'this week' average. "
+            "DCS publishes the week only as 'week n of a month', so points are placed by week number, not by a calendar date. "
+            "Retail prices: not comparable with HARTI's wholesale prices and never combined with them."
+        )
     )
     if not unavailable.empty:
         st.info(
-            f"DCS printed no price (0.00) for {vegetable} in {len(unavailable)} week(s): {', '.join(unavailable['period'])}. "
-            "Those weeks are shown as unavailable, not as Rs 0: they aren't plotted or counted, and the line breaks there."
+            t(
+                "DCS printed no price (0.00) for {vegetable} in {n} week(s): {weeks}. "
+                "Those weeks are shown as unavailable, not as Rs 0: they aren't plotted or counted, and the line breaks there.",
+                vegetable=localized(vegetable),
+                n=len(unavailable),
+                weeks=", ".join(unavailable["period"]),
+            )
         )
-    with st.expander("View as a table"):
+    with st.expander(t("View as a table")):
         table = selected[["period", "item", "unit", "price", "range_low", "range_high", "source_file"]].copy()
+        _unavailable_text = t("unavailable (DCS printed 0.00)")
         for column in ("price", "range_low", "range_high"):
-            table[column] = table[column].map(lambda value: f"{value:,.2f}" if pd.notna(value) else "unavailable (DCS printed 0.00)")
+            table[column] = table[column].map(lambda value: f"{value:,.2f}" if pd.notna(value) else _unavailable_text)
         st.dataframe(table, hide_index=True, width="stretch")
     st.stop()
 
 _market_list = ["Dambulla"] + (sorted(set(markets["market"]) - {"Dambulla"}) if markets is not None else [])
 _filters = st.columns([1, 1, 1], gap="medium")
 with _filters[0]:
-    market = st.selectbox("Market", _market_list, key="history_market")
+    market = st.selectbox(t("Market"), _market_list, key="history_market")
 if market == "Dambulla":
     series_frame = history[history["price"].notna()][["date", "vegetable", "price", "rainfall_mm", "temperature_c", "humidity_pct", "diesel_price", "petrol_price"]]
 else:
     series_frame = markets[markets["market"] == market].rename(columns={"reported": "date"})[["date", "vegetable", "price", "published"]]
 with _filters[1]:
-    vegetable = st.selectbox("Vegetable", sorted(series_frame["vegetable"].unique(), key=display_name), format_func=display_name, key=f"history_vegetable_{market}")
+    vegetable = st.selectbox(
+        t("Vegetable"), sorted(series_frame["vegetable"].unique(), key=display_name), format_func=display_name, key=f"history_vegetable_{market}"
+    )
 group = series_frame[series_frame["vegetable"] == vegetable].sort_values("date")
 
 first_date, last_date = group["date"].min().date(), group["date"].max().date()
 with _filters[2]:
-    selected_range = st.date_input("Date range", value=(first_date, last_date), min_value=first_date, max_value=last_date, key=f"history_range_{market}_{vegetable}")
+    selected_range = st.date_input(t("Date range"), value=(first_date, last_date), min_value=first_date, max_value=last_date, key=f"history_range_{market}_{vegetable}")
 if len(selected_range) != 2:
-    st.info("Choose an end date to continue.")
+    st.info(t("Choose an end date to continue."))
     st.stop()
 start, end = pd.Timestamp(selected_range[0]), pd.Timestamp(selected_range[1])
 selected = group[group["date"].between(start, end)]
 if selected.empty:
-    st.warning(f"No recorded prices for {display_name(vegetable)} at {market} in that range. Try a wider one.")
+    st.warning(t("No recorded prices for {vegetable} at {market} in that range. Try a wider one.", vegetable=display_name(vegetable), market=market))
     st.stop()
 
-ui.data_source_panel("HARTI daily bulletins", market, "Wholesale (Rs/kg)", group["date"].max(), extra=f"Series runs {first_date} to {last_date}.")
+ui.data_source_panel(
+    "HARTI daily bulletins", market, t("Wholesale (Rs/kg)"), group["date"].max(), extra=t("Series runs {first} to {last}.", first=first_date, last=last_date)
+)
 span_days = (end - start).days + 1
 columns = st.columns(4)
-columns[0].metric("Latest", f"Rs. {selected['price'].iloc[-1]:,.0f}", help=str(selected["date"].iloc[-1].date()))
-columns[1].metric("Average", f"Rs. {selected['price'].mean():,.0f}")
-columns[2].metric("Lowest", f"Rs. {selected['price'].min():,.0f}")
-columns[3].metric("Highest", f"Rs. {selected['price'].max():,.0f}")
+columns[0].metric(t("Latest"), f"Rs. {selected['price'].iloc[-1]:,.0f}", help=str(selected["date"].iloc[-1].date()))
+columns[1].metric(t("Average"), f"Rs. {selected['price'].mean():,.0f}")
+columns[2].metric(t("Lowest"), f"Rs. {selected['price'].min():,.0f}")
+columns[3].metric(t("Highest"), f"Rs. {selected['price'].max():,.0f}")
 
-st.subheader(f"{display_name(vegetable)} wholesale price at {market}")
-st.line_chart(break_long_gaps(selected.set_index("date")["price"]), x_label="Date", y_label="Rs / kg", color=ui.SERIES["actual"])
+st.subheader(t("{vegetable} wholesale price at {market}", vegetable=display_name(vegetable), market=market))
+ui.line_chart(break_long_gaps(selected.set_index("date")["price"]), t("Rs / kg"), ui.SERIES["actual"])
 st.caption(
-    f"Midpoint of HARTI's published daily range at {market}. {len(selected)} recorded days of {span_days} in this range. "
-    f"The line breaks where there is no reading for more than {MAX_CARRY_DAYS} days; shorter gaps are joined."
-    + ("" if market == "Dambulla" else " Dates are the market's own reporting dates.")
+    t(
+        "Midpoint of HARTI's published daily range at {market}. {n} recorded days of {span} in this range. "
+        "The line breaks where there is no reading for more than {gap} days; shorter gaps are joined.",
+        market=market,
+        n=len(selected),
+        span=span_days,
+        gap=MAX_CARRY_DAYS,
+    )
+    + ("" if market == "Dambulla" else " " + t("Dates are the market's own reporting dates."))
 )
 
 if market == "Dambulla":
     location = resolve_weather_region(vegetable, config_path=CONFIG_PATH)
-    st.subheader("Weather")
+    st.subheader(t("Weather"))
     if location.is_production_region:
-        st.caption(f"From **{location.region_name}**, this vegetable's main production region.")
+        st.caption(t("From **{region}**, this vegetable's main production region.", region=location.region_name))
     else:
-        st.caption("From Dambulla, because no single production region is evidenced for this vegetable.")
+        st.caption(t("From Dambulla, because no single production region is evidenced for this vegetable."))
     weather = selected.set_index("date")
     _weather_series = (
         ("rainfall_mm", "Rainfall", "mm"),
         ("temperature_c", "Mean temperature", "°C"),
         ("humidity_pct", "Mean humidity", "%"),
     )
-    for tab, (column, _title, unit) in zip(st.tabs([title for _, title, _ in _weather_series]), _weather_series, strict=True):
+    for tab, (column, _title, unit) in zip(st.tabs([t(title) for _, title, _ in _weather_series]), _weather_series, strict=True):
         with tab:
-            st.line_chart(break_long_gaps(weather[column]), x_label="Date", y_label=unit, height=220, color=ui.WEATHER_COLORS[column])
+            ui.line_chart(break_long_gaps(weather[column]), unit, ui.WEATHER_COLORS[column], height=220)
 
-with st.expander("View as a table"):
+with st.expander(t("View as a table")):
     st.dataframe(selected, hide_index=True, width="stretch")

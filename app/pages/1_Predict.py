@@ -16,7 +16,18 @@ import pandas as pd
 import streamlit as st
 
 from app import ui
-from app.catalogue import data_freshness, data_version, display_name, last_run_problem, past_date_notice, series_status, update_notice, update_status
+from app.i18n import t
+from app.catalogue import (
+    data_freshness,
+    data_version,
+    display_name,
+    last_run_problem,
+    localized,
+    past_date_notice,
+    series_status,
+    update_notice,
+    update_status,
+)
 from app.data_refresh import run_data_update
 from app.source_records import (
     cbsl_records,
@@ -105,7 +116,7 @@ _DATA_READ_ERRORS = (DataValidationError, ValueError, KeyError, TypeError, OSErr
 _SANDBOX_IN_USE = (
     "Using a **sandbox** model from the most recent sandbox training, not the project's saved models. "
     "It may have been trained on different data; train again above to use this data."
-)
+)  # shown through t()
 
 st.set_page_config(page_title="Predict | Vegetable Price Prediction", page_icon="📈", layout="wide", initial_sidebar_state="auto")
 ui.apply_theme()
@@ -122,37 +133,42 @@ def _render_weather_data_card(
     resolved_location,
     weather_date_label: str,
     weather_values: dict[str, float] | None,
-    used_for: str = f"Price Prediction (as {_WEATHER_LAG_DAYS}-day-lagged features)",
+    used_for: str | None = None,
 ) -> None:
     """Renders the 'Weather Data Used' transparency card: which location's weather fed
     this prediction, its coordinates, and (when available) the actual values used --
     never fabricated, never silently swapped in for the market's location."""
+    if used_for is None:
+        used_for = t("Price Prediction (as {days}-day-lagged features)", days=_WEATHER_LAG_DAYS)
     with st.container(border=True):
-        st.markdown("**🌦️ Weather Data Used**")
+        st.markdown(t("**🌦️ Weather Data Used**"))
         if resolved_location.is_production_region:
             location_label = resolved_location.region_name
-            location_note = "evidence-based cultivation/production region for this vegetable"
+            location_note = t("evidence-based cultivation/production region for this vegetable")
         else:
-            location_label = f"{market} (market location)"
-            location_note = (
-                f"⚠ fallback -- no sufficiently evidenced cultivation-region mapping exists for "
-                f"'{vegetable}' in config/crop_production_regions.yaml; this is the project's "
-                f"documented fallback, not a guess at {vegetable}'s actual cultivation location"
+            location_label = t("{market} (market location)", market=market)
+            location_note = t(
+                "⚠ fallback -- no sufficiently evidenced cultivation-region mapping exists for "
+                "'{vegetable}' in config/crop_production_regions.yaml; this is the project's "
+                "documented fallback, not a guess at {vegetable}'s actual cultivation location",
+                vegetable=vegetable,
             )
         st.markdown(
-            f"- **Vegetable:** {vegetable}\n"
-            f"- **Weather Location:** {location_label}\n"
-            f"- **Coordinates:** {resolved_location.latitude:.4f}, {resolved_location.longitude:.4f}\n"
-            f"- **Weather Source:** Open-Meteo\n"
-            f"- **Weather Date:** {weather_date_label}\n"
-            f"- **Data Used For:** {used_for}"
+            f"- **{t('Vegetable')}:** {localized(vegetable)}\n"
+            f"- **{t('Weather Location')}:** {location_label}\n"
+            f"- **{t('Coordinates')}:** {resolved_location.latitude:.4f}, {resolved_location.longitude:.4f}\n"
+            f"- **{t('Weather Source')}:** Open-Meteo\n"
+            f"- **{t('Weather Date')}:** {weather_date_label}\n"
+            f"- **{t('Data Used For')}:** {used_for}"
         )
         st.caption(location_note)
         if weather_values:
             ui.stat_cards([{"label": label, "value": value} for label, value in weather_values.items()], compact=True)
         st.caption(
-            "Weather used by this model: rainfall, temperature and humidity. "
-            "Wind speed is not part of this project's weather schema/model -- not shown, not fabricated."
+            t(
+                "Weather used by this model: rainfall, temperature and humidity. "
+                "Wind speed is not part of this project's weather schema/model -- not shown, not fabricated."
+            )
         )
 
 
@@ -240,11 +256,16 @@ def _load_model_files(load, description: str, training_script: str = "scripts/tr
     except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError):
         return None
     except ArtifactConsistencyError as error:
-        st.error(f"{description} the model files are inconsistent and cannot be used: {error}")
+        st.error(t("{description} the model files are inconsistent and cannot be used: {error}", description=t(description), error=error))
     except Exception as error:  # noqa: BLE001 -- a corrupt file can raise almost anything while unpickling
         st.error(
-            f"{description} the model files could not be read, so they may be damaged "
-            f"({type(error).__name__}: {error}). Restore them from a backup, or run `{training_script}` to recreate them."
+            t(
+                "{description} the model files could not be read, so they may be damaged "
+                "({error}). Restore them from a backup, or run `{script}` to recreate them.",
+                description=t(description),
+                error=f"{type(error).__name__}: {error}",
+                script=training_script,
+            )
         )
     return None
 
@@ -278,39 +299,46 @@ def _render_direct_result(
 ) -> None:
     """Show a direct forecast: the price, its path (for several days), weather and sources."""
     if multi_day:
-        st.subheader("📈 Future Vegetable Price Forecast")
+        st.subheader(t("📈 Future Vegetable Price Forecast"))
         st.warning(
-            "⚠ **FORECAST** -- a model estimate from the latest actual market data, not a guaranteed "
-            "future price. Error grows with distance; see **Model Performance** for measured accuracy."
+            t(
+                "⚠ **FORECAST** -- a model estimate from the latest actual market data, not a guaranteed "
+                "future price. Error grows with distance; see **Model Performance** for measured accuracy."
+            )
         )
         columns = st.columns(3)
-        columns[0].metric("Vegetable", result.vegetable)
-        columns[1].metric("Market", result.market)
-        columns[2].metric("Forecast Horizon", f"{result.forecast_horizon_days} day(s) ahead")
-    label = "Forecasted" if multi_day else "Predicted"
+        columns[0].metric(t("Vegetable"), localized(result.vegetable))
+        columns[1].metric(t("Market"), result.market)
+        columns[2].metric(t("Forecast Horizon"), t("{days} day(s) ahead", days=result.forecast_horizon_days))
+    label_template = "Forecasted Price -- {vegetable} at {market} on {date}" if multi_day else "Predicted Price -- {vegetable} at {market} on {date}"
     with st.container(key="vp_result_direct"):
         st.metric(
-            label=f"{label} Price -- {result.vegetable} at {result.market} on {result.target_date.date()}",
-            value=f"Rs. {result.predicted_price:.2f} / kg",
+            label=t(label_template, vegetable=localized(result.vegetable), market=result.market, date=result.target_date.date()),
+            value=f"Rs. {result.predicted_price:.2f} / {t('kg')}",
         )
         _latest_actual = actual_history.loc[actual_history["date"] == result.latest_actual_date, "price"]
-        _latest_price = f" (Rs. {_latest_actual.iloc[-1]:,.2f} / kg)" if not _latest_actual.empty else ""
+        _latest_price = f" (Rs. {_latest_actual.iloc[-1]:,.2f} / {t('kg')})" if not _latest_actual.empty else ""
         st.caption(
-            f"Latest actual data: **{result.latest_actual_date.date()}**{_latest_price}. Each day's forecast uses only what was "
-            f"known then, including other markets' published prices. **Data source:** {source_label}."
+            t(
+                "Latest actual data: **{date}**{price}. Each day's forecast uses only what was "
+                "known then, including other markets' published prices. **Data source:** {source}.",
+                date=result.latest_actual_date.date(),
+                price=_latest_price,
+                source=t(source_label),
+            )
         )
-        st.caption(f"**Model used:** {_model_used}")
+        st.caption(f"**{t('Model used')}:** {t(_model_used)}")
 
     chart_column, detail_column = st.columns([3, 2], gap="medium")
     origin_row = origin_rows[
         (origin_rows["vegetable"] == result.vegetable) & (origin_rows["origin"] == result.latest_actual_date)
     ].iloc[0]
     values = {
-        "Rainfall (last 7 days)": origin_row["rain_sum_7"],
-        "Temperature (7-day mean)": origin_row["temp_mean_7"],
-        "Humidity (7-day mean)": origin_row["humidity_mean_7"],
+        t("Rainfall (last 7 days)"): origin_row["rain_sum_7"],
+        t("Temperature (7-day mean)"): origin_row["temp_mean_7"],
+        t("Humidity (7-day mean)"): origin_row["humidity_mean_7"],
     }
-    units = {"Rainfall (last 7 days)": "mm", "Temperature (7-day mean)": "°C", "Humidity (7-day mean)": "%"}
+    units = dict(zip(values, ("mm", "°C", "%"), strict=True))
     path = pd.DataFrame(
         {"date": [p.date for p in result.daily_forecast], "forecasted_price": [p.predicted_price for p in result.daily_forecast]}
     )
@@ -319,24 +347,24 @@ def _render_direct_result(
             result.vegetable,
             result.market,
             location,
-            f"The 7 days up to {result.latest_actual_date.date()}",
+            t("The 7 days up to {date}", date=result.latest_actual_date.date()),
             {name: f"{value:.1f} {units[name]}" for name, value in values.items() if pd.notna(value)} or None,
-            used_for="Forecasting, from observed weather only (no future weather is needed)",
+            used_for=t("Forecasting, from observed weather only (no future weather is needed)"),
         )
         if multi_day:
-            with st.expander("Daily forecast path"):
+            with st.expander(t("Daily forecast path")):
                 st.dataframe(
-                    pd.DataFrame({"Date": path["date"].dt.date, "Forecast (Rs / kg)": path["forecasted_price"].round(2)}),
+                    ui.translated_columns(pd.DataFrame({"Date": path["date"].dt.date, "Forecast (Rs / kg)": path["forecasted_price"].round(2)})),
                     hide_index=True,
                 )
     recent = actual_history[actual_history["date"] >= result.latest_actual_date - pd.Timedelta(days=180)]
     fig, ax = plt.subplots(figsize=(8, 4.4))
-    ax.plot(recent["date"], recent["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Actual price")
+    ax.plot(recent["date"], recent["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label=t("Actual price"))
     if multi_day:
-        ax.plot(path["date"], path["forecasted_price"], marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label="Forecast")
-    ax.scatter([result.target_date], [result.predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Requested date")
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Price (Rs / kg)")
+        ax.plot(path["date"], path["forecasted_price"], marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label=t("Forecast"))
+    ax.scatter([result.target_date], [result.predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label=t("Requested date"))
+    ax.set_xlabel(t("Date"))
+    ax.set_ylabel(t("Price (Rs / kg)"))
     ax.legend()
     fig.autofmt_xdate()
     fig.tight_layout()
@@ -349,11 +377,14 @@ def _model_summary() -> str:
     try:
         metadata = load_artifact_metadata(config_path=CONFIG_PATH)
     except (ArtifactMetadataNotFoundError, ValueError, TypeError):
-        return "Earlier comparison model loaded from `models/`."
+        return t("Earlier comparison model loaded from `models/`.")
     data = metadata.training_data
-    return (
-        f"Earlier comparison model loaded: **{metadata.model_type}**, trained on {data.get('train_rows', '?')} rows "
-        f"of data from {data.get('start_date', '?')} to {data.get('end_date', '?')}."
+    return t(
+        "Earlier comparison model loaded: **{model}**, trained on {rows} rows of data from {start} to {end}.",
+        model=metadata.model_type,
+        rows=data.get("train_rows", "?"),
+        start=data.get("start_date", "?"),
+        end=data.get("end_date", "?"),
     )
 
 
@@ -389,58 +420,68 @@ def _publication_date(value) -> pd.Timestamp | None:
 
 
 def _render_source_status() -> None:
-    st.header("1. Official source status")
+    st.header(t("1. Official source status"))
     refresh = st.session_state.pop("real_data_refresh_result", None)
     if refresh is not None:
         getattr(st, refresh.level)(refresh.message)
         if refresh.output_tail and refresh.level != "success":
-            with st.expander("Update log (last lines)"):
+            with st.expander(t("Update log (last lines)")):
                 st.code(refresh.output_tail, language="text")
     status = _UPDATE_STATUS
     if status.last_attempt_failed:
-        st.warning(f"The latest update attempt failed ({status.last_error}). The status below is from the last completed check.")
+        st.warning(t("The latest update attempt failed ({error}). The status below is from the last completed check.", error=status.last_error))
     today = pd.Timestamp.now().normalize()
     for column, (key, (name, publishes, behind_days)) in zip(st.columns(3, gap="small"), _OFFICIAL_SOURCES.items()):
         info = status.sources.get(key)
         with column, st.container(border=True):
-            st.markdown(f"**{name}**  \n{publishes}")
+            st.markdown(f"**{name}**  \n{t(publishes)}")
             if info is None:
-                st.info("Not recorded yet: the last completed check predates source-by-source status. Use **Check official sources now**.")
+                st.info(t("Not recorded yet: the last completed check predates source-by-source status. Use **Check official sources now**."))
                 continue
             if info["status"] == "failed":
-                st.error("Couldn't be checked at the last update. Its stored records are shown unchanged.")
-                st.caption(f"Error: {info.get('error', 'no details')}")
+                st.error(t("Couldn't be checked at the last update. Its stored records are shown unchanged."))
+                st.caption(t("Error: {error}", error=info.get("error", t("no details"))))
             else:
-                st.success("Checked successfully")
+                st.success(t("Checked successfully"))
             newest = _publication_date(info.get("newest_published"))
             age = (today - newest).days if newest is not None else None
             lines = [
-                f"**Newest publication found:** {info.get('newest_published') or 'unknown'}"
-                + (f" ({age} day(s) ago)" if age is not None else ""),
-                f"**Last checked:** {pd.Timestamp(info['checked_at']):%Y-%m-%d %H:%M}",
+                f"**{t('Newest publication found')}:** {info.get('newest_published') or t('unknown')}"
+                + (" " + t("({days} day(s) ago)", days=age) if age is not None else ""),
+                f"**{t('Last checked')}:** {pd.Timestamp(info['checked_at']):%Y-%m-%d %H:%M}",
             ]
             if info["status"] != "failed":
                 new = info.get("new_records", 0)
-                lines.append(f"**New data collected:** {f'{new} record(s)' if key == 'harti' else f'{new} report(s)'}" if new else "**New data collected:** none, nothing newer was published")
+                collected = (t("{n} record(s)", n=new) if key == "harti" else t("{n} report(s)", n=new)) if new else t("none, nothing newer was published")
+                lines.append(f"**{t('New data collected')}:** {collected}")
             for problem in info.get("problems", []):
-                lines.append(f"**Import problem:** {problem}")
+                lines.append(f"**{t('Import problem')}:** {problem}")
             if age is not None and age > behind_days:
-                lines.append(f"**Stale:** the newest {name} publication is {age} days old")
+                lines.append(f"**{t('Stale')}:** " + t("the newest {name} publication is {days} days old", name=name, days=age))
             st.markdown("  \n".join(lines))
-    others = [f"{name.capitalize()}: {'couldn' + chr(39) + 't be updated' if status.sources[name]['status'] == 'failed' else 'checked'}" for name in ("weather", "fuel") if name in status.sources]
+    others = [
+        f"{t(name.capitalize())}: {t('couldn' + chr(39) + 't be updated') if status.sources[name]['status'] == 'failed' else t('checked')}"
+        for name in ("weather", "fuel")
+        if name in status.sources
+    ]
     st.caption(
-        (f"Last completed check of all sources: **{status.last_success:%Y-%m-%d %H:%M}**. " if status.last_success is not None else "No completed check recorded. ")
-        + "Checks run automatically every 3 hours (Windows task `VegetablePriceUpdate`), and on request below. "
+        (
+            t("Last completed check of all sources: **{when}**.", when=f"{status.last_success:%Y-%m-%d %H:%M}") + " "
+            if status.last_success is not None
+            else t("No completed check recorded.") + " "
+        )
+        + t("Checks run automatically every 3 hours (Windows task `VegetablePriceUpdate`), and on request below.")
+        + " "
         + ("; ".join(others) + "." if others else "")
     )
     problem = last_run_problem()
     if problem:
-        st.warning(problem + " The next scheduled update retries automatically.")
+        st.warning(problem + " " + t("The next scheduled update retries automatically."))
     freshness_rows = data_freshness()
-    with st.expander(ui.freshness_summary(freshness_rows) + " (all sources, including weather and fuel)"):
+    with st.expander(ui.freshness_summary(freshness_rows) + " " + t("(all sources, including weather and fuel)")):
         ui.data_freshness_panel(freshness_rows)
-    if st.button("Check official sources now", help="Downloads any newly published HARTI, CBSL and DCS reports (about a minute). Nothing already stored is changed."):
-        with st.spinner("Checking HARTI, CBSL and DCS for newly published reports..."):
+    if st.button(t("Check official sources now"), help=t("Downloads any newly published HARTI, CBSL and DCS reports (about a minute). Nothing already stored is changed.")):
+        with st.spinner(t("Checking HARTI, CBSL and DCS for newly published reports...")):
             st.session_state["real_data_refresh_result"] = run_data_update()
         st.rerun()
 
@@ -478,32 +519,35 @@ _RECORD_COLUMN_ORDER = [
 def _record_column_config() -> dict:
     text = st.column_config.TextColumn  # prices arrive pre-formatted, so a missing one can say why
     return {
-        "Observation date": text("Observation date", width=126, pinned=True),
-        "Market / location": text("Market / location", width=130, pinned=True, help="Market, or the area the price covers"),
-        "Minimum": text("Min", width=72, help="Lowest price in the source's published range"),
-        "Maximum": text("Max", width=72, help="Highest price in the source's published range"),
-        "Average / midpoint": text("Average / midpoint", width=128, help="HARTI: midpoint of its range (the model's price). CBSL: its single price. DCS: weekly average."),
-        "Unit": text("Unit", width=92),
-        "Source document": st.column_config.LinkColumn("Document", display_text="Open", width=84, help="The official bulletin or report this record was read from"),
-        "Collected": text("Collected", width=128, help="When this project downloaded the document"),
-        "Price type": text("Price type", width=136),
-        "Published": text("Published", width=112),
-        "Vegetable (as published)": text("Vegetable (as published)", width=170),
-        "Source": text("Source", width=250),
+        "Observation date": text(t("Observation date"), width=126, pinned=True),
+        "Market / location": text(t("Market / location"), width=130, pinned=True, help=t("Market, or the area the price covers")),
+        "Minimum": text(t("Min"), width=72, help=t("Lowest price in the source's published range")),
+        "Maximum": text(t("Max"), width=72, help=t("Highest price in the source's published range")),
+        "Average / midpoint": text(t("Average / midpoint"), width=128, help=t("HARTI: midpoint of its range (the model's price). CBSL: its single price. DCS: weekly average.")),
+        "Unit": text(t("Unit"), width=92),
+        "Source document": st.column_config.LinkColumn(t("Document"), display_text=t("Open"), width=84, help=t("The official bulletin or report this record was read from")),
+        "Collected": text(t("Collected"), width=128, help=t("When this project downloaded the document")),
+        "Price type": text(t("Price type"), width=136),
+        "Published": text(t("Published"), width=112),
+        "Vegetable (as published)": text(t("Vegetable (as published)"), width=170),
+        "Source": text(t("Source"), width=250),
     }
 
 
-def _render_records(frame: pd.DataFrame, key: str, missing: str = "not published") -> None:
+def _render_records(frame: pd.DataFrame, key: str, missing: str = "not published") -> None:  # missing: English, translated below
     """A record table: dates as dates, missing values named, never shown as zero."""
     if frame.empty:
-        st.info("No records.")
+        st.info(t("No records."))
         return
     shown = frame.copy()
     for column in ("Observation date", "Published"):
         shown[column] = shown[column].map(lambda v: v.date().isoformat() if isinstance(v, pd.Timestamp) else str(v))
-    shown["Collected"] = shown["Collected"].map(lambda v: f"{v:%Y-%m-%d %H:%M}" if pd.notna(v) else "not recorded")
+    not_recorded, missing_text = t("not recorded"), t(missing)
+    shown["Collected"] = shown["Collected"].map(lambda v: f"{v:%Y-%m-%d %H:%M}" if pd.notna(v) else not_recorded)
     for column in ("Minimum", "Maximum", "Average / midpoint"):
-        shown[column] = shown[column].map(lambda v: f"{v:,.2f}" if pd.notna(v) else missing)
+        shown[column] = shown[column].map(lambda v: f"{v:,.2f}" if pd.notna(v) else missing_text)
+    if "Price type" in shown.columns:
+        shown["Price type"] = shown["Price type"].map(lambda v: t(v) if isinstance(v, str) else v)
     st.dataframe(
         shown,
         hide_index=True,
@@ -513,8 +557,12 @@ def _render_records(frame: pd.DataFrame, key: str, missing: str = "not published
         column_config=_record_column_config(),
     )
     st.caption(
-        f"{len(shown)} record(s), {len(_RECORD_COLUMN_ORDER)} columns. ↔ Scroll the table sideways (scrollbar under it, or "
-        "Shift + mouse wheel) to reach the last columns, Vegetable (as published) and Source; the date and market stay pinned."
+        t(
+            "{n} record(s), {columns} columns. ↔ Scroll the table sideways (scrollbar under it, or "
+            "Shift + mouse wheel) to reach the last columns, Vegetable (as published) and Source; the date and market stay pinned.",
+            n=len(shown),
+            columns=len(_RECORD_COLUMN_ORDER),
+        )
     )
 
 
@@ -523,16 +571,24 @@ def _render_vegetable_records(series: str, tables: dict[str, pd.DataFrame]) -> N
     records = records_for_series(series, tables)
     dambulla = records["harti_dambulla"]
     if dambulla.empty:
-        st.error(f"No HARTI Dambulla price is stored for {display_name(series)}, so no prediction is possible. Nothing is estimated in its place.")
+        st.error(t("No HARTI Dambulla price is stored for {series}, so no prediction is possible. Nothing is estimated in its place.", series=display_name(series)))
         st.stop()
     start = dambulla.iloc[0]
     with st.container(border=True):
         st.markdown(
-            f"**Forecast starting point (used by the model):** {start['Source']}, {display_name(series)}, observed "
-            f"**{start['Observation date']:%Y-%m-%d}**: Rs **{start['Average / midpoint']:,.2f}** per kg (midpoint of "
-            f"{start['Minimum']:,.2f} to {start['Maximum']:,.2f}), wholesale. "
-            f"[Bulletin]({str(start['Source document']).replace(' ', '%20')}) · collected "
-            + (f"{start['Collected']:%Y-%m-%d %H:%M}" if pd.notna(start["Collected"]) else "time not recorded")
+            t(
+                "**Forecast starting point (used by the model):** {source}, {series}, observed "
+                "**{date}**: Rs **{price:,.2f}** per kg (midpoint of "
+                "{low:,.2f} to {high:,.2f}), wholesale. ",
+                source=start["Source"],
+                series=display_name(series),
+                date=f"{start['Observation date']:%Y-%m-%d}",
+                price=start["Average / midpoint"],
+                low=start["Minimum"],
+                high=start["Maximum"],
+            )
+            + f"[{t('Bulletin')}]({str(start['Source document']).replace(' ', '%20')}) · {t('collected')} "
+            + (f"{start['Collected']:%Y-%m-%d %H:%M}" if pd.notna(start["Collected"]) else t("time not recorded"))
         )
 
     def newest(frame: pd.DataFrame, periods: int) -> pd.DataFrame:
@@ -541,43 +597,49 @@ def _render_vegetable_records(series: str, tables: dict[str, pd.DataFrame]) -> N
 
     note = mapping_note(series)
     tabs = st.tabs([
-        "HARTI Dambulla · used by the model",
-        "HARTI other markets · model inputs",
-        "CBSL · reference only",
-        "DCS · reference only",
+        t("HARTI Dambulla · used by the model"),
+        t("HARTI other markets · model inputs"),
+        t("CBSL · reference only"),
+        t("DCS · reference only"),
     ])
     with tabs[0]:
-        st.caption("The forecaster's own series: the midpoint of HARTI's published min-max range, Rs per kg. Newest 10 bulletins.")
+        st.caption(t("The forecaster's own series: the midpoint of HARTI's published min-max range, Rs per kg. Newest 10 bulletins."))
         _render_records(newest(dambulla, 10), "dambulla")
     with tabs[1]:
         st.caption(
-            "The same bulletins' other markets. The model uses their prices relative to Dambulla as inputs; it doesn't "
-            "forecast them. Newest 3 bulletins. Min and max are shown where the bulletin's range has been extracted."
+            t(
+                "The same bulletins' other markets. The model uses their prices relative to Dambulla as inputs; it doesn't "
+                "forecast them. Newest 3 bulletins. Min and max are shown where the bulletin's range has been extracted."
+            )
         )
         _render_records(newest(records["harti_other"], 3), "other", missing="not extracted")
     with tabs[2]:
         st.caption(
-            "Collected by CBSL separately from HARTI, so its prices differ and are never combined with HARTI's. CBSL prints "
-            "one price per market (no range). Not used by the model. Newest 3 reports."
-            + (f" Matching: {note}." if note else "")
+            t(
+                "Collected by CBSL separately from HARTI, so its prices differ and are never combined with HARTI's. CBSL prints "
+                "one price per market (no range). Not used by the model. Newest 3 reports."
+            )
+            + (" " + t("Matching: {note}.", note=note) if note else "")
         )
         cbsl = newest(records["cbsl"], 3)
         if cbsl.empty:
-            st.info(f"CBSL's report has no item that clearly matches {display_name(series)}.")
+            st.info(t("CBSL's report has no item that clearly matches {series}.", series=display_name(series)))
         for price_type in ("Wholesale", "Retail"):
             part = cbsl[cbsl["Price type"] == price_type]
             if not part.empty:
-                st.markdown(f"**{price_type}**")
+                st.markdown(f"**{t(price_type)}**")
                 _render_records(part, f"cbsl_{price_type}")
     with tabs[3]:
         st.caption(
-            "Retail weekly averages for Colombo District. DCS publishes a week ('week n of a month'), not a date. "
-            "Retail, so never comparable with HARTI's wholesale prices. Not used by the model. Newest 4 weeks."
-            + (f" Matching: {note}." if note else "")
+            t(
+                "Retail weekly averages for Colombo District. DCS publishes a week ('week n of a month'), not a date. "
+                "Retail, so never comparable with HARTI's wholesale prices. Not used by the model. Newest 4 weeks."
+            )
+            + (" " + t("Matching: {note}.", note=note) if note else "")
         )
         dcs = newest(records["dcs"], 4)
         if dcs.empty:
-            st.info(f"DCS's bulletin has no item that clearly matches {display_name(series)}.")
+            st.info(t("DCS's bulletin has no item that clearly matches {series}.", series=display_name(series)))
         else:
             _render_records(dcs, "dcs")
 
@@ -593,21 +655,28 @@ def _band_metrics(version: str) -> dict[str, dict]:
 
 
 def _render_real_prediction() -> None:
-    st.header("4. Prediction")
+    st.header(t("4. Prediction"))
     st.caption(
-        f"**Model:** Ridge direct forecaster, one model per number of days ahead (1 to {MAX_HORIZON_DAYS}), trained on "
-        f"data through {forecaster.trained_through.date()}. **Its inputs:** HARTI Dambulla prices, other HARTI markets' "
-        "prices, Open-Meteo weather for the vegetable's growing region, and CEYPETCO fuel prices (next-day model only). "
-        "CBSL and DCS records are not inputs."
+        t(
+            "**Model:** Ridge direct forecaster, one model per number of days ahead (1 to {days}), trained on "
+            "data through {date}. **Its inputs:** HARTI Dambulla prices, other HARTI markets' "
+            "prices, Open-Meteo weather for the vegetable's growing region, and CEYPETCO fuel prices (next-day model only). "
+            "CBSL and DCS records are not inputs.",
+            days=MAX_HORIZON_DAYS,
+            date=forecaster.trained_through.date(),
+        )
     )
-    labels = [*_HORIZON_CHOICES, f"Another date (up to {MAX_HORIZON_DAYS} days)"]
-    choice = st.radio("Forecast period", labels, horizontal=True, key="real_forecast_period")
+    another = "Another date (up to {days} days)"
+    labels = [*_HORIZON_CHOICES, another]
+    choice = st.radio(
+        t("Forecast period"), labels, horizontal=True, key="real_forecast_period", format_func=lambda option: t(option, days=MAX_HORIZON_DAYS)
+    )
     if choice in _HORIZON_CHOICES:
         horizon = _HORIZON_CHOICES[choice]
         target = latest_actual_date + pd.Timedelta(days=horizon)
     else:
         picked = st.date_input(
-            "Forecast date",
+            t("Forecast date"),
             value=(latest_actual_date + pd.Timedelta(days=1)).date(),
             min_value=(latest_actual_date + pd.Timedelta(days=1)).date(),
             max_value=(latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS)).date(),
@@ -616,10 +685,15 @@ def _render_real_prediction() -> None:
         target = pd.Timestamp(picked)
         horizon = (target - latest_actual_date).days
     st.caption(
-        f"Forecast date **{target.date()}**: {horizon} day(s) after the latest actual price ({latest_actual_date.date()}). "
-        "Forecasts count from the latest published price, not from today."
+        t(
+            "Forecast date **{target}**: {days} day(s) after the latest actual price ({latest}). "
+            "Forecasts count from the latest published price, not from today.",
+            target=target.date(),
+            days=horizon,
+            latest=latest_actual_date.date(),
+        )
     )
-    if not st.button("Predict", type="primary", key="real_predict"):
+    if not st.button(t("Predict"), type="primary", key="real_predict"):
         return
     _show_direct_forecast(target, multi_day=horizon > 1)
 
@@ -638,13 +712,13 @@ def _render_real_prediction() -> None:
                 "Days ahead": days,
                 "Forecast date": point.date.date().isoformat(),
                 "Forecast (Rs per kg)": round(point.predicted_price, 2),
-                "Accuracy measured for": f"{_HORIZON_BANDS[days]} {'day' if _HORIZON_BANDS[days] == '1' else 'days'} ahead",
+                "Accuracy measured for": t("{band} day ahead", band=_HORIZON_BANDS[days]) if _HORIZON_BANDS[days] == "1" else t("{band} days ahead", band=_HORIZON_BANDS[days]),
                 "Measured MAE (Rs per kg)": round(band["model_mae"], 2) if band else None,
                 "Measured MAPE (%)": round(band["model_mape"], 1) if band else None,
                 "MAE of holding the last price (Rs per kg)": round(band["hold_mae"], 2) if band else None,
             }
         )
-    st.markdown("**Forecasts at 1, 7, 14 and 30 days**")
+    st.markdown(t("**Forecasts at 1, 7, 14 and 30 days**"))
     # Short headers and fixed widths so all seven columns fit at 1440 px; the full names are in each header's tooltip.
     number = st.column_config.NumberColumn
     st.dataframe(
@@ -653,45 +727,59 @@ def _render_real_prediction() -> None:
         width="stretch",
         key="real_horizon_table",
         column_config={
-            "Days ahead": number("Days ahead", width=88, format="%d"),
-            "Forecast date": st.column_config.TextColumn("Forecast date", width=112),
-            "Forecast (Rs per kg)": number("Forecast (Rs/kg)", width=124, format="%.2f", help="Forecast (Rs per kg)"),
-            "Accuracy measured for": st.column_config.TextColumn("Accuracy measured for", width=164, help="The range of days ahead whose test errors are shown"),
-            "Measured MAE (Rs per kg)": number("Model MAE (Rs/kg)", width=138, format="%.2f", help="Measured MAE (Rs per kg) of the model over that range"),
-            "Measured MAPE (%)": number("Model MAPE (%)", width=122, format="%.1f", help="Measured MAPE (%) of the model over that range"),
+            "Days ahead": number(t("Days ahead"), width=88, format="%d"),
+            "Forecast date": st.column_config.TextColumn(t("Forecast date"), width=112),
+            "Forecast (Rs per kg)": number(t("Forecast (Rs/kg)"), width=124, format="%.2f", help=t("Forecast (Rs per kg)")),
+            "Accuracy measured for": st.column_config.TextColumn(t("Accuracy measured for"), width=164, help=t("The range of days ahead whose test errors are shown")),
+            "Measured MAE (Rs per kg)": number(t("Model MAE (Rs/kg)"), width=138, format="%.2f", help=t("Measured MAE (Rs per kg) of the model over that range")),
+            "Measured MAPE (%)": number(t("Model MAPE (%)"), width=122, format="%.1f", help=t("Measured MAPE (%) of the model over that range")),
             "MAE of holding the last price (Rs per kg)": number(
-                "Hold-last-price MAE (Rs/kg)", width=196, format="%.2f", help="MAE of holding the last price (Rs per kg): the naive baseline over that range"
+                t("Hold-last-price MAE (Rs/kg)"), width=196, format="%.2f", help=t("MAE of holding the last price (Rs per kg): the naive baseline over that range")
             ),
         },
     )
     st.caption(
-        "**Model MAE** and **Hold-last-price MAE** are the average error in Rs per kg of this model and of simply "
-        "repeating the last price, over the range in **Accuracy measured for**. "
-        f"Each forecast comes from that day's own model, starting from Rs {actual_group_history['price'].iloc[-1]:,.2f} on "
-        f"{latest_actual_date.date()}. Accuracy was measured on all {len(forecaster.vegetables)} vegetables over the held-out "
-        f"test period {metrics.get('period', 'unknown')} (`reports/metrics/direct_forecaster_metrics.json`), not on "
-        f"{display_name(vegetable)} alone; see **Model Performance**."
+        t(
+            "**Model MAE** and **Hold-last-price MAE** are the average error in Rs per kg of this model and of simply "
+            "repeating the last price, over the range in **Accuracy measured for**. "
+            "Each forecast comes from that day's own model, starting from Rs {price:,.2f} on "
+            "{date}. Accuracy was measured on all {n} vegetables over the held-out "
+            "test period {period} (`reports/metrics/direct_forecaster_metrics.json`), not on "
+            "{vegetable} alone; see **Model Performance**.",
+            price=actual_group_history["price"].iloc[-1],
+            date=latest_actual_date.date(),
+            n=len(forecaster.vegetables),
+            period=metrics.get("period", t("unknown")),
+            vegetable=display_name(vegetable),
+        )
     )
 
 
 def _render_freshness(series: str, market_name: str, latest: pd.Timestamp, level, message, stale) -> None:
-    st.header("5. Data freshness and warnings")
+    st.header(t("5. Data freshness and warnings"))
     if message:
         (st.warning if level == "warning" else st.info)(message)
     if stale:
         st.warning(stale)
     failed = [_OFFICIAL_SOURCES[key][0] for key, info in _UPDATE_STATUS.sources.items() if key in _OFFICIAL_SOURCES and info.get("status") == "failed"]
     if failed:
-        st.warning(f"{', '.join(failed)} couldn't be checked at the last update, so newer records from it may exist.")
+        st.warning(t("{sources} couldn't be checked at the last update, so newer records from it may exist.", sources=", ".join(failed)))
     if latest + pd.Timedelta(days=1) < pd.Timestamp.now().normalize():
         st.caption(
-            f"The forecast path starts on {(latest + pd.Timedelta(days=1)).date()}, the day after the latest actual price. "
-            "Its days before today have already passed: they are forecasts, not recorded prices."
+            t(
+                "The forecast path starts on {date}, the day after the latest actual price. "
+                "Its days before today have already passed: they are forecasts, not recorded prices.",
+                date=(latest + pd.Timedelta(days=1)).date(),
+            )
         )
     st.caption(
-        f"Prices are HARTI's published Dambulla wholesale prices for {display_name(series)} at {market_name}, not real-time "
-        "prices. No price is invented: a day HARTI didn't publish stays missing in the records. For its inputs, the model "
-        "carries the last real price forward over at most 7 missing days (`MAX_CARRY_DAYS`), and treats older gaps as unknown."
+        t(
+            "Prices are HARTI's published Dambulla wholesale prices for {series} at {market}, not real-time "
+            "prices. No price is invented: a day HARTI didn't publish stays missing in the records. For its inputs, the model "
+            "carries the last real price forward over at most 7 missing days (`MAX_CARRY_DAYS`), and treats older gaps as unknown.",
+            series=display_name(series),
+            market=market_name,
+        )
     )
 
 
@@ -703,17 +791,23 @@ _missing_datasets = missing_historical_datasets(CONFIG_PATH)
 _data_source_options = [SOURCE_UPLOAD] + ([] if _missing_datasets else [SOURCE_REAL])
 if _missing_datasets:
     st.warning(
-        f"Latest Real Data Prediction is unavailable because of missing file(s): "
-        f"{', '.join(f'`{path}`' for path in _missing_datasets)}. Only an uploaded CSV can be used. "
-        "`reports/DATA_SOURCES.md` explains how to rebuild them."
+        t(
+            "Latest Real Data Prediction is unavailable because of missing file(s): "
+            "{files}. Only an uploaded CSV can be used. "
+            "`reports/DATA_SOURCES.md` explains how to rebuild them.",
+            files=", ".join(f"`{path}`" for path in _missing_datasets),
+        )
     )
 data_source = st.radio(
-    "Data source",
+    t("Data source"),
     _data_source_options,
     index=len(_data_source_options) - 1,
     horizontal=True,
-    help="Latest Real Data Prediction uses the official HARTI, CBSL and DCS records this project has collected. "
-    "Upload CSV uses only your file, with a different model.",
+    format_func=t,
+    help=t(
+        "Latest Real Data Prediction uses the official HARTI, CBSL and DCS records this project has collected. "
+        "Upload CSV uses only your file, with a different model."
+    ),
 )
 REAL_MODE = data_source == SOURCE_REAL
 
@@ -722,11 +816,13 @@ live_snapshot: HartiLiveSnapshot | None = None
 if REAL_MODE:
     _render_source_status()
 else:
-    st.header("1. Your data")
+    st.header(t("1. Your data"))
 if data_source == SOURCE_UPLOAD:
     uploaded_file = st.file_uploader(
-        "CSV with columns: date (YYYY-MM-DD), vegetable, market, price. Optional: rainfall_mm, temperature_c, "
-        "humidity_pct, and diesel_price, petrol_price (needed if the loaded model uses fuel prices).",
+        t(
+            "CSV with columns: date (YYYY-MM-DD), vegetable, market, price. Optional: rainfall_mm, temperature_c, "
+            "humidity_pct, and diesel_price, petrol_price (needed if the loaded model uses fuel prices)."
+        ),
         type="csv",
     )
     if uploaded_file is not None:
@@ -736,10 +832,10 @@ if data_source == SOURCE_UPLOAD:
             st.error(str(error))
             st.stop()
         except pd.errors.EmptyDataError:
-            st.error("That file is empty. It needs a header row and at least one row of data.")
+            st.error(t("That file is empty. It needs a header row and at least one row of data."))
             st.stop()
         except Exception as error:  # noqa: BLE001 -- surfaced directly to the user, not swallowed
-            st.error(f"Could not read that file as a comma-separated CSV saved in UTF-8. Details: {error}")
+            st.error(t("Could not read that file as a comma-separated CSV saved in UTF-8. Details: {error}", error=error))
             st.stop()
         for _note in _upload_notes:
             st.warning(_note)
@@ -747,16 +843,16 @@ else:  # SOURCE_REAL: the stored official records, as last imported
     try:
         history_df = _load_real_market_history_cached(_DATA_VERSION)
     except _DATA_READ_ERRORS as error:
-        st.error(f"Couldn't load the real datasets: {error}")
+        st.error(t("Couldn't load the real datasets: {error}", error=error))
         st.stop()
 
 if history_df is None:
-    st.info("Upload a CSV to continue.")
+    st.info(t("Upload a CSV to continue."))
     st.stop()
 
 missing_columns = REQUIRED_COLUMNS - set(history_df.columns)
 if missing_columns:
-    st.error(f"Uploaded data is missing required column(s): {sorted(missing_columns)}")
+    st.error(t("Uploaded data is missing required column(s): {columns}", columns=sorted(missing_columns)))
     st.stop()
 
 # Corrects each row's same-day weather to its vegetable's evidence-based production
@@ -766,19 +862,24 @@ if missing_columns:
 _region_weather_path = ConfigLoader(CONFIG_PATH).get("paths.raw_files.weather_data_by_region")
 if not _region_weather_path or not Path(_region_weather_path).exists():
     st.warning(
-        "The regional weather file is missing, so this data keeps its own weather rather than each "
-        "vegetable's production-region weather, even where the weather details below name a region."
+        t(
+            "The regional weather file is missing, so this data keeps its own weather rather than each "
+            "vegetable's production-region weather, even where the weather details below name a region."
+        )
     )
 try:
     history_df = apply_production_region_weather(history_df, config_path=CONFIG_PATH)
 except (ValueError, KeyError, TypeError, OSError) as error:
     st.warning(
-        f"The regional weather file could not be read ({type(error).__name__}), so this data keeps its own weather "
-        "rather than each vegetable's production-region weather, even where the weather details below name a region."
+        t(
+            "The regional weather file could not be read ({error}), so this data keeps its own weather "
+            "rather than each vegetable's production-region weather, even where the weather details below name a region.",
+            error=type(error).__name__,
+        )
     )
 
 if not REAL_MODE:
-    with st.expander("Preview loaded data"):
+    with st.expander(t("Preview loaded data")):
         st.dataframe(history_df.head(20))
 
 # ---------------------------------------------------------------------------
@@ -786,7 +887,7 @@ if not REAL_MODE:
 # ---------------------------------------------------------------------------
 
 if not REAL_MODE:
-    st.header("2. Model")
+    st.header(t("2. Model"))
 
 demo_models_dir = resolve_demo_models_dir(CONFIG_PATH)
 
@@ -797,18 +898,22 @@ if data_source in (SOURCE_HISTORICAL, SOURCE_LATEST):
     _problems = forecaster_problems(CONFIG_PATH)
     if _problems:
         st.error(
-            "**The Ridge direct forecaster can't run:**\n"
+            t("**The Ridge direct forecaster can't run:**")
+            + "\n"
             + "\n".join(f"- {problem}" for problem in _problems)
-            + "\n\nRestore the file(s) from a backup. `reports/DATA_SOURCES.md` explains how to rebuild datasets, "
-            "and `scripts/train_forecaster.py` recreates the model."
+            + "\n\n"
+            + t(
+                "Restore the file(s) from a backup. `reports/DATA_SOURCES.md` explains how to rebuild datasets, "
+                "and `scripts/train_forecaster.py` recreates the model."
+            )
         )
     else:
         forecaster = _load_model_files(lambda: _load_forecaster_version(_DATA_VERSION), "Ridge direct forecaster:", "scripts/train_forecaster.py")
     if forecaster is None and not st.checkbox(
-        "Use the earlier comparison model instead (a different model, with different accuracy)",
+        t("Use the earlier comparison model instead (a different model, with different accuracy)"),
         key="use_earlier_model_for_real_data",
     ):
-        st.info("No prediction is available from this data source until the forecaster can run.")
+        st.info(t("No prediction is available from this data source until the forecaster can run."))
         st.stop()
 use_direct = forecaster is not None
 production_predictor = None if use_direct else _load_model_files(lambda: _load_predictor(CONFIG_PATH), "Earlier comparison model:")
@@ -821,16 +926,20 @@ def _train_sandbox_model(button_label: str) -> None:
     docstring for why this function must never be trusted to decide when overwriting the
     real production model (models/best_model.joblib) is safe."""
     if st.button(button_label):
-        with st.spinner("Training..."):
+        with st.spinner(t("Training...")):
             try:
                 result = train_demo_model(history_df, CONFIG_PATH)
             except Exception as error:  # noqa: BLE001 -- training failures are shown, not swallowed
-                st.error(f"Training failed: {error}")
+                st.error(t("Training failed: {error}", error=error))
                 st.stop()
         st.success(
-            f"Sandbox model trained and saved under `{demo_models_dir}` (the saved project models are "
-            f"untouched). Best model: **{result.best_model_name}** "
-            f"({result.metrics[result.best_model_name]})"
+            t(
+                "Sandbox model trained and saved under `{folder}` (the saved project models are "
+                "untouched). Best model: **{model}** ({metrics})",
+                folder=demo_models_dir,
+                model=result.best_model_name,
+                metrics=result.metrics[result.best_model_name],
+            )
         )
         _load_demo_predictor.clear()
         st.rerun()
@@ -841,11 +950,15 @@ _missing_for_production = (
 )
 if use_direct:
     predictor = None
-    _model_used = f"Ridge direct forecaster, with a separate model for each day up to {MAX_HORIZON_DAYS} days ahead."
+    _model_used = "Ridge direct forecaster, with a separate model for each day up to 30 days ahead."
     if not REAL_MODE:
         st.success(
-            f"Ridge direct forecaster loaded: one model for each day up to {MAX_HORIZON_DAYS} days ahead, trained on data "
-            f"through {forecaster.trained_through.date()}. See **Model Performance** for measured accuracy."
+            t(
+                "Ridge direct forecaster loaded: one model for each day up to {days} days ahead, trained on data "
+                "through {date}. See **Model Performance** for measured accuracy.",
+                days=MAX_HORIZON_DAYS,
+                date=forecaster.trained_through.date(),
+            )
         )
 elif production_predictor is not None and not _missing_for_production:
     st.success(_model_summary())
@@ -853,41 +966,52 @@ elif production_predictor is not None and not _missing_for_production:
     _model_used = "Earlier comparison model (51 features), not the Ridge direct forecaster."
     if data_source in (SOURCE_HISTORICAL, SOURCE_LATEST):
         st.warning(
-            "**You chose the earlier comparison model.** The direct forecaster's accuracy on **Model Performance** "
-            "doesn't apply to these results."
+            t(
+                "**You chose the earlier comparison model.** The direct forecaster's accuracy on **Model Performance** "
+                "doesn't apply to these results."
+            )
         )
     else:
         st.info(
-            "**This data uses the earlier comparison model, not the Ridge direct forecaster.** The forecaster needs "
-            "other markets' published prices and regional weather on the same dates, which only the project's real "
-            "datasets have. The accuracy on **Model Performance** was measured on real Dambulla prices and doesn't "
-            "carry over to other data."
+            t(
+                "**This data uses the earlier comparison model, not the Ridge direct forecaster.** The forecaster needs "
+                "other markets' published prices and regional weather on the same dates, which only the project's real "
+                "datasets have. The accuracy on **Model Performance** was measured on real Dambulla prices and doesn't "
+                "carry over to other data."
+            )
         )
-    with st.expander("Train a sandbox model on the data loaded above"):
-        st.caption(f"Saved separately under `{demo_models_dir}` -- never overwrites the project's saved models.")
-        _train_sandbox_model("Train sandbox model")
+    with st.expander(t("Train a sandbox model on the data loaded above")):
+        st.caption(t("Saved separately under `{folder}` -- never overwrites the project's saved models.", folder=demo_models_dir))
+        _train_sandbox_model(t("Train sandbox model"))
 elif production_predictor is not None:
     st.warning(
-        f"The earlier comparison model needs {', '.join(_missing_for_production)}, which this data doesn't have. To "
-        f"try the app on this data, train a temporary sandbox model (saved under `{demo_models_dir}`, never over the "
-        "project's saved models). Its results describe only the data it was trained on."
+        t(
+            "The earlier comparison model needs {columns}, which this data doesn't have. To "
+            "try the app on this data, train a temporary sandbox model (saved under `{folder}`, never over the "
+            "project's saved models). Its results describe only the data it was trained on.",
+            columns=", ".join(_missing_for_production),
+            folder=demo_models_dir,
+        )
     )
-    _train_sandbox_model("Train sandbox model on loaded data")
+    _train_sandbox_model(t("Train sandbox model on loaded data"))
     if demo_predictor is None or _missing_required_columns(demo_predictor, history_df):
         st.stop()
-    st.info(_SANDBOX_IN_USE)
+    st.info(t(_SANDBOX_IN_USE))
     predictor = demo_predictor
     _model_used = "Temporary sandbox model, from the most recent sandbox training."
 else:
     st.warning(
-        "The earlier comparison model isn't available from `models/` (`scripts/train.py` creates it). You can train a "
-        f"temporary sandbox model on the data loaded above (saved under `{demo_models_dir}`, never over the project's "
-        "saved models) to try the app."
+        t(
+            "The earlier comparison model isn't available from `models/` (`scripts/train.py` creates it). You can train a "
+            "temporary sandbox model on the data loaded above (saved under `{folder}`, never over the project's "
+            "saved models) to try the app.",
+            folder=demo_models_dir,
+        )
     )
-    _train_sandbox_model("Train sandbox model on loaded data")
+    _train_sandbox_model(t("Train sandbox model on loaded data"))
     if demo_predictor is None or _missing_required_columns(demo_predictor, history_df):
         st.stop()
-    st.info(_SANDBOX_IN_USE)
+    st.info(t(_SANDBOX_IN_USE))
     predictor = demo_predictor
     _model_used = "Temporary sandbox model, from the most recent sandbox training."
 
@@ -896,20 +1020,20 @@ else:
 # ---------------------------------------------------------------------------
 
 if REAL_MODE:
-    st.header("2. Latest collected data")
+    st.header(t("2. Latest collected data"))
     _source_tables = _load_source_records(_DATA_VERSION)
-    with st.expander("Newest HARTI Dambulla price of every vegetable (what a forecast would start from)"):
+    with st.expander(t("Newest HARTI Dambulla price of every vegetable (what a forecast would start from)")):
         _render_records(latest_dambulla_overview(_source_tables["harti_dambulla"]), key="overview")
     # The chosen vegetable's records are drawn here, in section 2, once it is chosen in section 3 below:
     # one selector drives both, so the tables and the prediction always describe the same vegetable.
     _vegetable_records_area = st.container()
-    st.header("3. Vegetable and market")
+    st.header(t("3. Vegetable and market"))
 else:
-    st.header("3. Request a prediction")
+    st.header(t("3. Request a prediction"))
 
 _priced_rows = history_df[history_df["price"].notna()]
 if _priced_rows.empty:
-    st.error("The loaded data has no usable prices.")
+    st.error(t("The loaded data has no usable prices."))
     st.stop()
 if use_direct:
     # Only series the forecaster was trained on and whose latest price is within its reach: a
@@ -918,56 +1042,62 @@ if use_direct:
     _supported = _status[_status["prediction_supported"]]
     _unsupported = _status[~_status["prediction_supported"]]
     if _supported.empty:
-        st.error("No price series is recent enough to forecast. Run `scripts/update_data.py` to import the latest bulletins.")
+        st.error(t("No price series is recent enough to forecast. Run `scripts/update_data.py` to import the latest bulletins."))
         st.stop()
-    vegetable = st.selectbox("Vegetable", _supported["series"].tolist(), format_func=display_name, key="predict_vegetable")
+    vegetable = st.selectbox(t("Vegetable"), _supported["series"].tolist(), format_func=display_name, key="predict_vegetable")
     if not _unsupported.empty:
-        with st.expander(f"{len(_unsupported)} recorded price series can't be forecast, and why"):
+        with st.expander(t("{n} recorded price series can't be forecast, and why", n=len(_unsupported))):
             st.dataframe(
-                pd.DataFrame(
+                ui.translated_columns(pd.DataFrame(
                     {
                         "Series": _unsupported["display_name"],
                         "Recorded from": _unsupported["first"].dt.date,
                         "Latest price": _unsupported["latest"].dt.date,
                         "Reason": _unsupported["reason"],
                     }
-                ),
+                )),
                 hide_index=True,
                 width="stretch",
             )
-            st.caption("Their recorded prices are still on the **Price History** page.")
+            st.caption(t("Their recorded prices are still on the **Price History** page."))
 else:
-    vegetable = st.selectbox("Vegetable", sorted(_priced_rows["vegetable"].unique()), key="predict_vegetable")
+    vegetable = st.selectbox(t("Vegetable"), sorted(_priced_rows["vegetable"].unique()), key="predict_vegetable")
 if REAL_MODE:
     with _vegetable_records_area:
-        st.markdown(f"**Records for {display_name(vegetable)}** (the vegetable chosen in section 3)")
+        st.markdown(t("**Records for {vegetable}** (the vegetable chosen in section 3)", vegetable=display_name(vegetable)))
         _render_vegetable_records(vegetable, _source_tables)
-market =st.selectbox("Market", sorted(_priced_rows.loc[_priced_rows["vegetable"] == vegetable, "market"].unique()))
+market =st.selectbox(t("Market"), sorted(_priced_rows.loc[_priced_rows["vegetable"] == vegetable, "market"].unique()))
 _update_level, _update_message = None, None
 if use_direct:
     ui.data_source_panel(
-        "HARTI daily bulletins", market, "Wholesale (Rs/kg)",
+        "HARTI daily bulletins", market, t("Wholesale (Rs/kg)"),
         _priced_rows.loc[_priced_rows["vegetable"] == vegetable, "date"].max(),
-        extra=f"Forecasts run from the latest recorded price, up to {MAX_HORIZON_DAYS} days ahead.",
+        extra=t("Forecasts run from the latest recorded price, up to {days} days ahead.", days=MAX_HORIZON_DAYS),
     )
     # Stored data: when the official sources were last checked, and whether the data may be behind
     # (shown under "Data freshness and warnings").
     _series_rows = _priced_rows[(_priced_rows["vegetable"] == vegetable) & (_priced_rows["market"] == market)].sort_values("date")
     _update_level, _update_message = update_notice(_UPDATE_STATUS, _series_rows["date"].iloc[-1])
     st.caption(
-        f"**Latest actual price:** Rs. {_series_rows['price'].iloc[-1]:,.2f} / kg on {_series_rows['date'].iloc[-1].date()} "
-        f"&nbsp;|&nbsp; **Last successful data update:** "
-        + (f"{_UPDATE_STATUS.last_success:%Y-%m-%d %H:%M}" if _UPDATE_STATUS.last_success is not None else "none recorded")
+        t(
+            "**Latest actual price:** Rs. {price:,.2f} / kg on {date} &nbsp;|&nbsp; **Last successful data update:** ",
+            price=_series_rows["price"].iloc[-1],
+            date=_series_rows["date"].iloc[-1].date(),
+        )
+        + (f"{_UPDATE_STATUS.last_success:%Y-%m-%d %H:%M}" if _UPDATE_STATUS.last_success is not None else t("none recorded"))
     )
 
 if use_direct and vegetable not in forecaster.vegetables:
-    st.error(f"**{vegetable}** has too little price history for the forecaster to have been trained on it.")
+    st.error(t("**{vegetable}** has too little price history for the forecaster to have been trained on it.", vegetable=localized(vegetable)))
     st.stop()
 _unseen = [] if use_direct else predictor.unseen_categories(vegetable=vegetable, market=market)
 if _unseen:
     st.warning(
-        f"This model never saw **{', '.join(_unseen)}** during training. It can still return a number from the "
-        "recent prices, but nothing specific to this selection is behind it, so treat it with caution."
+        t(
+            "This model never saw **{items}** during training. It can still return a number from the "
+            "recent prices, but nothing specific to this selection is behind it, so treat it with caution.",
+            items=", ".join(_unseen),
+        )
     )
 
 live_fuel_snapshot: LiveFuelPriceSnapshot | None = None
@@ -975,16 +1105,12 @@ if live_snapshot is not None:
     try:
         live_fuel_snapshot = _fetch_live_fuel_price_cached()
     except LiveFuelPriceError as error:
-        st.caption(
-            f"Live fuel price unavailable ({error}) -- falling back to the last known "
-            "fuel price from historical data."
-        )
+        st.caption(t("Live fuel price unavailable ({error}) -- falling back to the last known fuel price from historical data.", error=error))
     else:
         st.caption(
-            "**Live fuel price (CEYPETCO):** "
+            t("**Live fuel price (CEYPETCO):** ")
             + ", ".join(
-                f"{column} Rs.{price:.2f} (effective "
-                f"{live_fuel_snapshot.effective_dates[column].date()})"
+                t("{fuel} Rs.{price:.2f} (effective {date})", fuel=column, price=price, date=live_fuel_snapshot.effective_dates[column].date())
                 for column, price in live_fuel_snapshot.prices.items()
             )
         )
@@ -994,23 +1120,34 @@ if live_snapshot is not None:
             vegetable, market, f"{live_snapshot.bulletin_date.date()}|{_DATA_VERSION}", history_df, live_snapshot, live_fuel_snapshot
         )
     except HartiLiveDataError as error:
-        st.warning(f"Using historical data only for this selection: {error}")
+        st.warning(t("Using historical data only for this selection: {error}", error=error))
         live_snapshot = None
 
 resolved_location = resolve_weather_region(vegetable, config_path=CONFIG_PATH)
 _coords_caption = f"({resolved_location.latitude:.4f}, {resolved_location.longitude:.4f})"
 if resolved_location.is_production_region:
     st.caption(
-        f"**Vegetable:** {vegetable} &nbsp;|&nbsp; **Market:** {market} &nbsp;|&nbsp; "
-        f"**Weather region:** {resolved_location.region_name} {_coords_caption} (evidence-based "
-        f"production region, not the market) &nbsp;|&nbsp; **Weather source:** Open-Meteo"
+        t(
+            "**Vegetable:** {vegetable} &nbsp;|&nbsp; **Market:** {market} &nbsp;|&nbsp; "
+            "**Weather region:** {region} {coords} (evidence-based "
+            "production region, not the market) &nbsp;|&nbsp; **Weather source:** Open-Meteo",
+            vegetable=localized(vegetable),
+            market=market,
+            region=resolved_location.region_name,
+            coords=_coords_caption,
+        )
     )
 else:
     st.caption(
-        f"**Vegetable:** {vegetable} &nbsp;|&nbsp; **Market:** {market} &nbsp;|&nbsp; "
-        f"**Weather region:** {market} {_coords_caption} (market location -- no sufficiently "
-        f"evidenced production region for {vegetable}, falling back to market weather) "
-        f"&nbsp;|&nbsp; **Weather source:** Open-Meteo"
+        t(
+            "**Vegetable:** {vegetable} &nbsp;|&nbsp; **Market:** {market} &nbsp;|&nbsp; "
+            "**Weather region:** {market} {coords} (market location -- no sufficiently "
+            "evidenced production region for {vegetable}, falling back to market weather) "
+            "&nbsp;|&nbsp; **Weather source:** Open-Meteo",
+            vegetable=localized(vegetable),
+            market=market,
+            coords=_coords_caption,
+        )
     )
 
 group_history = history_df[(history_df["vegetable"] == vegetable) & (history_df["market"] == market)]
@@ -1020,8 +1157,14 @@ default_target = (latest_actual_date + pd.Timedelta(days=1)).date()
 
 _days_since_reading = (pd.Timestamp.now().normalize() - latest_actual_date).days
 _stale_message = (
-    f"The latest price for {vegetable} at {market} is from **{latest_actual_date.date()}**, "
-    f"{_days_since_reading} days ago. A prediction here continues from that date, not from today."
+    t(
+        "The latest price for {vegetable} at {market} is from **{date}**, "
+        "{days} days ago. A prediction here continues from that date, not from today.",
+        vegetable=vegetable,
+        market=market,
+        date=latest_actual_date.date(),
+        days=_days_since_reading,
+    )
     if _days_since_reading > _STALE_AFTER_DAYS
     else None
 )
@@ -1041,12 +1184,12 @@ if use_direct:
 def _show_direct_forecast(requested_date, multi_day: bool) -> None:
     """Run and display a direct forecast, reporting a refusal on the page."""
     try:
-        with st.spinner("Calculating the forecast..."):
+        with st.spinner(t("Calculating the forecast...")):
             result = direct_forecast(
                 forecaster, _direct_rows, vegetable, market, requested_date, latest_actual_date, [_direct_sources]
             )
     except (ForecastInputError, ForecastDataUnavailableError) as error:
-        st.error(f"Cannot forecast that date: {error}")
+        st.error(t("Cannot forecast that date: {error}", error=error))
         return
     _render_direct_result(result, _direct_rows, actual_group_history, resolved_location, _direct_sources, multi_day)
 
@@ -1057,22 +1200,28 @@ if REAL_MODE and use_direct:
     st.stop()
 
 prediction_type = st.radio(
-    "Prediction type",
+    t("Prediction type"),
     ["Latest / Next Available Prediction", "Future Date Forecast (multi-step)"],
     horizontal=True,
+    format_func=t,
     help=(
-        f"Both options use a separate model for each number of days ahead, up to {MAX_HORIZON_DAYS}. "
-        "'Future Date Forecast' also shows the daily path to the chosen date."
+        t(
+            "Both options use a separate model for each number of days ahead, up to {days}. "
+            "'Future Date Forecast' also shows the daily path to the chosen date.",
+            days=MAX_HORIZON_DAYS,
+        )
         if use_direct
-        else "'Latest / Next Available Prediction' scores one date directly. 'Future Date Forecast' reaches a "
-        "distant date by predicting every day in between and feeding each prediction into the next, so errors "
-        "can build up -- see README.md section 12."
+        else t(
+            "'Latest / Next Available Prediction' scores one date directly. 'Future Date Forecast' reaches a "
+            "distant date by predicting every day in between and feeding each prediction into the next, so errors "
+            "can build up -- see README.md section 12."
+        )
     ),
 )
 use_live_weather = use_direct or st.checkbox(
-    "Fetch latest weather from Open-Meteo automatically (recommended)",
+    t("Fetch latest weather from Open-Meteo automatically (recommended)"),
     value=True,
-    help=(
+    help=t(
         "If the loaded history's weather doesn't reach far enough back for a required date's "
         "14-day weather lag feature, fetch the missing day(s) from Open-Meteo instead of "
         "failing. Uncheck to predict/forecast using only the weather already in the loaded "
@@ -1083,7 +1232,7 @@ use_live_weather = use_direct or st.checkbox(
 
 if prediction_type == "Latest / Next Available Prediction":
     target_date = st.date_input(
-        "Date to predict",
+        t("Date to predict"),
         value=default_target,
         min_value=default_target,
     )
@@ -1092,13 +1241,15 @@ if prediction_type == "Latest / Next Available Prediction":
         st.warning(_past)
     if not use_direct:
         st.caption(
-            "Predicting further beyond the last historical date needs correspondingly more lag/rolling "
-            "history (up to 30 days per config.feature_engineering). If it's missing, you'll see a clear "
-            "error naming the exact feature(s) that couldn't be computed -- never a fabricated result. "
-            "For a date far enough ahead to need more than that, use **Future Date Forecast** instead."
+            t(
+                "Predicting further beyond the last historical date needs correspondingly more lag/rolling "
+                "history (up to 30 days per config.feature_engineering). If it's missing, you'll see a clear "
+                "error naming the exact feature(s) that couldn't be computed -- never a fabricated result. "
+                "For a date far enough ahead to need more than that, use **Future Date Forecast** instead."
+            )
         )
 
-    if st.button("Predict", type="primary"):
+    if st.button(t("Predict"), type="primary"):
         if use_direct:
             _show_direct_forecast(target_date, multi_day=False)
             st.stop()
@@ -1113,9 +1264,15 @@ if prediction_type == "Latest / Next Available Prediction":
         if imputed_dates:
             _severity = st.error if len(imputed_dates) > _MANY_IMPUTED_DAYS else st.warning
             _severity(
-                f"{len(imputed_dates)} of the last 30 days have no real price for {vegetable} at {market}, so "
-                "estimates from surrounding real prices fill them for the model's features: "
-                f"{', '.join(day.date().isoformat() for day in imputed_dates)}. Original data is unchanged."
+                t(
+                    "{n} of the last 30 days have no real price for {vegetable} at {market}, so "
+                    "estimates from surrounding real prices fill them for the model's features: "
+                    "{dates}. Original data is unchanged.",
+                    n=len(imputed_dates),
+                    vegetable=vegetable,
+                    market=market,
+                    dates=", ".join(day.date().isoformat() for day in imputed_dates),
+                )
             )
 
         try:
@@ -1124,7 +1281,7 @@ if prediction_type == "Latest / Next Available Prediction":
             else:
                 input_df = build_prediction_input(prediction_history, target_ts, vegetable, market)
         except LiveWeatherError as error:
-            st.error(f"Couldn't get live weather data: {error}")
+            st.error(t("Couldn't get live weather data: {error}", error=error))
             st.stop()
 
         pipeline = PredictionPipeline(config_path=CONFIG_PATH, predictor=predictor)
@@ -1132,19 +1289,19 @@ if prediction_type == "Latest / Next Available Prediction":
         try:
             result = pipeline.predict(input_df, target_date=target_ts, vegetable=vegetable, market=market)
         except FeatureEngineeringError as error:
-            st.error(f"Missing required data: {error}")
+            st.error(t("Missing required data: {error}", error=error))
         except PredictionInputError as error:
-            st.error(f"Invalid input: {error}")
+            st.error(t("Invalid input: {error}", error=error))
         except FeatureAlignmentError as error:
-            st.error(f"Not enough historical context to predict: {error}")
+            st.error(t("Not enough historical context to predict: {error}", error=error))
         except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError) as error:
-            st.error(f"Model not available: {error}")
+            st.error(t("Model not available: {error}", error=error))
         else:
             predicted_price = float(result.loc[0, "predicted_price"])
             with st.container(key="vp_result_next"):
                 st.metric(
-                    label=f"Predicted price -- {vegetable} at {market} on {target_date}",
-                    value=f"Rs. {predicted_price:.2f} / kg",
+                    label=t("Predicted price -- {vegetable} at {market} on {date}", vegetable=vegetable, market=market, date=target_date),
+                    value=f"Rs. {predicted_price:.2f} / {t('kg')}",
                 )
 
             _weather_lookup_date = target_ts - pd.Timedelta(days=_WEATHER_LAG_DAYS)
@@ -1154,9 +1311,9 @@ if prediction_type == "Latest / Next Available Prediction":
                     input_df, target_date=target_ts, vegetable=vegetable, market=market
                 )
                 _weather_values = {
-                    "Rainfall": f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
-                    "Temperature": f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
-                    "Humidity": f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
+                    t("Rainfall"): f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
+                    t("Temperature"): f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
+                    t("Humidity"): f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
                 }
             except (PredictionInputError, KeyError):
                 pass  # display the card without values rather than fail the page
@@ -1165,19 +1322,16 @@ if prediction_type == "Latest / Next Available Prediction":
             )
 
             if live_snapshot is not None:
-                st.caption(
-                    f"Data source: **Latest HARTI Data** -- bulletin dated {live_snapshot.bulletin_date.date()}, "
-                    "not real-time."
-                )
+                st.caption(t("Data source: **Latest HARTI Data** -- bulletin dated {date}, not real-time.", date=live_snapshot.bulletin_date.date()))
             else:
-                st.caption(f"Data source: {data_source}")
-            st.caption(f"**Model used:** {_model_used}")
+                st.caption(t("Data source: {source}", source=t(data_source)))
+            st.caption(f"**{t('Model used')}:** {t(_model_used)}")
 
             fig, ax = plt.subplots(figsize=(8, 4.4))
-            ax.plot(group_history["date"], group_history["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Historical price")
-            ax.scatter([pd.Timestamp(target_date)], [predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Prediction")
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Price")
+            ax.plot(group_history["date"], group_history["price"], marker="o", markersize=2.5, color=ui.SERIES["actual"], label=t("Historical price"))
+            ax.scatter([pd.Timestamp(target_date)], [predicted_price], s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label=t("Prediction"))
+            ax.set_xlabel(t("Date"))
+            ax.set_ylabel(t("Price"))
             ax.legend()
             fig.autofmt_xdate()
             fig.tight_layout()
@@ -1187,43 +1341,57 @@ if prediction_type == "Latest / Next Available Prediction":
 else:  # "Future Date Forecast (multi-step)"
     if use_direct:
         st.caption(
-            f"The furthest date available is **{(latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS)).date()}**, "
-            f"{MAX_HORIZON_DAYS} days after the latest actual price."
+            t(
+                "The furthest date available is **{date}**, {days} days after the latest actual price.",
+                date=(latest_actual_date + pd.Timedelta(days=MAX_HORIZON_DAYS)).date(),
+                days=MAX_HORIZON_DAYS,
+            )
         )
     else:
         estimated_max_date = max_supported_forecast_date(latest_actual_date, CONFIG_PATH)
         st.caption(
-            f"Estimated furthest forecastable date given the live weather provider's own forward "
-            f"limit: **~{estimated_max_date.date()}**. The loaded history's own weather coverage can "
-            "extend this further; the real limit is only known once you generate the forecast."
+            t(
+                "Estimated furthest forecastable date given the live weather provider's own forward "
+                "limit: **~{date}**. The loaded history's own weather coverage can "
+                "extend this further; the real limit is only known once you generate the forecast.",
+                date=estimated_max_date.date(),
+            )
         )
     forecast_date = st.date_input(
-        "Forecast date",
+        t("Forecast date"),
         value=default_target,
         min_value=default_target,
         key="forecast_date_input",
     )
     forecast_horizon_preview = (pd.Timestamp(forecast_date) - latest_actual_date).days
     st.caption(
-        f"Latest actual data: **{latest_actual_date.date()}** &nbsp;|&nbsp; Forecast horizon: "
-        f"**{forecast_horizon_preview} day(s) ahead**"
+        t(
+            "Latest actual data: **{date}** &nbsp;|&nbsp; Forecast horizon: **{days} day(s) ahead**",
+            date=latest_actual_date.date(),
+            days=forecast_horizon_preview,
+        )
     )
     _past = past_date_notice(forecast_date, latest_actual_date)
     if _past:
         st.warning(_past)
     elif pd.Timestamp(default_target) < pd.Timestamp.now().normalize():
         st.caption(
-            f"The forecast path starts on {default_target}, the day after the latest actual data; its days before "
-            "today have already passed and are forecasts, not recorded prices."
+            t(
+                "The forecast path starts on {date}, the day after the latest actual data; its days before "
+                "today have already passed and are forecasts, not recorded prices.",
+                date=default_target,
+            )
         )
 
     if forecast_horizon_preview > 7:
         st.warning(
-            "Forecast error grows quickly with distance. See the **Model Performance** page for measured "
-            "accuracy at each range before relying on a date this far ahead."
+            t(
+                "Forecast error grows quickly with distance. See the **Model Performance** page for measured "
+                "accuracy at each range before relying on a date this far ahead."
+            )
         )
 
-    if st.button("Generate Forecast", type="primary"):
+    if st.button(t("Generate Forecast"), type="primary"):
         if use_direct:
             _show_direct_forecast(forecast_date, multi_day=True)
             st.stop()
@@ -1232,7 +1400,7 @@ else:  # "Future Date Forecast (multi-step)"
         try:
             live_fuel_snapshot_for_forecast = _fetch_live_fuel_price_cached()
         except LiveFuelPriceError as error:
-            st.caption(f"Live fuel price unavailable ({error}) -- using historical fuel price fallback.")
+            st.caption(t("Live fuel price unavailable ({error}) -- using historical fuel price fallback.", error=error))
 
         # Recursive forecasting depends on the ENTIRE trailing lag/rolling window staying
         # dense. Real archived bulletins fill holes first; a date HARTI genuinely has none
@@ -1243,7 +1411,7 @@ else:  # "Future Date Forecast (multi-step)"
 
         pipeline = PredictionPipeline(config_path=CONFIG_PATH, predictor=predictor)
 
-        with st.spinner(f"Forecasting {forecast_horizon_preview} day(s) ahead, recursively..."):
+        with st.spinner(t("Forecasting {days} day(s) ahead, recursively...", days=forecast_horizon_preview)):
             try:
                 forecast_result = forecast_future_price(
                     forecast_input_history,
@@ -1256,27 +1424,32 @@ else:  # "Future Date Forecast (multi-step)"
                     live_fuel_snapshot=live_fuel_snapshot_for_forecast,
                 )
             except ForecastInputError as error:
-                st.error(f"Invalid forecast request: {error}")
+                st.error(t("Invalid forecast request: {error}", error=error))
                 st.stop()
             except ForecastDataUnavailableError as error:
-                st.error(f"Cannot forecast that far ahead: {error}")
+                st.error(t("Cannot forecast that far ahead: {error}", error=error))
                 st.stop()
             except (ModelArtifactNotFoundError, TransformationArtifactNotFoundError) as error:
-                st.error(f"Model not available: {error}")
+                st.error(t("Model not available: {error}", error=error))
                 st.stop()
 
-        st.subheader("📈 Future Vegetable Price Forecast")
+        st.subheader(t("📈 Future Vegetable Price Forecast"))
         st.warning(
-            "⚠ **FORECAST** -- generated recursively from the latest available actual market "
-            "data. This is a model estimate, not a guaranteed future price."
+            t(
+                "⚠ **FORECAST** -- generated recursively from the latest available actual market "
+                "data. This is a model estimate, not a guaranteed future price."
+            )
         )
         info_cols = st.columns(3)
-        info_cols[0].metric("Vegetable", forecast_result.vegetable)
-        info_cols[1].metric("Market", forecast_result.market)
-        info_cols[2].metric("Forecast Horizon", f"{forecast_result.forecast_horizon_days} day(s) ahead")
+        info_cols[0].metric(t("Vegetable"), forecast_result.vegetable)
+        info_cols[1].metric(t("Market"), forecast_result.market)
+        info_cols[2].metric(t("Forecast Horizon"), t("{days} day(s) ahead", days=forecast_result.forecast_horizon_days))
         st.caption(
-            f"Latest actual data: **{forecast_result.latest_actual_date.date()}** &nbsp;|&nbsp; "
-            f"Forecast date: **{forecast_result.target_date.date()}**"
+            t(
+                "Latest actual data: **{latest}** &nbsp;|&nbsp; Forecast date: **{date}**",
+                latest=forecast_result.latest_actual_date.date(),
+                date=forecast_result.target_date.date(),
+            )
         )
         _forecast_weather_lookup_date = forecast_result.target_date - pd.Timedelta(days=_WEATHER_LAG_DAYS)
         _forecast_weather_values = None
@@ -1297,9 +1470,9 @@ else:  # "Future Date Forecast (multi-step)"
                 _final_day_input, target_date=forecast_result.target_date, vegetable=vegetable, market=market
             )
             _forecast_weather_values = {
-                "Rainfall": f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
-                "Temperature": f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
-                "Humidity": f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
+                t("Rainfall"): f"{_engineered_row[f'rainfall_mm_lag{_WEATHER_LAG_DAYS}d']:.1f} mm",
+                t("Temperature"): f"{_engineered_row[f'temperature_c_lag{_WEATHER_LAG_DAYS}d']:.1f} °C",
+                t("Humidity"): f"{_engineered_row[f'humidity_pct_lag{_WEATHER_LAG_DAYS}d']:.0f} %",
             }
         except (LiveWeatherError, PredictionInputError, KeyError):
             pass  # display the card without values rather than fail the page
@@ -1308,14 +1481,16 @@ else:  # "Future Date Forecast (multi-step)"
         )
         with st.container(key="vp_result_recursive"):
             st.metric(
-                label=(
-                    f"Forecasted Price -- {forecast_result.vegetable} at {forecast_result.market} on "
-                    f"{forecast_result.target_date.date()}"
+                label=t(
+                    "Forecasted Price -- {vegetable} at {market} on {date}",
+                    vegetable=forecast_result.vegetable,
+                    market=forecast_result.market,
+                    date=forecast_result.target_date.date(),
                 ),
-                value=f"Rs. {forecast_result.predicted_price:.2f} / kg",
+                value=f"Rs. {forecast_result.predicted_price:.2f} / {t('kg')}",
             )
-            st.caption("**Data source:** " + " + ".join(forecast_result.data_sources))
-            st.caption(f"**Model used:** {_model_used} Reached by predicting one day at a time.")
+            st.caption(f"**{t('Data source')}:** " + " + ".join(t(source) for source in forecast_result.data_sources))
+            st.caption(f"**{t('Model used')}:** {t(_model_used)} {t('Reached by predicting one day at a time.')}")
         for warning_message in forecast_result.warnings:
             st.caption(f"⚠ {warning_message}")
 
@@ -1325,7 +1500,7 @@ else:  # "Future Date Forecast (multi-step)"
                 "forecasted_price": [point.predicted_price for point in forecast_result.daily_forecast],
             }
         )
-        with st.expander("Daily forecast path"):
+        with st.expander(t("Daily forecast path")):
             st.dataframe(daily_forecast_df)
             if forecast_result.imputed_historical_dates:
                 imputed_mask = forecast_input_history["source"] == IMPUTED_HISTORICAL_SOURCE_LABEL
@@ -1335,7 +1510,7 @@ else:  # "Future Date Forecast (multi-step)"
             fig, ax = plt.subplots(figsize=(8, 4.4))
             ax.plot(
                 actual_group_history["date"], actual_group_history["price"],
-                marker="o", markersize=2.5, color=ui.SERIES["actual"], label="Historical price (actual)",
+                marker="o", markersize=2.5, color=ui.SERIES["actual"], label=t("Historical price (actual)"),
             )
             if forecast_result.imputed_historical_dates:
                 imputed_mask = forecast_input_history["source"] == IMPUTED_HISTORICAL_SOURCE_LABEL
@@ -1343,18 +1518,18 @@ else:  # "Future Date Forecast (multi-step)"
                 ax.scatter(
                     imputed_points["date"], imputed_points["price"],
                     marker="x", color=ui.SERIES["estimate"], zorder=4,
-                    label="Imputed historical (estimated -- not real HARTI data)",
+                    label=t("Imputed historical (estimated -- not real HARTI data)"),
                 )
             ax.plot(
                 daily_forecast_df["date"], daily_forecast_df["forecasted_price"],
-                marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label="Forecast (recursive)",
+                marker="o", markersize=3, linestyle="--", color=ui.SERIES["forecast"], label=t("Forecast (recursive)"),
             )
             ax.scatter(
                 [forecast_result.target_date], [forecast_result.predicted_price],
-                s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label="Requested forecast date",
+                s=70, color=ui.SERIES["target"], edgecolors=ui.COLORS["background"], zorder=5, label=t("Requested forecast date"),
             )
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Price")
+            ax.set_xlabel(t("Date"))
+            ax.set_ylabel(t("Price"))
             ax.legend()
             fig.autofmt_xdate()
             fig.tight_layout()

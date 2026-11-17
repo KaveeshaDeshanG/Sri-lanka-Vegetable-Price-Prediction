@@ -344,6 +344,30 @@ unreadable, the Predict page names the problem and gives no real-data prediction
 comparison model is used only if you tick the box asking for it, and every result states which model
 produced it. The dashboard never switches model on its own.
 
+### Languages: English, Sinhala and Tamil
+
+Every page has a language switcher at the top right: **English · සිංහල · தமிழ்** (English is the
+default). The choice applies at once, stays through reruns and page changes, and is kept in the address
+(`?lang=si`, `?lang=ta`), so a reload or a bookmark opens in the same language. Everything the app writes
+is translated: page and section titles, the sidebar, buttons, help text, messages, tables, chart titles,
+axes, legends and tooltips, the data freshness cards and the planner's price comparison. Dates keep their
+numbers (month names are translated; chart axes show 2026-11-17-style dates), and prices stay in Rs.
+
+- **How it works:** `app/i18n.py` provides `t("English text", **values)`. The English text is the key,
+  so English output is exactly what the code says and a missing translation falls back to English.
+  Translations are in `app/translations/si.json` and `ta.json`; `en.json` lists every key.
+- **Vegetable names** keep the familiar English name and add the local one ("Beans · බෝංචි"), taken from
+  the Department of Agriculture's names in `data/reference/vegetable_names.csv`.
+- **Not translated, on purpose:** stored data (market, item and cultivar names, DCS's "week n" labels),
+  source names (HARTI, CBSL, DCS, CEYPETCO, Open-Meteo), the Department of Agriculture's quoted timing
+  wording (marked as quoted in English), file names and code identifiers. Model inputs, predictions and
+  datasets are the same in every language.
+- **Adding or changing text:** wrap it in `t()`, then run
+  `.venv312/Scripts/python.exe scripts/i18n_texts.py --run-pages --write-en` to list it and see what
+  needs a Sinhala and Tamil translation. `tests/app/test_i18n.py` fails if any text lacks one.
+- The Sinhala and Tamil wording was written for this project and should be reviewed by a native
+  speaker, especially the agricultural terms, before wider use.
+
 ### Uploaded data: current limitations
 
 Uploaded data uses the earlier comparison model (Linear Regression, 51 features, trained on real

@@ -27,6 +27,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from app.i18n import t
 from src.models.direct_forecaster import MAX_HORIZON_DAYS, DirectForecaster
 
 REFERENCE_COLUMNS = (
@@ -100,28 +101,44 @@ class CropTiming:
 
     @property
     def date_label(self) -> str:
-        return START_STAGES[self.start_stage][0]
+        return t(START_STAGES[self.start_stage][0])
 
     @property
     def stage_note(self) -> str:
-        return START_STAGES[self.start_stage][1]
+        return t(START_STAGES[self.start_stage][1])
+
+    @property
+    def event_text(self) -> str:
+        """The event the duration runs to ("first harvest", "maturity"...), in the current language."""
+        return t(self.event)
+
+    @property
+    def stage_text(self) -> str:
+        """The stage the duration counts from ("planting", "transplanting"...), in the current language."""
+        return t(self.start_stage)
 
     @property
     def duration_text(self) -> str:
         """The duration as published, e.g. "60–65 days", "10–12 weeks", "4½ months"."""
         low, high = _format_value(self.min_value), _format_value(self.max_value)
-        unit = self.unit if not (self.min_value == self.max_value == 1) else self.unit.rstrip("s")
+        unit = t(self.unit if not (self.min_value == self.max_value == 1) else self.unit.rstrip("s"))
         return f"{low} {unit}" if low == high else f"{low}–{high} {unit}"
 
     @property
     def calculation_basis(self) -> str:
         if self.unit == "days":
-            rule = "days are added to the date"
+            rule = t("days are added to the date")
         elif self.unit == "weeks":
-            rule = "each week is 7 days"
+            rule = t("each week is 7 days")
         else:
-            rule = "months are calendar months; a half month is halfway between the two whole months around it"
-        return f"{self.duration_text} after the {self.date_label.split(' (')[0].lower()}, to {self.event}; {rule}."
+            rule = t("months are calendar months; a half month is halfway between the two whole months around it")
+        return t(
+            "{duration} after the {stage}, to {event}; {rule}.",
+            duration=self.duration_text,
+            stage=self.date_label.split(" (")[0].lower(),
+            event=self.event_text,
+            rule=rule,
+        )
 
 
 def _format_value(value: float) -> str:
@@ -401,7 +418,7 @@ class PriceResult:
 
     @property
     def label(self) -> str:
-        return PRICE_KINDS[self.kind]
+        return t(PRICE_KINDS[self.kind])
 
 
 def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=None, latest_record: dict | None = None) -> PriceResult:
@@ -420,10 +437,11 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
     if plan.status == "no_prices" or actual is None or _valid(actual).empty:
         return PriceResult(
             "unavailable",
-            explanation=(
-                f"No verified price can be shown for {plan.timing.crop}: HARTI's daily bulletin has no price series for it, "
+            explanation=t(
+                "No verified price can be shown for {crop}: HARTI's daily bulletin has no price series for it, "
                 "so the project's HARTI Dambulla data (data/raw/harti_prices.csv) holds none, and no other "
-                "vegetable's prices are substituted for it."
+                "vegetable's prices are substituted for it.",
+                crop=plan.timing.crop,
             ),
         )
     actual = _valid(actual)
@@ -433,8 +451,11 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
         coverage = (
             None
             if plan.fully_forecast
-            else f"The forecast covers {plan.forecast_days} of the {plan.window_days} harvest days; "
-            "the rest are beyond its 30-day reach."
+            else t(
+                "The forecast covers {covered} of the {total} harvest days; the rest are beyond its 30-day reach.",
+                covered=plan.forecast_days,
+                total=plan.window_days,
+            )
         )
         return PriceResult(
             "model_forecast",
@@ -443,10 +464,13 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
             high=None if pd.isna(first["high"]) else float(first["high"]),
             date=pd.Timestamp(first["date"]),
             horizon=int(first["horizon"]),
-            explanation=(
-                f"The Ridge direct forecaster's prediction for {first['date']:%Y-%m-%d}, {int(first['horizon'])} day(s) after "
-                f"the latest recorded price ({plan.latest_price_date:%Y-%m-%d}). The range is the middle 80% of the "
-                "forecaster's test-period errors for all vegetables together at that many days ahead."
+            explanation=t(
+                "The Ridge direct forecaster's prediction for {date}, {days} day(s) after "
+                "the latest recorded price ({latest}). The range is the middle 80% of the "
+                "forecaster's test-period errors for all vegetables together at that many days ahead.",
+                date=f"{first['date']:%Y-%m-%d}",
+                days=int(first["horizon"]),
+                latest=f"{plan.latest_price_date:%Y-%m-%d}",
             ),
             limitation=coverage,
         )
@@ -460,10 +484,10 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
             high=float(prices.max()),
             median=float(prices.median()),
             mean=float(prices.mean()),
-            period=f"{plan.harvest_start.date()} to {plan.harvest_end.date()}",
+            period=t("{start} to {end}", start=plan.harvest_start.date(), end=plan.harvest_end.date()),
             observations=len(prices),
             years=sorted(plan.recorded_in_window["date"].dt.year.unique().tolist()),
-            explanation="The harvest window has already passed, so these are the prices actually recorded in it (median shown).",
+            explanation=t("The harvest window has already passed, so these are the prices actually recorded in it (median shown)."),
         )
 
     seasonal = plan.seasonal
@@ -479,16 +503,24 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
             period="; ".join(seasonal["periods"]),
             observations=seasonal["observations"],
             years=seasonal["years"],
-            explanation=(
-                f"{reason} This is the median of the {seasonal['observations']} prices recorded in the same weeks "
-                f"(the harvest dates ± {seasonal['pad_days']} days) of the {seasonal['seasons']} most recent earlier years "
-                f"that have prices then (dates from {seasonal['years'][0]} to {seasonal['years'][-1]}): "
-                "what the price has been at this time of year, not a prediction of this year's price."
+            explanation=reason
+            + " "
+            + t(
+                "This is the median of the {n} prices recorded in the same weeks "
+                "(the harvest dates ± {pad} days) of the {seasons} most recent earlier years "
+                "that have prices then (dates from {first} to {last}): "
+                "what the price has been at this time of year, not a prediction of this year's price.",
+                n=seasonal["observations"],
+                pad=seasonal["pad_days"],
+                seasons=seasonal["seasons"],
+                first=seasonal["years"][0],
+                last=seasonal["years"][-1],
             ),
             limitation=(
-                "Earlier years' prices are not adjusted for inflation, and a year can differ a lot from the next."
+                t("Earlier years' prices are not adjusted for inflation, and a year can differ a lot from the next.")
                 + (
-                    f" The most recent of these prices is from {seasonal['years'][-1]}, so they may be a poor guide to today's level."
+                    " "
+                    + t("The most recent of these prices is from {year}, so they may be a poor guide to today's level.", year=seasonal["years"][-1])
                     if plan.harvest_start.year - seasonal["years"][-1] > 2
                     else ""
                 )
@@ -500,12 +532,16 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
     observed = pd.Timestamp(record.get("date", last["date"]))
     thin = ""
     if seasonal and seasonal["observations"]:
-        thin = (
-            f" Only {seasonal['observations']} price(s) in {seasonal['seasons']} earlier year(s) fall in the same weeks, "
-            f"too few for a seasonal reference (at least {MIN_SEASONAL_OBSERVATIONS} prices in {MIN_SEASONAL_YEARS} years are needed)."
+        thin = " " + t(
+            "Only {n} price(s) in {seasons} earlier year(s) fall in the same weeks, "
+            "too few for a seasonal reference (at least {min_n} prices in {min_years} years are needed).",
+            n=seasonal["observations"],
+            seasons=seasonal["seasons"],
+            min_n=MIN_SEASONAL_OBSERVATIONS,
+            min_years=MIN_SEASONAL_YEARS,
         )
     elif seasonal is not None:
-        thin = " No price was recorded in the same weeks of any earlier year."
+        thin = " " + t("No price was recorded in the same weeks of any earlier year.")
     return PriceResult(
         "latest_actual",
         price=float(record.get("price", last["price"])),
@@ -513,25 +549,28 @@ def select_price(plan: "CultivationPlan", actual: pd.DataFrame | None, today=Non
         high=None if pd.isna(record.get("high", float("nan"))) else float(record["high"]),
         date=observed,
         age_days=int((today - observed).days),
-        explanation=f"{reason}{thin} This is the newest price actually recorded, shown for reference.",
-        limitation="Today's price says little about the price at a harvest weeks or months away.",
+        explanation=f"{reason}{thin} " + t("This is the newest price actually recorded, shown for reference."),
+        limitation=t("Today's price says little about the price at a harvest weeks or months away."),
     )
 
 
 def _no_forecast_reason(plan: "CultivationPlan") -> str:
     if plan.stale:
-        return (
-            f"No forecast: the latest recorded price ({plan.latest_price_date:%Y-%m-%d}) is more than "
-            f"{MAX_HORIZON_DAYS} days old."
+        return t(
+            "No forecast: the latest recorded price ({date}) is more than {days} days old.",
+            date=f"{plan.latest_price_date:%Y-%m-%d}",
+            days=MAX_HORIZON_DAYS,
         )
     if plan.status in ("beyond", "partly_in_reach"):
-        return (
-            f"No forecast: the harvest is after {plan.forecast_end:%Y-%m-%d}, the furthest date the model forecasts "
-            f"({MAX_HORIZON_DAYS} days after the latest recorded price)."
+        return t(
+            "No forecast: the harvest is after {date}, the furthest date the model forecasts "
+            "({days} days after the latest recorded price).",
+            date=f"{plan.forecast_end:%Y-%m-%d}",
+            days=MAX_HORIZON_DAYS,
         )
     if plan.status == "passed":
-        return "The harvest window has passed and no price was recorded in it."
-    return "No forecast is available."
+        return t("The harvest window has passed and no price was recorded in it.")
+    return t("No forecast is available.")
 
 
 def build_plan(
@@ -558,7 +597,7 @@ def build_plan(
     if actual is None or actual.empty or price_label is None:
         plan = CultivationPlan(timing, price_label, start, harvest_start, harvest_end, None, None, "no_prices")
         plan.warnings.append(
-            f"No market price series exists for {timing.crop} in the HARTI data, so only the harvest dates are shown."
+            t("No market price series exists for {crop} in the HARTI data, so only the harvest dates are shown.", crop=timing.crop)
         )
         _add_timing_warnings(plan)
         return plan
@@ -581,8 +620,13 @@ def build_plan(
     plan.stale = (today - latest).days > MAX_HORIZON_DAYS
     if plan.stale:
         plan.warnings.append(
-            f"The latest recorded price for {price_label} is from {latest.date()}, {(today - latest).days} days ago, "
-            "so no forecast is shown for it. Recorded prices from earlier years are shown instead."
+            t(
+                "The latest recorded price for {series} is from {date}, {days} days ago, "
+                "so no forecast is shown for it. Recorded prices from earlier years are shown instead.",
+                series=price_label,
+                date=latest.date(),
+                days=(today - latest).days,
+            )
         )
 
     if status in ("in_reach", "partly_in_reach") and not plan.stale and forecaster is not None and origin_rows is not None:
@@ -595,8 +639,13 @@ def build_plan(
             plan.best_day, plan.clear_advantage = suggest_selling_day(plan.window_forecast)
         if status == "partly_in_reach":
             plan.warnings.append(
-                f"The forecast covers only {plan.forecast_days} of the {plan.window_days} days in the harvest window "
-                f"(its reach ends {forecast_end.date()}), so no selling day is suggested."
+                t(
+                    "The forecast covers only {covered} of the {total} days in the harvest window "
+                    "(its reach ends {end}), so no selling day is suggested.",
+                    covered=plan.forecast_days,
+                    total=plan.window_days,
+                    end=forecast_end.date(),
+                )
             )
     if status in ("passed", "partly_in_reach"):
         recorded = actual[actual["date"].between(harvest_start, harvest_end)]
@@ -611,13 +660,16 @@ def _add_timing_warnings(plan: CultivationPlan) -> None:
     timing = plan.timing
     if timing.start_stage == "not stated":
         plan.warnings.append(
-            "The source doesn't say whether this duration counts from sowing, planting or transplanting. "
-            "The dates are counted from the date you entered, so treat them as approximate."
+            t(
+                "The source doesn't say whether this duration counts from sowing, planting or transplanting. "
+                "The dates are counted from the date you entered, so treat them as approximate."
+            )
         )
     if timing.start_stage == "flowering":
-        plan.warnings.append("This duration counts from flowering, so enter the date the crop flowered, not the planting date.")
+        plan.warnings.append(t("This duration counts from flowering, so enter the date the crop flowered, not the planting date."))
     if timing.event == "first harvest" and timing.repeat_harvest:
-        plan.warnings.append(f"The dates are for the first harvest. Later harvests, as published: {timing.repeat_harvest}")
+        # The repeat-harvest wording is the DOA's own, quoted as published.
+        plan.warnings.append(t("The dates are for the first harvest. Later harvests, as published: {repeat}", repeat=timing.repeat_harvest))
 
 
 # --- current price vs harvest-time price -----------------------------------------------------------
@@ -660,7 +712,7 @@ def current_price(
     if valid is None or valid.empty:
         return CurrentPrice(
             None, None, None,
-            reason=f"HARTI's daily bulletin has no price series for {crop}, so there is no recorded market price.",
+            reason=t("HARTI's daily bulletin has no price series for {crop}, so there is no recorded market price.", crop=crop),
         )
     valid = valid.sort_values("date")
     last = valid.iloc[-1]
@@ -675,9 +727,10 @@ def current_price(
         high=None if high is None or pd.isna(high) else float(high),
     )
     if not result.is_current:
-        result.reason = (
-            f"The latest recorded price is from {observed:%Y-%m-%d}, {result.age_days} days ago, "
-            f"too old to count as today's price."
+        result.reason = t(
+            "The latest recorded price is from {date}, {days} days ago, too old to count as today's price.",
+            date=f"{observed:%Y-%m-%d}",
+            days=result.age_days,
         )
     if start_date is not None:
         start = pd.Timestamp(start_date).normalize()
@@ -712,12 +765,12 @@ def compare_prices(current: CurrentPrice, harvest: PriceResult) -> PriceComparis
     if not current.is_current:
         return PriceComparison(False, reason=current.reason)
     if harvest.kind == "unavailable" or harvest.price is None:
-        return PriceComparison(False, reason="There is no harvest-time price to compare with.")
+        return PriceComparison(False, reason=t("There is no harvest-time price to compare with."))
     if harvest.kind == "recorded_actual":
-        return PriceComparison(False, reason="The harvest window has already passed, so there is no expected price to compare.")
+        return PriceComparison(False, reason=t("The harvest window has already passed, so there is no expected price to compare."))
     if harvest.kind == "latest_actual":
         return PriceComparison(
-            False, reason="There is no forecast or seasonal reference for the harvest dates, only today's price itself."
+            False, reason=t("There is no forecast or seasonal reference for the harvest dates, only today's price itself.")
         )
     difference = harvest.price - current.price
     percent = difference / current.price * 100
