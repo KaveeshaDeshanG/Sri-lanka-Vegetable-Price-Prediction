@@ -1,0 +1,30 @@
+BT-01 PASS | Loaded: True; exception boxes: 0; 'Data freshness' shown: True; 'Datasets' shown: True
+BT-02 PASS | Data freshness HARTI daily bulletin Recently Updated Type: Wholesale Location: Dambulla (used by the model) and 10 other markets Latest data: 2026-11-
+BT-03 PASS | Last daily update 2026-11-17 22:00; newest HARTI bulletin listed 2026-11-17; 0 Dambulla and 0 all-market prices added. Updates import newly published 
+BT-30 PASS | Loaded: True; translated headings found: True; exception boxes: 0; sidebar: '🏠\n\nමුල් පිටුව\n\n📈\n\nපුරෝකථනය\n\n📊\n\nආකෘති කාර්ය සාධනය\n\n🗓️\n\nමිල ඉ
+BT-31 PASS | Loaded: True; translated headings found: True; exception boxes: 0; sidebar: '🏠\n\nமுகப்பு\n\n📈\n\nகணிப்பு\n\n📊\n\nமாதிரி செயல்திறன்\n\n🗓️\n\nவிலை வரலா
+BT-32 PASS | Sinhala headings shown: True; address: http://localhost:8501/?lang=si
+BT-33 PASS | Address: http://localhost:8501/Price_History?lang=si; Sinhala page title shown: True
+BT-34 PASS | English title shown: True; Sinhala title gone: True
+BT-04 PASS | Predict: loaded, errors 0; Model_Performance: loaded, errors 0; Price_History: loaded, errors 0; Cultivation_Planner: loaded, errors 0
+BT-05 PASS | 1. Official source status  HARTI Daily wholesale bulletin, every market  Checked successfully  Newest publication found: 2026-11-17 (1 day(s) ago) Las
+BT-06 PASS | Forecast date 2026-11-24: 7 day(s) after the latest actual price (2026-11-17); forecast shown: Rs. 450.00 / kg; horizon table shown: True; error boxes
+BT-07 PASS | Forecast date 2026-11-24: 7 day(s) after the latest actual price (2026-11-17)
+BT-08 PASS | Options: 1 day / 7 days / 14 days / 30 days / 'Another date (up to 30 days)' present: True (date limits set by min_value/max_value in 1_Predict.py)
+BT-09 PASS | Message: 'The CSV is missing required column(s): ['price']. Columns found: ['date', 'vegetable', 'market', 'source', 'rainfall_mm', 'temperature_c', '
+BT-10 PASS | Message: 'That file is empty. It needs a header row and at least one row of data.'
+BT-11 PASS | Loaded: True; 'Hold last price' present: True; '17.47' present: True
+BT-12 PASS | Heading: 'Ash Plantain wholesale price at Dambulla'; cards shown: True; weather section: True
+BT-13 PASS | Heading: 'Ash Plantain wholesale price at Kandy'
+BT-14 PASS | Heading: 'Beans: retail price, CBSL'; Narahenpita present: True
+BT-15 PASS | Heading: 'Ash Plantain: retail price, Colombo District'; years filter: True
+BT-16 PASS | Date range field value: '2015-06-22 | 2026-11-17'
+BT-35 PASS | Loaded: True; translated title: True; English month names on chart axes: 0; error boxes: 0
+BT-36 PASS | Loaded: True; translated title: True; English month names on chart axes: 0; error boxes: 0
+BT-17 PASS | Loaded: True; 'Published timing: 45 days to first harvest, counted from planting date.'; quoted text: 'Bush types can be harvested from 45 days after 
+BT-18 PASS | Expected harvest: 24 Nov 2026 Horizon: 7 days after the latest recorded price (6 days from today)
+BT-19 PASS | Current market price (planning time) Rs. 450.00 / kg Vegetable: Beans Price date: 17 Nov 2026 (1 day(s) ago), latest recorded Day's range: Rs. 400.00 
+BT-20 PASS | Typical price at harvest time Rs. 387.50 / kg Vegetable: Beans Expected harvest: 2 Jan 2027 Horizon: 46 days after the latest recorded price (45 days 
+BT-21 PASS | No verified price
+BT-37 PASS | English values: ['Rs. 450.00', 'Rs. 400.00', 'Rs. 440.00', 'Rs. 463.04', 'Rs. 383.54', 'Rs. 13.04']; Tamil values: ['Rs. 450.00', 'Rs. 400.00', 'Rs. 4
+BT-38 PASS | Horizontal overflow: 0 px; error boxes: 0

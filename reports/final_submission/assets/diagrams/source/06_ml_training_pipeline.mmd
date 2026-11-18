@@ -1,0 +1,11 @@
+flowchart TB
+  A["Load stored history: HARTI Dambulla and<br/>other markets, regional weather, fuel"] --> B["ForecastFeatureBuilder: features as of<br/>each origin date (published information only)"]
+  B --> C["For each horizon h = 1 … 30:<br/>target = log(price at origin + h ÷ last price)"]
+  C --> D["Model selection on 4 validation windows<br/>(14 May 2025 - 13 May 2026): Linear, Ridge α=100 and 1000,<br/>Random Forest, XGBoost; feature-group ablation"]
+  D --> E["Chosen: Ridge per horizon,<br/>4 bands with their own α and feature groups"]
+  E --> F["Fit on targets before 14 May 2026<br/>(median imputer → scaler → Ridge)"]
+  F --> G["Score on 14 May - 6 Nov 2026: MAE, RMSE, MAPE, R²<br/>against holding the last price; bootstrap 95% CI"]
+  G --> H["reports/metrics/direct_forecaster_metrics.json"]
+  G --> I["Refit on all data → models/direct_forecaster.joblib<br/>(trained through 6 Nov 2026)"]
+  I --> J["retrain_if_better.py, 13 Nov 2026: candidate on<br/>2015-2026 history, 60-day hold-out check"]
+  J -- "rejected" --> K["Saved model kept;<br/>reasons in retrain_decision.json"]

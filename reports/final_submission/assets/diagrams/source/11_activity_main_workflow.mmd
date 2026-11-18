@@ -1,0 +1,21 @@
+flowchart TB
+  S(("Start")) --> A["Open the app<br/>(start_app.bat → localhost:8501)"]
+  A --> B["Home: check data freshness<br/>and the latest update"]
+  B --> L{"Change language?"}
+  L -- "yes" --> L1["Choose සිංහල or தமிழ்<br/>in the switcher"]
+  L1 --> C
+  L -- "no" --> C{"What is needed?"}
+  C -- "a future price" --> P["Predict: vegetable and period → Predict"]
+  C -- "past prices" --> H["Price History: source, vegetable,<br/>market and date range"]
+  C -- "a planting decision" --> Q["Cultivation Planner: crop, variety,<br/>start date → Generate Cultivation Plan"]
+  C -- "how accurate is it?" --> M["Model Performance"]
+  P --> R1["Read the forecast with its source,<br/>date and measured error"]
+  Q --> R2["Read the harvest window and the<br/>current vs harvest-time price"]
+  H --> R3["Read the chart, cards and table"]
+  M --> R4["Read errors against the baseline"]
+  R1 --> E{"Another task?"}
+  R2 --> E
+  R3 --> E
+  R4 --> E
+  E -- "yes" --> C
+  E -- "no" --> X(("End"))

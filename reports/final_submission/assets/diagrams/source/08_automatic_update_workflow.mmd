@@ -1,0 +1,19 @@
+flowchart TB
+  T["Task Scheduler (every 3 hours from 07:00)<br/>or the 'check sources now' button"] --> L{"Lock held by a live update?"}
+  L -- "yes" --> X["Exit code 3: another update is running"]
+  L -- "no, or stale" --> L2["Record an abandoned run as 'interrupted';<br/>take the lock"]
+  L2 --> BK["Back up files before changing them<br/>(newest 14 runs kept)"]
+  BK --> S1["HARTI: bulletins not yet stored<br/>(last 30 days re-checked)"]
+  BK --> S2["CBSL: new working-day reports<br/>(10 s between requests)"]
+  BK --> S3["DCS: new weekly bulletins"]
+  BK --> S4["Open-Meteo weather, CEYPETCO fuel"]
+  S1 --> R{"Source reachable?"}
+  S2 --> R
+  S3 --> R
+  S4 --> R
+  R -- "no, after retries at 30 s and 90 s" --> F["Mark the source 'failed';<br/>keep its stored data (exit code 4)"]
+  R -- "yes" --> V["Validate; append only new rows<br/>(write .tmp, then rename)"]
+  V --> M["Rewrite data_manifest.json:<br/>rows, SHA-256, latest dates"]
+  F --> LOG["Append the run to update_log.jsonl<br/>(ok / partial / failed); release the lock"]
+  M --> LOG
+  LOG --> APP["App shows the new data on the next interaction<br/>(cache keyed on file times)"]

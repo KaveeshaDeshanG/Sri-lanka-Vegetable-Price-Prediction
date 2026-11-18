@@ -1,0 +1,13 @@
+flowchart TB
+  A["List bulletins on HARTI's archive page"] --> B{"Already stored?"}
+  B -- "yes" --> SKIP["Skip: no duplicate rows"]
+  B -- "no" --> C["Download the PDF; record URL,<br/>SHA-256 and retrieval time"]
+  C --> D["Read the table from word positions;<br/>find each market column and its reporting date"]
+  D --> E["Parse 'min - max' cells;<br/>map row labels through the alias table"]
+  E --> F{"Valid? price > 0, min ≤ max,<br/>reading date ≤ bulletin date"}
+  F -- "no" --> G["Store nothing from this bulletin;<br/>log the reason (exit code 2)"]
+  F -- "yes" --> H["Price = midpoint of the range;<br/>keep low, high, raw cell, source URL"]
+  H --> I["Append to harti_prices.csv and<br/>harti_all_markets.csv (atomic write)"]
+  I --> J["Extend weather (Open-Meteo) and<br/>fuel (CEYPETCO) to the newest day"]
+  J --> K["Preprocess for the model: standard names,<br/>one reading per date, market and vegetable;<br/>weather joined by production region, fuel by date"]
+  K --> L["Carry the last price forward ≤ 7 days,<br/>with a days-since-reading feature"]

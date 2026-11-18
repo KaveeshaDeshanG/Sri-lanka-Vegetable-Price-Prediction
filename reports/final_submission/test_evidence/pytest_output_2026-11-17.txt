@@ -1,0 +1,53 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+........................................................................ [ 38%]
+........................................................................ [ 43%]
+........................................................................ [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 87%]
+........................................................................ [ 92%]
+........................................................................ [ 98%]
+........................                                                 [100%]
+============================== warnings summary ===============================
+tests/app/test_data_freshness.py::test_every_page_shows_data_freshness[pages/3_Price_History.py]
+tests/app/test_data_freshness.py::test_every_page_shows_data_freshness[pages/3_Price_History.py]
+tests/app/test_data_freshness.py::test_every_page_shows_data_freshness[pages/3_Price_History.py]
+tests/app/test_data_freshness.py::test_every_page_shows_data_freshness[pages/3_Price_History.py]
+tests/app/test_dcs_unavailable_prices.py::test_price_history_does_not_plot_or_count_unavailable_dcs_weeks_as_zero
+tests/app/test_dcs_unavailable_prices.py::test_price_history_does_not_plot_or_count_unavailable_dcs_weeks_as_zero
+tests/app/test_dcs_unavailable_prices.py::test_price_history_does_not_plot_or_count_unavailable_dcs_weeks_as_zero
+tests/app/test_dcs_unavailable_prices.py::test_price_history_does_not_plot_or_count_unavailable_dcs_weeks_as_zero
+  D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegetable-Price-Prediction-main\.venv312\Lib\site-packages\streamlit\elements\lib\built_in_chart_utils.py:620: Pandas4Warning: The inplace keyword in DataFrame.reset_index is deprecated and will be removed in a future version (PDEP-8).
+  See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+    df.reset_index(inplace=True)  # noqa: PD002
+
+tests/app/test_forecasting.py: 231 warnings
+tests/app/test_harti_live_services.py: 7 warnings
+tests/app/test_model_availability.py: 2 warnings
+tests/app/test_services.py: 6 warnings
+tests/feature_engineering/test_categorical_features.py: 1 warning
+tests/feature_engineering/test_dataset_builder.py: 14 warnings
+tests/feature_engineering/test_date_features.py: 4 warnings
+tests/feature_engineering/test_feature_engineer.py: 12 warnings
+tests/feature_engineering/test_train_test_split.py: 2 warnings
+tests/models/test_pipeline.py: 5 warnings
+tests/models/test_trainer.py: 2 warnings
+tests/prediction/test_pipeline.py: 22 warnings
+tests/prediction/test_pipeline_live_weather.py: 14 warnings
+tests/prediction/test_predictor.py: 14 warnings
+tests/scripts/test_train.py: 9 warnings
+  D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegetable-Price-Prediction-main\src\feature_engineering\date_features.py:45: Pandas4Warning: Series.dt.dayofweek is deprecated and will be removed in a future version. Use Series.dt.day_of_week instead.
+    df["day_of_week"] = date_series.dt.dayofweek
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1320 passed, 353 warnings in 714.97s (0:11:54)
+exit 0

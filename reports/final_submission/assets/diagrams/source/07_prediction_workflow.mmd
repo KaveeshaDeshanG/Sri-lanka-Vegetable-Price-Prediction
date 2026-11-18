@@ -1,0 +1,13 @@
+flowchart TB
+  A["User opens Predict<br/>(Latest Real Data Prediction)"] --> B["Load stored datasets and saved model<br/>(cached; key = file times and sizes)"]
+  B --> C{"Model and datasets readable?"}
+  C -- "no" --> C1["Name the missing or damaged file;<br/>no real-data prediction"]
+  C -- "yes" --> D["Show source status, latest records<br/>and freshness warnings"]
+  D --> E["User selects a vegetable and a period:<br/>1, 7, 14 or 30 days, or a date ≤ 30 days"]
+  E --> F["h = target date − date of the latest actual price"]
+  F --> G{"1 ≤ h ≤ 30 and the latest<br/>price ≤ 30 days old?"}
+  G -- "no" --> G1["Refuse with an explanation"]
+  G -- "yes" --> H["Build the origin features for the latest date"]
+  H --> I["Ridge model for each day 1 … h predicts the log change"]
+  I --> J["Forecast = last price × exp(predicted change)"]
+  J --> K["Show Rs/kg, chart, and the 1/7/14/30-day table<br/>with the measured model and baseline errors"]

@@ -1,0 +1,18 @@
+flowchart TB
+  A["User chooses vegetable, variety<br/>and HARTI price series"] --> B["Published DOA/HORDI timing, its quote and source<br/>(e.g. 45 days from planting)"]
+  B --> C["User enters the start date<br/>(planting, transplanting or sowing)"]
+  C --> D["add_duration(): days and weeks exact,<br/>months as calendar months"]
+  D --> E["Expected harvest window"]
+  E --> W["Weather panel for a chosen location<br/>(model uses the crop's production region)"]
+  E --> F{"Harvest window compared with<br/>the forecast reach"}
+  F -- "within 30 days of the latest price" --> G["Model forecast with a likely range<br/>(middle 80% of past errors)"]
+  F -- "already passed" --> H["Prices recorded in the window"]
+  F -- "beyond the reach" --> Q{"≥ 10 prices in ≥ 3 earlier years<br/>in the same weeks (± 7 days)?"}
+  Q -- "yes" --> I["Seasonal reference: median of those prices<br/>(5 latest earlier years); labelled 'not a forecast'"]
+  Q -- "no" --> N["Latest available actual price,<br/>labelled 'not a future prediction'"]
+  F -- "no HARTI price series" --> J["'No verified price available' (never Rs 0)"]
+  G --> K["Compare with the current price<br/>(latest HARTI Dambulla record)"]
+  I --> K
+  K --> L["Difference in Rs and %: higher,<br/>lower or about the same (within ±5%)"]
+  H --> NC["No comparison shown, with the reason<br/>(no expected price distinct from today's)"]
+  N --> NC
