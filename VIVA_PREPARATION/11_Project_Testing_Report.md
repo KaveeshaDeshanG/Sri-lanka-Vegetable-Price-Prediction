@@ -1,5 +1,7 @@
 # 11 — Project Testing Report
 
+> **Dated record.** This describes the test run of 13 Nov 2026. The current results are **1,320 automated tests passed (19 Nov 2026)** and **30 browser tests passed (18 Nov 2026)**; see `reports/final_submission/test_evidence/` and Chapter 6 of the final report.
+
 **Re-executed for this guide on 13 November 2026**, against the running app (started with `start_app.bat`, port 8501,
 health `/_stcore/health` = ok). Nothing in the project was changed for testing. Status is **PASS** only if the test
 actually ran and met its expected result.
@@ -8,7 +10,7 @@ actually ran and met its expected result.
 |---|---|
 | UI test runner (headless Microsoft Edge via Chrome DevTools Protocol) | `VIVA_PREPARATION\test_evidence_2026-11-13\run_ui_tests.py` |
 | This run's results (13 Nov 2026 13:19) + screenshots + pytest log | `VIVA_PREPARATION\test_evidence_2026-11-13\` (`ui_results.json`, `screenshots\`, `pytest_output.txt`) |
-| Permanent copy of earlier identical run (for the report) | `Final_Project_Report\testing_evidence\` |
+| Copy of the earlier identical run (archived outside the project) | `Sri-lanka-Vegetable-Price-Backups\report_before_final_upgrade_20261118\Final_Project_Report\testing_evidence\` |
 
 > සිංහල: මෙහි ඇති සෑම PASS එකක්ම 2026-11-13 දින සැබවින්ම ධාවනය කළ පරීක්ෂණයකින්. ධාවනය නොකළ ඒවා "NOT TESTED" ලෙස ලකුණු කර ඇත.
 

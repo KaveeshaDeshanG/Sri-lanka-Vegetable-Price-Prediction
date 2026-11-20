@@ -31,7 +31,7 @@ vegetable at the Dambulla market 1 to 30 days ahead**, shown in a **Streamlit** 
 > සිංහල: ප්‍රධාන ප්‍රශ්නය — "Machine Learning ආකෘතියකට, 'හෙට මිල අද මිලම වේ' යන සරලම අනුමානයට වඩා හොඳින් අනාවැකි කිව හැකිද?"
 > පිළිතුර: ඔව්, නමුත් සුළු ප්‍රමාණයකින් (MAE 4–8% කින් අඩුයි).
 
-## 3. Key facts to remember (verified from files on 13 Nov 2026)
+## 3. Key facts to remember (verified from files on 19 Nov 2026)
 
 | Fact | Value | Evidence |
 |---|---|---|
@@ -41,11 +41,14 @@ vegetable at the Dambulla market 1 to 30 days ahead**, shown in a **Streamlit** 
 | Pages | Home + Predict, Model Performance, Price History, Cultivation Planner | `app/Home.py`, `app/pages/1_…4_*.py` |
 | Main model | **Ridge Regression direct forecaster** — one model per day ahead (30 models) | `src/models/direct_forecaster.py` lines 34–52, 103–124 |
 | Earlier models | Linear Regression, Random Forest, XGBoost (51 features, one day ahead) | `src/models/trainer.py`, `config/config.yaml` `model:` |
-| Prices | 76,719 Dambulla readings, 22 Jun 2015 – 9 Nov 2026; 526,905 readings in 11 markets | `data/raw/data_manifest.json` |
+| Prices | 77,011 Dambulla readings, 22 Jun 2015 – 19 Nov 2026; 529,020 readings in 11 markets (they grow with every update) | `data/raw/data_manifest.json` |
 | Model trained on | 25 Apr 2024 – 6 Nov 2026, 31 vegetable series | `models/direct_forecaster.joblib` (`trained_through`) |
 | Accuracy (test 14 May–6 Nov 2026) | next-day MAE Rs 17.47/kg (7.5%), **4.3% better than the baseline**; 7.8% better at 22–30 days | `reports/metrics/direct_forecaster_metrics.json` |
 | Storage | CSV/JSON files + joblib model files — **no database** | `data/raw`, `models/` |
-| Tests | 1,060 automated test cases (565 functions) + 20 practical tests | `tests/`, `11_Project_Testing_Report.md` |
+| Tests | 1,320 automated test cases (19 Nov 2026) + 30 browser tests of the running app (18 Nov 2026) | `tests/`, `reports/final_submission/test_evidence/` |
+| Languages | English, Sinhala and Tamil — switcher at the top right of every page; kept in the address (`?lang=si`, `?lang=ta`) | `app/i18n.py`, `app/translations/` (864 texts each) |
+| Automatic updates | Every 3 hours (Windows task `VegetablePriceUpdate`), or **Check official sources now** | `scripts/daily_update.py`, `data/raw/update_log.jsonl` |
+| Final report | `reports/final_submission/Final_Report.docx` (PDF alongside) | |
 
 ## 4. Implemented vs not implemented (be honest in the viva)
 

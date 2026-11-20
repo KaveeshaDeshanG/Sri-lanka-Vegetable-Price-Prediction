@@ -20,7 +20,7 @@ The versions are exactly as pinned in `requirements.txt` and installed in `.venv
 | **matplotlib** | 3.11.2 | Static figures in `reports/figures` (training scripts) | `scripts/train.py` etc. | Standard plotting | රූපසටහන් (report figures) |
 | **Altair** | (installed with Streamlit) | Interactive charts in the app (Predict, Price History, Model Performance) | `app/pages/*.py` `import altair` | Streamlit's native chart library | App එකේ chart |
 | **Pillow** | 13.0.0 | Image crops in `scripts/validate_real_datasets.py` | that script | Checking parsed numbers against PDF images | රූප කැපීම |
-| **pytest** | dev extra | 1,060 automated test cases in `tests/` | `pyproject.toml` `[project.optional-dependencies] dev` | Standard test runner | ස්වයංක්‍රීය පරීක්ෂණ |
+| **pytest** | dev extra | 1,320 automated test cases in `tests/` | `pyproject.toml` `[project.optional-dependencies] dev` | Standard test runner | ස්වයංක්‍රීය පරීක්ෂණ |
 | **Open-Meteo API** | — | Weather history and recent weather (rain, temperature, humidity) — no API key | `live_weather_client.py` 78/180/215; `config.yaml` `weather_api` | Free, no key, historical archive | කාලගුණ දත්ත |
 | **CSV / JSON files** | — | All storage (no database) | `data/raw/*.csv`, `data/raw/data_manifest.json`, `reports/metrics/*.json` | Simple, transparent, versionable | දත්ත ගබඩාව — database නැත |
 | **Windows batch** | — | `start_app.bat`, `scripts/run_daily_update.bat` | project root / scripts | One-click start for the user | Double-click කර app එක ආරම්භ කිරීම |

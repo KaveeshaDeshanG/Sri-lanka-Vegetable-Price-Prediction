@@ -9,12 +9,12 @@ All numbers below come from `data/raw/data_manifest.json` (generated 2026-11-11 
 
 | File | Source | Price type | Rows | Period | Used for |
 |---|---|---|---|---|---|
-| `harti_prices.csv` | HARTI daily food commodity bulletins — https://www.harti.gov.lk/daily-price.php | Wholesale Rs/kg, **midpoint** of the published range, Dambulla | 76,719 | 2015-06-22 → 2026-11-09 | **Training target** + history |
-| `harti_all_markets.csv` | Same bulletins, every market (11) | Wholesale | 526,905 | 2015-06-22 → 2026-11-09 | `other_markets` features; Price History page |
-| `cbsl_daily_prices.csv` | Central Bank of Sri Lanka Daily Price Report — cbsl.gov.lk price-report | Wholesale **and** retail (column `price_type`), Pettah / Dambulla / Narahenpita | 9,277 | 2026-09-01 → 2026-11-10 | Price History only (cross-check, **never** training) |
+| `harti_prices.csv` | HARTI daily food commodity bulletins — https://www.harti.gov.lk/daily-price.php | Wholesale Rs/kg, **midpoint** of the published range, Dambulla | 77,011 | 2015-06-22 → 2026-11-19 | **Training target** + history |
+| `harti_all_markets.csv` | Same bulletins, every market (11) | Wholesale | 529,020 | 2015-06-22 → 2026-11-19 | `other_markets` features; Price History page |
+| `cbsl_daily_prices.csv` | Central Bank of Sri Lanka Daily Price Report — cbsl.gov.lk price-report | Wholesale **and** retail (column `price_type`), Pettah / Dambulla / Narahenpita | 10,551 | 2026-09-01 → 2026-11-19 | Price History only (cross-check, **never** training) |
 | `dcs_weekly_retail_prices.csv` | Department of Census and Statistics weekly retail prices | Retail, weekly, Colombo District | 11,439 | 2019-12 wk 4 → 2026-11 wk 1 | Price History only |
-| `fuel_prices.csv` | CEYPETCO price revisions | Diesel/petrol Rs/litre | 4,161 | 2015-06-22 → 2026-11-11 | `fuel` features |
-| `weather_data_by_region.csv` | Open-Meteo historical archive | Rain, temperature, humidity; 8 locations | 33,264 | 2015-06-22 → 2026-11-08 | `rain_windows`, `weather_lag_14` features |
+| `fuel_prices.csv` | CEYPETCO price revisions | Diesel/petrol Rs/litre | 4,169 | 2015-06-22 → 2026-11-19 | `fuel` features |
+| `weather_data_by_region.csv` | Open-Meteo historical archive | Rain, temperature, humidity; 8 locations | 33,328 | 2015-06-22 → 2026-11-16 | `rain_windows`, `weather_lag_14` features |
 | `app/sample_data/sample_history.csv` | **Synthetic** (made up for demo) | — | 360 | 2026-05-15 → 2026-08-12 | Tests only; no longer offered on the Predict page (since 15 Nov 2026) |
 
 **Why "midpoint"?** HARTI prints a range like "400-450". `parse_price_range` (`harti_live_client.py` line 138) turns

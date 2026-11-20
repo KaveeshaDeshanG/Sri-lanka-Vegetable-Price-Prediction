@@ -1,8 +1,8 @@
 """Editable source of the hand-laid-out diagrams (architecture, context/DFD 0, use case, DFD 1, multilingual).
 
 Each diagram is a list of shapes with explicit coordinates, written as SVG into ../rendered/. Edit a coordinate or
-a label here and re-run:  python structural_diagrams.py   (PNG copies are made from the SVGs in headless Edge by
-the report build; the SVG files open in any browser, Inkscape or draw.io).
+a label here and re-run:  python structural_diagrams.py, then  python svg_to_png.py ../rendered/<name>.svg  for the PNG
+(headless Edge). The SVG files open in any browser, Inkscape or draw.io.
 """
 from html import escape
 from pathlib import Path

@@ -1,8 +1,8 @@
-# Opens the built DOCX in the installed word processor (Word or WPS, through the Word.Application COM interface),
-# fills in the table of contents and the lists of figures and tables, saves the DOCX and exports the PDF.
+# Opens Final_Report.docx in the installed word processor (Word or WPS, through the Word.Application COM interface),
+# refreshes the table of contents and the lists of figures and tables, saves the DOCX and exports the PDF.
 param(
-    [string]$Docx = (Join-Path $PSScriptRoot "..\Final_Report.docx"),
-    [string]$Pdf = (Join-Path $PSScriptRoot "..\Final_Report.pdf")
+    [string]$Docx = (Join-Path $PSScriptRoot "Final_Report.docx"),
+    [string]$Pdf = (Join-Path $PSScriptRoot "Final_Report.pdf")
 )
 $Docx = (Resolve-Path $Docx).Path
 $Pdf = [System.IO.Path]::GetFullPath($Pdf)

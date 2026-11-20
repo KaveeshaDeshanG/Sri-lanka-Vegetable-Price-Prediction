@@ -21,7 +21,7 @@ There are **two generations** of models. Know both and which one the app uses.
 ## 1. Step-by-step: from raw data to a prediction
 
 ### Step 1 — Raw data
-`data/raw/harti_prices.csv` — 76,719 Dambulla wholesale prices (Rs/kg), 22 Jun 2015 – 9 Nov 2026, from HARTI PDFs.
+`data/raw/harti_prices.csv` — 77,011 Dambulla wholesale prices (Rs/kg), 22 Jun 2015 – 19 Nov 2026 (the saved model's training data ends 6 Nov 2026), from HARTI PDFs.
 Plus `harti_all_markets.csv` (other markets), `weather_data_by_region.csv` (Open-Meteo), `fuel_prices.csv` (CEYPETCO).
 
 ### Step 2 — Preprocessing (`src/preprocessing/`)

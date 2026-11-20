@@ -124,7 +124,7 @@ reach) + history table. Planted 20 Oct 2026 → first harvest 4 Dec 2026 → for
 9. Section 4: Forecast period **7 days** → **Predict** → Rs 431.62, chart, weather card, then the **1, 7, 14 and 30 days** table with measured accuracy.
 10. Choose **Another date** → pick a date → **Predict** (dates beyond 30 days can't be chosen).
 11. Section 5: read the freshness message.
-12. Data source → **Upload CSV** → upload `Final_Project_Report\testing_evidence\inputs\missing_price_column.csv` → the red error. Then `valid_upload.csv` → loads (no official data shown).
+12. Data source → **Upload CSV** → upload `reports\final_submission\test_evidence\inputs\missing_price_column.csv` → the red error. Then `valid_upload.csv` → loads (no official data shown).
 13. Sidebar → **Model Performance** → explain the bar chart (model vs hold last price), the 4.3% gain and the earlier models table.
 14. Sidebar → **Price History** → HARTI: change Market to **Kandy**, change the date range, open the weather tabs (with Dambulla).
 15. Switch to **CBSL daily report** → Price type **retail** → show the three markets.

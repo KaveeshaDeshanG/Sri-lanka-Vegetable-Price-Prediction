@@ -8,12 +8,13 @@ cd "D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegetable-Price-P
 ```
 URL **http://localhost:8501** · Stop **Ctrl + C** · Entry point **app/Home.py** (NO app.py) · Python **3.12** (`.venv312`)
 Port check: `Get-NetTCPConnection -LocalPort 8501 -State Listen -ErrorAction SilentlyContinue`
-Tests: `.\.venv312\Scripts\python.exe -m pytest -q` → **1,060 passed**
+Tests: `.\.venv312\Scripts\python.exe -m pytest -q` → **1,320 passed**
 
-## The project in 3 lines
-1. Parses **HARTI** daily PDF bulletins (2015-06-22 → 2026-11-09): **76,719** Dambulla prices, **526,905** across 11 markets.
+## The project in 4 lines
+1. Parses **HARTI** daily PDF bulletins (2015-06-22 → 2026-11-19): **77,011** Dambulla prices, **529,020** across 11 markets (on 19 Nov; updated every 3 hours).
 2. **Ridge direct forecaster**: 30 models (one per day ahead), predicts **log(future/today)**, price = last × exp(change).
 3. **Streamlit**: Home, Predict, Model Performance, Price History, Cultivation Planner.
+4. **Languages**: English, Sinhala and Tamil (switcher at the top right; `?lang=si`, `?lang=ta`).
 
 ## Numbers to remember
 | | Value |
@@ -28,7 +29,7 @@ Tests: `.\.venv312\Scripts\python.exe -m pytest -q` → **1,060 passed**
 | Model trained | 25 Apr 2024 – 6 Nov 2026, **31** series |
 | Max horizon | **30 days** (beyond → refused) |
 | Bootstrap | 2,000 resamples of whole dates |
-| Tests | 1,060 pytest + 18 UI + independent check → all pass |
+| Tests | 1,320 pytest + 30 browser tests + independent check → all pass |
 
 ## Bands (`direct_forecaster.py` 47–52)
 1 day α1000: momentum, level, market, fuel, weather_lag_14, other_markets ·

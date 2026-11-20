@@ -12,7 +12,7 @@ say "the data was updated this morning".
    ```powershell
    Get-NetTCPConnection -LocalPort 8501 -State Listen -ErrorAction SilentlyContinue
    ```
-3. Open File Explorer at the project folder. Have `Final_Project_Report\testing_evidence\inputs\` ready (CSV files for upload).
+3. Open File Explorer at the project folder. Have `reports\final_submission\test_evidence\inputs\` ready (CSV files for upload).
 4. Optional: start the app once and open each page so caches are warm, then leave it running.
 
 ---
@@ -28,11 +28,12 @@ say "the data was updated this morning".
 1. Point at the blue box: "Ridge direct forecaster, trained through 6 November 2026."
 2. Point at the four cards: **Next-day error 7.5 %**, **4.3 % lower than holding the price**, 1–30 days, 31 vegetables.
    Say: "Every result is compared with the naive baseline — tomorrow's price equals today's."
-3. Scroll to **Data in use**: "76,719 HARTI Dambulla prices from 2015, plus all markets, CBSL, DCS, fuel and weather — all real, with source links."
+3. Scroll to **Data in use**: "About 77,000 HARTI Dambulla prices from 2015, plus all markets, CBSL, DCS, fuel and weather — all real, with source links."
 4. Point at "Last daily update …" line.
+4a. Click **සිංහල**, then **தமிழ்**, at the top right: "The whole interface is in Sinhala and Tamil as well as English. The choice stays when I change page, and prices and forecasts are identical in every language." Click **English** to return.
 
 ## 4:00–9:00 — Predict page (main feature)
-*(Page redesigned on 15 Nov 2026: two data sources, five sections. Expected values below are from the 15 Nov data.)*
+*(Page redesigned on 15 Nov 2026: two data sources, five sections. Expected values below are from the 15 Nov data; they change with every new bulletin. On 18 Nov 2026, for example, the 7-day Beans forecast from Rs 450.00 (17 Nov) was Rs 463.04 for 24 Nov.)*
 
 5. Sidebar → **Predict**. It opens on **Latest Real Data Prediction**. Section **1. Official source status**:
    "Every 3 hours a scheduled task checks HARTI, CBSL and DCS. Each card shows the newest publication found, when it
@@ -73,7 +74,7 @@ say "the data was updated this morning".
 
 ## 16:30–18:00 — Code and tests (only if asked)
 24. Open `src/models/direct_forecaster.py` → lines 47–52 (bands) and 118–121 (pipeline and log target).
-25. In a second PowerShell: `.\.venv312\Scripts\python.exe -m pytest -q` → (takes 3–9 minutes, so better to show `VIVA_PREPARATION\test_evidence_2026-11-13\pytest_output.txt`) "1,060 tests pass."
+25. In a second PowerShell: `.\.venv312\Scripts\python.exe -m pytest -q` → (takes 3–12 minutes, so better to show `reports\final_submission\test_evidence\pytest_output_2026-11-17.txt`) "1,320 tests pass."
 
 ## 18:00–20:00 — Close
 26. Close the browser tab. In the console window press **Ctrl + C** → Streamlit stops. Close the window.

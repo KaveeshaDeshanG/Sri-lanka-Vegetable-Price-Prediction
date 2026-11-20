@@ -6,6 +6,15 @@ __pycache__/
 venv/
 *.egg-info/
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
 
 # Private settings and credentials (never commit)
 .env
@@ -33,6 +42,8 @@ logs/
 .vs/
 .idea/
 .DS_Store
+Thumbs.db
+desktop.ini
 
 # Streamlit
 .streamlit/secrets.toml

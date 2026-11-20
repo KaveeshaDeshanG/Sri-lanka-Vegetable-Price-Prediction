@@ -7,7 +7,7 @@ from PIL import Image
 SHOTS, OUT = Path(sys.argv[1]), Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
 CAP = json.loads((SHOTS / "capture.json").read_text(encoding="utf-8"))
-P = Path(r"D:/ECU/Sri-lanka-Vegetable-Price-Prediction-main/Sri-lanka-Vegetable-Price-Prediction-main/app/translations")
+P = Path(__file__).resolve().parents[4] / "app" / "translations"
 TR = {c: json.loads((P / f"{c}.json").read_text(encoding="utf-8")) for c in ("si", "ta")}
 tr = lambda c, s: s if c == "en" else TR[c][s]
 

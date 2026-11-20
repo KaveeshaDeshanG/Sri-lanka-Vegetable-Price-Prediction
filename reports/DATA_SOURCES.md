@@ -23,8 +23,8 @@ Sources and known issues for the datasets in `data/raw/`.
 - HARTI prints "Dambala (Wing Beans)" and "Thithbatu" rows in 2015-2023 bulletins, but no market ever
   has a price in them.
 
-`.gitignore` excludes `data/raw/*`, so **these datasets are not committed to Git**. Back them
-up separately. A downloaded copy of the repository won't include them.
+These datasets are committed to Git (`data/raw/`), so a downloaded copy of the repository includes them.
+The source PDF bulletins are not committed; they are kept in the separate backup folder described below.
 
 ## Datasets
 

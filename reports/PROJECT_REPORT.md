@@ -1,3 +1,6 @@
+> **Superseded.** This is an earlier project report, kept for its audit history. The final report is
+> `reports/final_submission/Final_Report.docx` (PDF alongside).
+
 # AI-Powered Sri Lankan Vegetable Price Prediction: Project Report
 
 **Version:** 1.0.0

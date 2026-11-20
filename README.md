@@ -32,11 +32,12 @@ scripts/
   train.py                               Train and compare the earlier 51-feature models
   backtest_forecast.py                   Measure the earlier one-day-at-a-time forecasting
 app/
-  Home.py, services.py, forecasting.py
-  pages/  1_Predict.py, 2_Model_Performance.py, 3_Price_History.py
-tests/                   One pytest subpackage per src/ package (554 tests)
+  Home.py, services.py, forecasting.py, cultivation.py, catalogue.py, i18n.py, translations/
+  pages/  1_Predict.py, 2_Model_Performance.py, 3_Price_History.py, 4_Cultivation_Planner.py
+tests/                   One pytest subpackage per src/ package, plus tests/app (1,320 test cases)
 reports/
-  PROJECT_REPORT.md, DATA_SOURCES.md, DATA_QUALITY_REPORT.md
+  final_submission/      Final report (DOCX, PDF), screenshots, diagrams and test evidence
+  DATA_SOURCES.md, DATA_QUALITY_REPORT.md, PROJECT_REPORT.md (earlier report, superseded)
   metrics/direct_forecaster_metrics.json, metrics/model_metrics.json, metrics/forecast_backtest.json
 ```
 
@@ -67,26 +68,29 @@ All datasets are real. Sources, derivation and known issues are in
 
 | File | Rows | Range | Source |
 |---|---|---|---|
-| `harti_prices.csv` | 76,719 | 2015-06-22 to 2026-11-09 | HARTI bulletins, Dambulla wholesale (35 series) |
-| `harti_all_markets.csv` | 526,905 | 2015-06-22 to 2026-11-09 | HARTI bulletins, all 11 markets (Pettah until 2022) |
-| `cbsl_daily_prices.csv` | 9,277 | 2026-09-01 to 2026-11-10 | CBSL Daily Price Report, wholesale and retail, kept apart |
+| `harti_prices.csv` | 77,011 | 2015-06-22 to 2026-11-19 | HARTI bulletins, Dambulla wholesale (35 series) |
+| `harti_all_markets.csv` | 529,020 | 2015-06-22 to 2026-11-19 | HARTI bulletins, all 11 markets (Pettah until 2022) |
+| `cbsl_daily_prices.csv` | 10,551 | 2026-09-01 to 2026-11-19 | CBSL Daily Price Report, wholesale and retail, kept apart |
 | `dcs_weekly_retail_prices.csv` | 11,439 | 2019-12 week 4 to 2026-11 week 1 | DCS weekly retail prices, Colombo District |
-| `fuel_prices.csv` | 4,161 | 2015-06-22 to 2026-11-11 | CEYPETCO price revisions, per day |
-| `weather_data.csv` | 4,158 | 2015-06-22 to 2026-11-08 | Open-Meteo archive, Dambulla |
-| `weather_data_by_region.csv` | 33,264 | 2015-06-22 to 2026-11-08 | Open-Meteo archive, 8 locations |
+| `fuel_prices.csv` | 4,169 | 2015-06-22 to 2026-11-19 | CEYPETCO price revisions, per day |
+| `weather_data.csv` | 4,166 | 2015-06-22 to 2026-11-16 | Open-Meteo archive, Dambulla |
+| `weather_data_by_region.csv` | 33,328 | 2015-06-22 to 2026-11-16 | Open-Meteo archive, 8 locations |
 
-Imported on 2026-11-11 and kept current by the daily update (section 10). The latest dates are recorded
-in `data/raw/data_manifest.json` and shown on the Home page. 2,915 of the 4,159 calendar days have a
-Dambulla price. Gaps include days with no bulletin and 224 bulletins that couldn't be read. 151 of those
+Figures as of 2026-11-19; the datasets are kept current by the automatic update every 3 hours (section 10), so
+the live numbers grow. The latest dates are recorded in `data/raw/data_manifest.json` and shown on the Home
+page. 2,925 of the 4,169 calendar days have a Dambulla price. Gaps include days with no bulletin and 224 bulletins that couldn't be read. 151 of those
 are from 2022-2023, mostly the one-page "Min/Max" layout, and 41 can't be downloaded. The reasons are
 in `harti_prices_build_report.json`.
 
 **The saved forecaster is still the one trained on 2024-04-25 to 2026-11-06.** Its accuracy below was
 measured on that data. Retraining on the longer history goes through `scripts/retrain_if_better.py`,
-which keeps a new model only if it beats the current approach on recent, unseen prices.
+which keeps a new model only if it beats the current approach on recent, unseen prices. Its last run
+(2026-11-13) trained a candidate on 2015-2026 and rejected it: on the most recent 60 days it clearly beat
+holding the last price up to 7 days ahead, was level at 8-14 days and worse at 15-30 days. The decision is in `reports/metrics/retrain_decision.json`.
 
-**`.gitignore` excludes `data/raw/`, `models/*.joblib` and `reports/metrics/`, so these aren't in
-Git.** Keep a separate backup.
+The datasets (`data/raw/`), trained models (`models/*.joblib`) and evaluation results (`reports/metrics/`)
+are committed to Git, so a fresh clone runs the app without rebuilding. The source PDF bulletins are not
+(about 700 MB); keep them backed up separately.
 
 Predictions are for one market (Dambulla) and the 31 series the forecaster was trained on. The other
 markets are inputs only. Four series that HARTI stopped reporting in 2019-2023 (Bitter Gourd and
@@ -282,7 +286,8 @@ http://localhost:8501. Keep its window open while using the app, and close it to
 
 The dashboard's dark theme is set in `.streamlit/config.toml`, which Streamlit reads when started from
 the project folder. The shared cards, header, sidebar and chart styling are in `app/ui.py`.
-Screenshots are in `docs/screenshots/`.
+Current screenshots (18 Nov 2026, in English, Sinhala and Tamil) are in `reports/final_submission/assets/screenshots/`;
+`docs/screenshots/` keeps earlier ones from 9 Nov 2026, before the language switcher was added.
 
 ## 9. Dashboard
 

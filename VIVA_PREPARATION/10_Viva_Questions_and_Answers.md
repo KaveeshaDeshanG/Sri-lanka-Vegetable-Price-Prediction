@@ -9,7 +9,7 @@ Every number is from the project files (see docs 06, 07, 11).
 
 **1. Explain your project in one minute.**
 It forecasts Dambulla wholesale vegetable prices 1–30 days ahead. I parse every HARTI daily PDF bulletin since
-June 2015 into a clean dataset (76,719 Dambulla prices), add weather, fuel and other markets' prices, train a Ridge
+June 2015 into a clean dataset (about 77,000 Dambulla prices), add weather, fuel and other markets' prices, train a Ridge
 "direct" forecaster (one model per day ahead), and show it in a Streamlit dashboard with a cultivation planner.
 සිංහල: HARTI PDF වලින් දත්ත ගෙන, දින 1–30 ඉදිරියට දඹුල්ල තොග මිල අනාවැකි කියන Streamlit පද්ධතියක්.
 ⚠ *"So what is new?"* → The full PDF-to-dataset pipeline for 11 years and 11 markets, and an honest evaluation against the naive baseline with confidence intervals.
@@ -47,7 +47,7 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 
 **11. Where does the data come from?** HARTI daily bulletins (harti.gov.lk/daily-price.php), CBSL Daily Price Report, DCS weekly retail, Open-Meteo weather, CEYPETCO fuel. All public (`data_manifest.json`).
 
-**12. How many records?** 76,719 Dambulla prices (2015-06-22 → 2026-11-09); 526,905 rows across 11 markets; 33,264 weather rows; 4,161 fuel rows; CBSL 9,277; DCS 11,439.
+**12. How many records?** On 19 Nov 2026: 77,011 Dambulla prices (2015-06-22 → 2026-11-19); 529,020 rows across 11 markets; 33,328 weather rows; 4,169 fuel rows; CBSL 10,551; DCS 11,439. They grow with every update.
 
 **13. Is any data fake?** Only `app/sample_data/sample_history.csv` (360 rows), labelled "Not real market data" in the app (TC09). Nothing used for training is synthetic.
 සිංහල: පුහුණුවට භාවිතා කළ සියල්ල සැබෑ දත්ත.
@@ -153,7 +153,7 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 
 ## E. Testing (56–62)
 
-**56. How did you test?** 1,060 automated pytest cases (565 functions) + 18 browser UI tests + an independent recomputation of a forecast + this report (doc 11).
+**56. How did you test?** 1,320 automated pytest cases + 30 browser tests of the running app + an independent recomputation of a forecast + this report (doc 11).
 
 **57. Give examples of unit tests.** PDF parsing of ranges and merged labels, cleaner rules, feature calculations, forecaster horizons, upload validation.
 
@@ -190,6 +190,10 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 
 **72. If you started again, what would you change?** Start from the naive baseline and time-based validation on day one, and design the PDF parser with layout tests from the beginning.
 
+**73. Does the app work in Sinhala and Tamil?** Yes. A switcher at the top right changes every page, button, message, table and chart label; the choice is kept in the address (`?lang=si`, `?lang=ta`). Prices, dates and model inputs are the same in every language. Source names (HARTI, CBSL, DCS) and stored data are not translated.
+
+**74. How were the translations checked?** `tests/app/test_i18n.py` checks that all 864 texts exist in all three files with the same placeholders and in the right script, and that the planner gives identical prices in every language. The wording has not yet been reviewed by a native speaker; that is listed as future work.
+
 ---
 
 ### Hard "trap" questions — short safe answers
@@ -197,6 +201,6 @@ are used as input features (`COMPARISON_MARKETS`, `forecast_features.py` line 27
 |---|---|
 | "Your R² is 0.97, so the model is 97 % accurate?" | No — R² is variance explained; the error is 7.5 % MAPE, and the gain over the baseline is 4.3 %. |
 | "Did you use deep learning?" | No. I compared LR, RF, XGBoost and Ridge; tree models already failed the baseline, so deeper models weren't justified with this data. |
-| "Is this live data?" | The newest published bulletin, downloaded on demand — not a streaming feed. |
+| "Is this live data?" | No. It is the newest published official data, collected every 3 hours (or on request) — not a real-time feed. HARTI usually uploads its bulletins 1 to 3 days late. |
 | "Did you invent any data?" | No. Only the labelled sample file is synthetic, and it is never used for the real model. |
 | "Is the planner range a confidence interval?" | No — it is the 10th–90th percentile of past forecast errors. |

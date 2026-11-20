@@ -1,17 +1,20 @@
-"""Report screenshots and browser test cases, from the running app (http://localhost:8501) through headless Edge.
+"""Run from the project folder with the app running:  .venv312/Scripts/python.exe reports/final_submission/test_evidence/browser_tests_script.py <output folder>
+(needs Microsoft Edge and the websockets package). Report screenshots and browser test cases, from the running app (http://localhost:8501) through headless Edge.
 Read-only for the project: it uses the app as a user would. Saves full-page captures (1.5x scale) plus a JSON of the
 on-page results and of the positions of headings, so report figures can be cropped afterwards. argv: output folder."""
 import asyncio, base64, datetime as dt, json, re, subprocess, sys, time, urllib.request
 from pathlib import Path
 
-sys.path.insert(0, r"C:/Users/desha/AppData/Local/Temp/claude/fa0ab8d33aa3696b/d5c7a8bb-7b5a-4539-97cd-d99c4d9015d9/scratchpad/testing")
+HERE = Path(__file__).resolve().parent
+PROJECT = HERE.parents[2]
+# Reuses the Tab helper of the earlier browser tests (same file as the 13 Nov 2026 evidence).
+sys.path.insert(0, str(PROJECT / "VIVA_PREPARATION" / "test_evidence_2026-11-13"))
 import run_ui_tests as r  # noqa: E402  (reuses its Tab helper)
 import websockets  # noqa: E402
 
 OUT = Path(sys.argv[1]); FULL = OUT / "full"; FULL.mkdir(parents=True, exist_ok=True)
-INPUTS = Path(r"C:/Users/desha/AppData/Local/Temp/claude/fa0ab8d33aa3696b/d5c7a8bb-7b5a-4539-97cd-d99c4d9015d9/scratchpad/testing/inputs")
+INPUTS = HERE / "inputs"  # the CSV files uploaded in BT-09 and BT-10
 r.BASE = "http://localhost:8501"
-PROJECT = Path(r"D:/ECU/Sri-lanka-Vegetable-Price-Prediction-main/Sri-lanka-Vegetable-Price-Prediction-main")
 TR = {c: json.loads((PROJECT / "app/translations" / f"{c}.json").read_text(encoding="utf-8")) for c in ("si", "ta")}
 WIDTH, SCALE = 1280, 1.5
 RES = {"run_started": dt.datetime.now().isoformat(timespec="seconds"), "tests": [], "captures": {}}

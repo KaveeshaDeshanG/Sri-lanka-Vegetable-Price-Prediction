@@ -21,7 +21,8 @@ unless the examiner allows Sinhala.
 > Ridge regression model for each forecast day.
 >
 > Third, it **presents** everything in a Streamlit dashboard: predictions, model performance, price history and a
-> cultivation planner that links a planting date to the expected harvest price.
+> cultivation planner that links a planting date to the expected harvest price. The whole interface is available in
+> English, Sinhala and Tamil, and the data updates itself every three hours from the official sources.
 >
 > My key result is that the model is **4.3 % more accurate next day, and 7.8 % more accurate at 22 to 30 days,
 > than simply assuming the price stays the same** — a modest but statistically supported improvement.
@@ -54,7 +55,7 @@ unless the examiner allows Sinhala.
 > **Evaluation.** The test period is 14 May to 6 November 2026, never used for tuning. Next-day MAE is Rs 17.47 per kg,
 > or 7.5 %, against 18.26 for holding the price — 4.3 % lower, with a 95 % bootstrap interval of 2.6 to 6 %.
 >
-> **Testing.** 1,060 automated tests pass, plus 18 browser-driven UI tests and an independent recomputation of a
+> **Testing.** 1,320 automated tests pass, plus 30 browser-driven tests of the running app and an independent recomputation of a
 > forecast that matched the app exactly.
 
 සිංහල: Architecture → Data pipeline (PDF කියවීම) → Features → Model (Ridge, දිනකට එක ආකෘතියක්) → Evaluation (baseline සමඟ) → Testing.

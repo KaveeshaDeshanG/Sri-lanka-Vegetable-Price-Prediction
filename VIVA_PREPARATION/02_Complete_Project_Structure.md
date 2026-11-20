@@ -13,6 +13,8 @@ Project root: `D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegeta
 │   ├── forecasting.py      direct_forecast() and the older recursive forecast_future_price()
 │   ├── cultivation.py      Cultivation Planner logic (harvest dates, plan building)
 │   ├── catalogue.py        Vegetable names, freshness checks, data_version() cache key
+│   ├── i18n.py             Language switching: t() looks up English, Sinhala or Tamil text
+│   ├── translations/       en.json, si.json, ta.json (864 texts each)
 │   └── sample_data/        sample_history.csv — SYNTHETIC demo data (Carrot, Tomato)
 ├── src/                    Reusable Python packages (no Streamlit inside)
 │   ├── data_collection/    Loaders, validators, HARTI/CBSL/DCS PDF parsers, Open-Meteo and CEYPETCO clients
@@ -26,16 +28,13 @@ Project root: `D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegeta
 │   ├── raw/                The datasets (CSV/JSON) — see section 4
 │   └── reference/          DOA harvest durations, Sinhala/Tamil names, evidence copies
 ├── models/                 Saved models (.joblib) + metadata
-├── reports/                PROJECT_REPORT.md, DATA_SOURCES.md, DATA_QUALITY_REPORT.md, metrics/*.json, figures/
-├── tests/                  pytest test suite (565 test functions, 1,060 cases) + real PDF fixtures
+├── reports/                final_submission/ (final report, screenshots, diagrams, test evidence), DATA_SOURCES.md, DATA_QUALITY_REPORT.md, PROJECT_REPORT.md (earlier, superseded), metrics/*.json, figures/
+├── tests/                  pytest test suite (1,320 cases) + real PDF fixtures
 ├── docs/screenshots/       Older screenshots
-├── notebooks/              Empty (only .gitkeep) — not used
-├── Final_Project_Report/   Your Word report, PDF, figures, testing_evidence
 ├── VIVA_PREPARATION/       These documents
 ├── logs/                   Output of run_daily_update.bat (created when it runs)
 ├── .streamlit/config.toml  Dark theme colours; toolbarMode = "minimal"
 ├── .venv312/               ✅ Python 3.12 environment — the one that works
-├── .venv/                  ❌ Python 3.15 environment — broken for this project (see 03)
 ├── start_app.bat           Double-click starter (checks packages, then runs app/Home.py)
 ├── requirements.txt        Pinned package versions
 ├── pyproject.toml          Package metadata; requires-python >=3.12,<3.15; dev extras (pytest)
@@ -119,10 +118,10 @@ Project root: `D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegeta
 
 | Path | Content |
 |---|---|
-| `data/raw/harti_prices.csv` | Dambulla wholesale, 76,719 rows, 2015-06-22 → 2026-11-09 |
+| `data/raw/harti_prices.csv` | Dambulla wholesale, 77,011 rows, 2015-06-22 → 2026-11-19 |
 | `data/raw/harti_prices_detail.csv` | Same + low, high, raw cell, bulletin date, source PDF URL |
-| `data/raw/harti_all_markets.csv` | 11 markets, 526,905 rows |
-| `data/raw/cbsl_daily_prices.csv` | CBSL wholesale & retail, 9,277 rows, 2026-09-01 → 2026-11-10 |
+| `data/raw/harti_all_markets.csv` | 11 markets, 529,020 rows |
+| `data/raw/cbsl_daily_prices.csv` | CBSL wholesale & retail, 10,551 rows, 2026-09-01 → 2026-11-19 |
 | `data/raw/dcs_weekly_retail_prices.csv` | DCS retail, 11,439 rows |
 | `data/raw/weather_data_by_region.csv`, `weather_data.csv` | Open-Meteo weather, 8 locations, → 2026-11-08 |
 | `data/raw/fuel_prices.csv` | CEYPETCO diesel/petrol, → 2026-11-11 |
@@ -157,9 +156,8 @@ Project root: `D:\ECU\Sri-lanka-Vegetable-Price-Prediction-main\Sri-lanka-Vegeta
 
 ## 6. Unused or incomplete items (honest list)
 
-- `notebooks/` — empty.
 - `src/visualization/` — empty package (only `__init__.py`).
 - `data/reference/doa_harvest_durations.csv` — old version, replaced by `_v2`.
 - `app/catalogue.py` `load_catalogue` (152) — function exists, its CSV was never built (`scripts/build_vegetable_catalogue.py` not run).
 - `scripts/retrain_if_better.py` — implemented, never run.
-- `.venv` (Python 3.15) — cannot run the project.
+- An earlier `.venv` (Python 3.15) could not run the project and was removed on 20 Nov 2026; use `.venv312`.

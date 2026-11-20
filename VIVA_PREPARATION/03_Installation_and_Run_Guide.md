@@ -22,8 +22,8 @@ py -3.12 --version           # should print Python 3.12.x
 ```
 
 **Why 3.12?** `pyproject.toml` says `requires-python = ">=3.12,<3.15"`. PyMuPDF 2.1 (used to read the PDF
-bulletins) needs `onnxruntime`, which has **no Python 3.15 build**. That is why the folder `.venv` (Python 3.15) is
-broken — its numpy/pandas imports fail — and `.venv312` (Python 3.12.10) is the one to use.
+bulletins) needs `onnxruntime`, which has **no Python 3.15 build**. That is why an earlier `.venv` (Python 3.15) was
+broken — its numpy/pandas imports failed — and was removed; `.venv312` (Python 3.12.10) is the one to use.
 
 > සිංහල: Python 3.12 අනිවාර්යයි. 3.15 සමඟ PDF කියවන පුස්තකාලය (PyMuPDF) install කළ නොහැක.
 
@@ -116,7 +116,7 @@ Health check: `Invoke-WebRequest -UseBasicParsing http://localhost:8501/_stcore/
 ```powershell
 .\.venv312\Scripts\python.exe -m pytest -q
 ```
-Expected: `1060 passed` (last run 13 Nov 2026).
+Expected: `1320 passed` (last run 19 Nov 2026; takes about 3 to 12 minutes).
 
 ---
 
@@ -126,7 +126,7 @@ Expected: `1060 passed` (last run 13 Nov 2026).
 |---|---|---|
 | `Error: Invalid value: File does not exist: app.py` | Wrong entry point | Use `app/Home.py` |
 | `No module named streamlit` (path shows `pythoncore-3.15`) | Plain `python` is the global 3.15, not `.venv312` | Use `.\.venv312\Scripts\python.exe -m streamlit run app/Home.py` |
-| `numpy … _multiarray_umath … cp312 … not compatible with cpython-315` | You used the broken `.venv` (3.15) | Use `.venv312` |
+| `numpy … _multiarray_umath … cp312 … not compatible with cpython-315` | You used a Python 3.15 environment | Use `.venv312` |
 | `running scripts is disabled on this system` | PowerShell execution policy | `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` or skip activation |
 | App opens on port **8502** | 8501 already used (an old copy is running) | Close the old window, or use the 8502 URL |
 | "The forecaster's model file could not be read" / "missing file" on Home | Model or data file missing/damaged | Restore from `D:\ECU\Sri-lanka-Vegetable-Price-Backups\…` or rebuild with `scripts\update_data.py` and `scripts\train_forecaster.py` |
